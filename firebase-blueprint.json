@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "checkout_records": {
+      "title": "CheckoutRecord",
+      "description": "Records of guest payment checkouts and receipt settlements",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Settlement checkout transaction serial key" },
+        "orderId": { "type": "string", "description": "The customer order ID" },
+        "tableNumber": { "type": "string", "description": "Assigned table number" },
+        "subtotal": { "type": "number", "description": "Items base subtotal in TWD" },
+        "discount": { "type": "number", "description": "Discount applied under cashier adjustments" },
+        "serviceCharge": { "type": "number", "description": "Markup service surcharge if applicable" },
+        "total": { "type": "number", "description": "Sum final amount settled" },
+        "amountPaid": { "type": "number", "description": "Physical cash or electronic amount tendered" },
+        "changeProvided": { "type": "number", "description": "Change refunded of cash payments" },
+        "paymentMethod": { "type": "string", "description": "Completed method: cash, credit, linepay" },
+        "staffPin": { "type": "string", "description": "Authorized staff verification 4-digit code" },
+        "checkoutTime": { "type": "string", "format": "date-time", "description": "ISO timestamp checkout complete duration" }
+      },
+      "required": ["id", "orderId", "tableNumber", "subtotal", "total", "amountPaid", "paymentMethod", "checkoutTime"]
+    }
+  },
+  "firestore": {
+    "/checkouts/{checkoutId}": {
+      "schema": "checkout_records",
+      "description": "Collection of finalized client order billing payments"
+    }
+  }
+}

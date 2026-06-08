@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reusable, hardened helpers
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    
+    function incoming() { 
+      return request.resource.data; 
+    }
+
+    function isValidCheckout(data) {
+      return data.keys().hasAll(['id', 'orderId', 'tableNumber', 'subtotal', 'serviceCharge', 'total', 'amountPaid', 'changeProvided', 'paymentMethod', 'staffPin', 'checkoutTime'])
+        && (data.keys().size() == 11 || (data.keys().size() == 12 && 'discount' in data))
+        && data.id is string && data.id.size() <= 128
+        && data.orderId is string && data.orderId.size() <= 128
+        && data.tableNumber is string && data.tableNumber.size() <= 64
+        && data.subtotal is number && data.subtotal >= 0
+        && (!('discount' in data) || (data.discount is number && data.discount >= 0))
+        && data.serviceCharge is number && data.serviceCharge >= 0
+        && data.total is number && data.total >= 0
+        && data.amountPaid is number && data.amountPaid >= 0
+        && data.changeProvided is number
+        && data.paymentMethod is string && data.paymentMethod.size() <= 32
+        && data.staffPin is string && data.staffPin.size() <= 16
+        && data.checkoutTime is string && data.checkoutTime.size() <= 64;
+    }
+
+    // Checkouts collection
+    match /checkouts/{checkoutId} {
+      // Allow read for reporting and history logs within the managerial dashboard
+      allow read: if true;
+      
+      // Allow creation if the record complies with our safety blueprint
+      allow create: if isValidId(checkoutId) && isValidCheckout(incoming());
+      
+      // Checkouts should be immutable once created
+      allow update, delete: if false;
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Sabai Thai BBQ Table Ordering",
+  "description": "Full-stack Thai BBQ & Hotpot QR Code online table ordering app for Sabay BBQ. Features translations (ZH/EN/KO/JA/TH), sweetness & spiciness customization, simulated LINE login, real-time Kitchen progress check, virtual LAN receipt print cues, live stock levels logs, and business insights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
