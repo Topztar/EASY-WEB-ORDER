@@ -282,17 +282,14 @@ export const GoogleLoginMock: React.FC<GoogleLoginMockProps> = ({
                       </div>
                       <p>請前往 <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline inline-flex items-center gap-0.5" referrerPolicy="no-referrer">Google Cloud Platform <ExternalLink size={8} /></a> 註冊用戶憑證：</p>
                       <ol className="list-decimal pl-4 space-y-1">
-                        <li>申請 <strong>OAuth 2.0 用戶端 ID</strong> (網頁應用程式)</li>
-                        <li>於「已授權的重新導向 URI」新增專屬 callback 連結：
-                          <div className="bg-slate-100 text-[10px] p-2 rounded-xl border border-slate-200 mt-1 select-all font-mono break-all text-slate-800">
+                        <li>申請 <strong>OAuth 2.0 用戶端 ID</strong> 及 <strong>秘密金鑰</strong></li>
+                        <li>設定「已授權的重新導向 URI」，請填入本應用的回調網址：
+                          <div className="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] font-mono break-all text-slate-800 font-bold select-all mt-1">
                             {window.location.origin}/auth/callback
                           </div>
                         </li>
-                        <li>在新開啟的 AI Studio 設定/秘密金鑰 Secrets 面板，新增這兩個環境變數：
-                          <ul className="list-disc pl-4 mt-0.5 text-slate-500 font-mono text-[9px]">
-                            <li>GOOGLE_CLIENT_ID</li>
-                            <li>GOOGLE_CLIENT_SECRET</li>
-                          </ul>
+                        <li>
+                          請在設定中將取得的憑證填寫至 <strong className="font-extrabold text-zinc-850">GOOGLE_CLIENT_ID</strong> 與 <strong className="font-extrabold text-zinc-850">GOOGLE_CLIENT_SECRET</strong> 秘密金鑰
                         </li>
                       </ol>
                     </div>
@@ -302,6 +299,7 @@ export const GoogleLoginMock: React.FC<GoogleLoginMockProps> = ({
                   <div className="py-1">
                     <button
                       type="button"
+                      id="google-confirm-btn"
                       onClick={handleRealGoogleLogin}
                       className="w-full flex items-center justify-center space-x-2.5 p-3.5 bg-[#4285F4] hover:bg-[#357ae8] text-white rounded-2xl shadow-md transition cursor-pointer text-center ring-4 ring-blue-500/10 hover:ring-blue-500/20 active:scale-95"
                     >
@@ -312,10 +310,23 @@ export const GoogleLoginMock: React.FC<GoogleLoginMockProps> = ({
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#ffffff" opacity="0.95" />
                       </svg>
                       <div className="text-left font-sans">
-                        <div className="text-xs font-black">使用 Google 帳戶真實驗證</div>
+                        <div className="text-xs font-black">使用 Google 帳戶真實現證</div>
                         <div className="text-[9.5px] text-blue-100 font-medium">Verify via Real Google Account</div>
                       </div>
                     </button>
+
+                    {/* Highly Targeted Hint warning for the Google 401 error */}
+                    <div className="mt-2.5 bg-amber-500/5 border border-amber-500/15 rounded-2xl p-3 text-[10.5px] text-slate-600 leading-relaxed font-sans shrink-0" id="google-401-troubleshoot-panel">
+                      <div className="font-extrabold text-amber-800 flex items-center gap-1 text-[11px] mb-1">
+                        ⚠️ 看到 Google 顯示「錯誤 401：invalid_client」？
+                      </div>
+                      <p className="text-slate-500 text-[10px] leading-normal">
+                        這代表您在 AI Studio「Secrets (密鑰設定)」中填寫的 <code className="bg-slate-150 px-1 py-0.5 rounded font-mono font-bold text-[9px] text-[#4285F4]">GOOGLE_CLIENT_ID</code> 有誤或尚未儲存。請務必複製 GCP 憑證頁面中完整的用戶端 ID 欄位。
+                      </p>
+                      <div className="mt-1.5 font-bold text-[#4285F4] bg-[#4285F4]/5 p-2 rounded-xl text-[9.5px]">
+                        💡 預覽小幫手：如果是普通體驗，建議「直接點擊下方：測試快速登入」即可一秒模擬授權登入哦！
+                      </div>
+                    </div>
                   </div>
 
                   <div className="relative flex py-1 items-center">
@@ -323,6 +334,8 @@ export const GoogleLoginMock: React.FC<GoogleLoginMockProps> = ({
                     <span className="flex-shrink mx-2 text-[10px] text-slate-400 font-bold tracking-wider">或在沙盒模擬環境下登入</span>
                     <div className="flex-grow border-t border-slate-100"></div>
                   </div>
+
+
 
                   <div className="space-y-1.5">
                     {/* Account 1: User's real email */}

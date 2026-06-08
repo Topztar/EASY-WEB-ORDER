@@ -173,7 +173,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [cashierSurchargeRate, setCashierSurchargeRate] = useState<number>(0); // percentage surcharge, e.g. 10 for +10% service charge
   const [cashierSurchargeFlat, setCashierSurchargeFlat] = useState<number>(0); // flat NT$ surcharge
   const [cashierSurchargeType, setCashierSurchargeType] = useState<'percent' | 'flat'>('percent');
-  const [cashierPaymentMethod, setCashierPaymentMethod] = useState<'cash' | 'credit' | 'member'>('cash');
+  const [cashierPaymentMethod, setCashierPaymentMethod] = useState<'cash' | 'credit' | 'member' | 'linepay'>('cash');
   const [cashierCashChannel, setCashierCashChannel] = useState<'counter' | 'kiosk' | 'delivery'>('counter');
   const [cashierCashReceived, setCashierCashReceived] = useState<number>(0);
   const [cashierListFilter, setCashierListFilter] = useState<'all' | 'completed' | 'dinein' | 'takeout'>('all');
@@ -208,8 +208,9 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       setIsAdjustingSurcharge(false);
       
       const method = cashierSelectedOrder.paymentMethod === 'credit' ? 'credit' : 
+                     cashierSelectedOrder.paymentMethod === 'member' ? 'member' :
                      cashierSelectedOrder.paymentMethod === 'linepay' ? 'linepay' : 'cash';
-      setCashierPaymentMethod(method as any);
+      setCashierPaymentMethod(method);
 
       if (method === 'credit') {
         setCashierSurchargeRate(10);
@@ -564,7 +565,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
           setTakeoutStatus(d);
         }
       } catch (e) {
-        console.error('[Takeout Polling Error]', e);
+        console.warn('[Takeout Polling Warning]:', e);
       }
     };
     fetchTakeoutStatus();
@@ -1629,18 +1630,19 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
                           {/* Manual Input field */}
                           <div className="space-y-1">
-                            <span className="text-[10px] text-zinc-500 block">自訂加成數值</span>
+                            <span className="text-[10px] text-zinc-500 block">自訂調整數值</span>
                             <div className="relative">
                               <input
                                 type="number"
                                 min="0"
+                                max={cashierSurchargeType === 'percent' ? 100 : cashierSelectedOrder.subtotal}
                                 value={cashierSurchargeType === 'percent' ? cashierSurchargeRate || '' : cashierSurchargeFlat || ''}
                                 onChange={(e) => {
                                   const val = Math.max(0, parseFloat(e.target.value) || 0);
                                   if (cashierSurchargeType === 'percent') {
-                                    setCashierSurchargeRate(val);
+                                    setCashierSurchargeRate(Math.min(100, val));
                                   } else {
-                                    setCashierSurchargeFlat(val);
+                                    setCashierSurchargeFlat(Math.min(cashierSelectedOrder.subtotal, val));
                                   }
                                 }}
                                 className="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-white font-mono text-xs font-bold focus:outline-none focus:border-blue-500"
@@ -1653,26 +1655,17 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                         </div>
                       </div>
 
-                      {/* Small Info Hint Alert depending on payment selection */}
-                      <div className="bg-zinc-900/40 border border-white/5 rounded-xl p-2 px-3 text-[10px] text-zinc-400 font-sans flex items-center gap-1.5">
-                        <span>💡 結帳提示：</span>
-                        {cashierPaymentMethod === 'credit' ? (
-                          <span className="text-[#E5B453] font-bold">已預先為信用卡方式啟動 10% 服務加成（可手動調降或變更為固定金額）。</span>
-                        ) : (
-                          <span>當前已手動開啟全通路折抵與加成設定。非信用卡預設不加收服務費，您可視需求手動設定。</span>
-                        )}
-                      </div>
-
                       {/* Payment Method Selector Grid */}
                       <div className="space-y-2">
                         <span className="text-[10px] text-zinc-500 font-bold tracking-wider uppercase block">
                           💳 選擇收銀支付管道 (Payment Method Selector)
                         </span>
-                        <div className="grid grid-cols-3 gap-2.5">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {[
                             { id: 'cash', label: '💵 現金收銀', desc: '實收大鈔與選管道' },
                             { id: 'credit', label: '💳 信用卡結', desc: '預設 10% 服務加成' },
-                            { id: 'member', label: '⭐️ 會員儲值', desc: '扣抵會員與儲值管理' }
+                            { id: 'member', label: '⭐️ 會員儲值', desc: '扣抵會員與儲值管理' },
+                            { id: 'linepay', label: '📱 行動支付', desc: 'LINEPAY / 街口等電子付' }
                           ].map((pay) => {
                             const isAct = cashierPaymentMethod === pay.id;
                             return (
@@ -1695,7 +1688,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                                     setCashierDiscountFlat(0);
                                   }
                                 }}
-                                className={`text-left rounded-xl p-3 border cursor-pointer flex flex-col justify-between transition-all active:scale-95 duration-100 ${
+                                className={`text-left rounded-xl p-2.5 border cursor-pointer flex flex-col justify-between transition-all active:scale-95 duration-100 ${
                                   isAct
                                     ? pay.id === 'member'
                                       ? 'bg-amber-400/10 border-amber-400 text-white shadow shadow-amber-400/10'
@@ -1706,7 +1699,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                                 <span className={`font-bold text-xs ${isAct ? 'text-[#E5B453]' : 'text-zinc-300'}`}>
                                   {pay.label}
                                 </span>
-                                <span className="text-[9px] opacity-60 mt-1 block">
+                                <span className="text-[9px] opacity-60 mt-0.5 block leading-tight">
                                   {pay.desc}
                                 </span>
                               </button>
@@ -1714,6 +1707,383 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                           })}
                         </div>
                       </div>
+
+                      {/* Cash handling drawer if cash is chosen */}
+                      {cashierPaymentMethod === 'cash' && (
+                        <div className="bg-black/40 border border-white/12 p-3.5 rounded-xl flex flex-col lg:flex-row gap-4 font-sans mt-2 justify-between">
+                          {/* Left Panel: Received Cash Calculations */}
+                          <div className="flex-1 flex flex-col justify-between space-y-3 min-w-0">
+                            <div className="space-y-1.5">
+                              <span className="text-[10px] text-[#E5B453] font-bold block tracking-wider uppercase">💶 實收大鈔 (Cash Received Option)</span>
+                              <div className="flex items-center gap-2">
+                                <div className="relative flex-1">
+                                  <span className="absolute left-2.5 top-2 font-bold font-mono text-[#E5B453] text-[13px]">NT$</span>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    id="cashier-received-amt-input"
+                                    value={cashierCashReceived === 0 ? '' : cashierCashReceived}
+                                    onChange={(e) => setCashierCashReceived(parseFloat(e.target.value) || 0)}
+                                    className="w-full bg-[#161616] border border-white/10 rounded-lg py-1.5 px-2.5 pl-10 text-white font-mono text-sm font-extrabold focus:outline-none focus:border-[#E5B453] transition"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setCashierCashReceived(cashierCalculatedTotals.total)}
+                                  className="px-2.5 py-2 text-xs font-sans bg-amber-500/10 border border-amber-500/30 text-[#E5B453] hover:bg-[#E5B453] hover:text-black rounded-lg transition font-black cursor-pointer whitespace-nowrap active:scale-95"
+                                >
+                                  剛好 Total: NT$ {cashierCalculatedTotals.total}
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* 2. 現金收銀管道選擇 */}
+                            <div className="space-y-1.5 bg-black/30 p-2 rounded-lg border border-white/5">
+                              <span className="text-[9px] text-zinc-400 block font-bold uppercase tracking-wide">📦 選擇現金收銀管道 (Cash Channel)</span>
+                              <div className="grid grid-cols-3 gap-1.5">
+                                {[
+                                  { id: 'counter', title: '🏢 櫃檯現金', desc: 'Counter' },
+                                  { id: 'kiosk', title: '🏪 自助收銀', desc: 'Self Kiosk' },
+                                  { id: 'delivery', title: '🛵 外送代收', desc: 'Delivery' }
+                                ].map((chan) => (
+                                  <button
+                                    key={`cash-chan-${chan.id}`}
+                                    type="button"
+                                    onClick={() => setCashierCashChannel(chan.id as any)}
+                                    className={`py-1 px-1 rounded-lg border text-left cursor-pointer transition flex flex-col justify-center items-center ${
+                                      cashierCashChannel === chan.id
+                                        ? 'bg-[#E5B453]/20 border-[#E5B453] text-[#E5B453] font-black'
+                                        : 'bg-[#121212]/90 border-white/5 text-zinc-400 hover:text-white hover:border-white/10'
+                                    }`}
+                                  >
+                                    <span className="text-[9px] font-extrabold block leading-none">{chan.title}</span>
+                                    <span className="text-[8px] opacity-60 mt-0.5 block leading-none">{chan.desc}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* 1. 實收大鈔可選1000、500、100 */}
+                            <div className="space-y-1">
+                              <span className="text-[9px] text-zinc-500 block font-bold">單張面額付鈔 Set Denomination</span>
+                              <div className="grid grid-cols-3 gap-1.5">
+                                {[1000, 500, 100].map((note) => (
+                                  <button
+                                    key={`note-set-${note}`}
+                                    type="button"
+                                    onClick={() => setCashierCashReceived(note)}
+                                    className="py-1.5 text-xs font-mono font-black border border-white/10 hover:border-[#E5B453] hover:bg-[#E5B453]/10 bg-zinc-900 rounded-lg text-white transition cursor-pointer flex flex-col items-center justify-center gap-0.5 active:scale-95"
+                                  >
+                                    <span>NT$ {note}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="space-y-1">
+                              <span className="text-[9px] text-zinc-500 block font-bold">累加點鈔 Add Bill Notes</span>
+                              <div className="grid grid-cols-3 gap-1.5">
+                                {[1000, 500, 100].map((note) => (
+                                  <button
+                                    key={`note-add-${note}`}
+                                    type="button"
+                                    onClick={() => setCashierCashReceived(prev => (prev || 0) + note)}
+                                    className="py-1 text-xs font-mono font-bold border border-white/5 hover:border-[#E5B453]/40 hover:bg-[#E5B453]/10 bg-zinc-950 rounded-lg text-zinc-300 transition cursor-pointer flex items-center justify-center gap-0.5 active:scale-95"
+                                  >
+                                    <span>＋{note}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* 💳 現金結帳確認欄 (Cash Checkout Confirmation Summary Panel) */}
+                            <div className="bg-amber-500/5 border border-amber-500/30 p-2.5 rounded-xl space-y-1.5 mt-1 text-[11px] font-sans">
+                              <div className="flex items-center justify-between border-b border-white/5 pb-1 flex-wrap">
+                                <span className="text-[#E5B453] font-black uppercase text-xs">📝 櫃檯現金付款確認 (Cashier Checkout Confirmation)</span>
+                                <span className="bg-amber-500/10 text-amber-500 text-[9px] px-1.5 py-0.5 rounded font-black font-mono">
+                                  核收核對
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-zinc-300">
+                                <div className="space-y-0.5">
+                                  <div className="flex justify-between">
+                                    <span className="text-zinc-500">應收總額 Total Due:</span>
+                                    <span className="font-mono font-bold text-white">NT$ {cashierCalculatedTotals.total}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-zinc-500">實收現鈔 Cash Paid:</span>
+                                    <span className="font-mono font-bold text-amber-400">NT$ {cashierCashReceived}</span>
+                                  </div>
+                                </div>
+                                <div className="space-y-0.5 border-l border-white/5 pl-2.5">
+                                  <div className="flex justify-between">
+                                    <span className="text-zinc-500">應找零錢 Change:</span>
+                                    <span className="font-mono font-extrabold text-emerald-400">
+                                      NT$ {Math.max(0, cashierCashReceived - cashierCalculatedTotals.total)}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-zinc-500">收銀管道 Channel:</span>
+                                    <span className="font-bold text-blue-400">
+                                      {cashierCashChannel === 'counter' ? '🏢 櫃檯現金' : cashierCashChannel === 'kiosk' ? '🏪 自助收銀' : '🛵 外送代收'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              {cashierCashReceived < cashierCalculatedTotals.total ? (
+                                <div className="bg-red-500/10 border border-red-500/20 text-red-400 py-1 px-2 rounded text-[10px] text-center font-bold">
+                                  ⚠️ 實收金額不足！尚差 NT$ {cashierCalculatedTotals.total - cashierCashReceived} 元
+                                </div>
+                              ) : (
+                                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 py-1 px-2 rounded text-[10px] text-center font-bold">
+                                  ⚡ 現金經現場核對無誤，可安全核可付款並上傳 Firestore 資料庫
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Right Panel: Compact, touchscreen numeric keypad */}
+                          <div className="w-full lg:w-48 bg-black/20 p-2 border border-white/5 rounded-xl flex flex-col gap-1.5 self-start">
+                            <span className="text-[9px] text-zinc-500 font-extrabold block text-center uppercase tracking-wider">🎯 觸控快速鍵盤 Touch Keypad</span>
+                            <div className="grid grid-cols-3 gap-1">
+                              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
+                                <button
+                                  key={`keypad-${num}`}
+                                  type="button"
+                                  onClick={() => {
+                                    setCashierCashReceived(prev => {
+                                      const s = String(prev);
+                                      if (prev === 0 || prev === cashierCalculatedTotals.total) {
+                                        return parseFloat(num) || 0;
+                                      } else {
+                                        return parseFloat(s + num) || 0;
+                                      }
+                                    });
+                                  }}
+                                  className="w-full h-8 flex items-center justify-center font-mono text-xs font-bold text-white hover:text-black bg-[#1c1c1c] hover:bg-[#E5B453] border border-white/5 hover:border-transparent rounded-lg transition active:scale-95 cursor-pointer"
+                                >
+                                  {num}
+                                </button>
+                              ))}
+                              {/* Bottom row: Clear, 0, Backspace */}
+                              <button
+                                type="button"
+                                onClick={() => setCashierCashReceived(0)}
+                                className="w-full h-8 flex items-center justify-center font-bold text-[10px] bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition active:scale-95 cursor-pointer"
+                                title="清除 Clear"
+                              >
+                                C
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCashierCashReceived(prev => {
+                                    const s = String(prev);
+                                    if (prev === 0 || prev === cashierCalculatedTotals.total) {
+                                      return 0;
+                                    } else {
+                                      return parseFloat(s + '0') || 0;
+                                    }
+                                  });
+                                }}
+                                className="w-full h-8 flex items-center justify-center font-mono text-xs font-bold text-white bg-[#1c1c1c] hover:bg-[#E5B453] hover:text-black border border-white/5 rounded-lg transition active:scale-95 cursor-pointer"
+                              >
+                                0
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCashierCashReceived(prev => {
+                                    const s = String(prev);
+                                    if (s.length <= 1) return 0;
+                                    return parseFloat(s.slice(0, -1)) || 0;
+                                  });
+                                }}
+                                className="w-full h-8 flex items-center justify-center font-mono text-xs font-bold text-zinc-400 hover:text-white bg-[#1a1a1a] hover:bg-zinc-800 border border-white/5 rounded-lg transition active:scale-95 cursor-pointer"
+                                title="倒退 Backspace"
+                              >
+                                ⌫
+                              </button>
+                            </div>
+                            
+                            {/* Extra touch helpers: +00 */}
+                            <div className="grid grid-cols-2 gap-1">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCashierCashReceived(prev => {
+                                    const s = String(prev);
+                                    if (prev === 0 || prev === cashierCalculatedTotals.total) {
+                                      return 0;
+                                    } else {
+                                      return parseFloat(s + '00') || 0;
+                                    }
+                                  });
+                                }}
+                                className="py-1 flex items-center justify-center font-mono text-[10px] bg-[#1c1c1c] border border-white/5 hover:border-zinc-700 rounded-lg transition active:scale-95 cursor-pointer text-zinc-300 font-bold"
+                              >
+                                00
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCashierCashReceived(prev => {
+                                    const s = String(prev);
+                                    if (prev === 0 || prev === cashierCalculatedTotals.total) {
+                                      return 0;
+                                    } else {
+                                      return parseFloat(s + '000') || 0;
+                                    }
+                                  });
+                                }}
+                                className="py-1 flex items-center justify-center font-mono text-[10px] bg-[#1c1c1c] border border-white/5 hover:border-zinc-700 rounded-lg transition active:scale-95 cursor-pointer text-zinc-300 font-bold"
+                              >
+                                000
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Member management drawer if member is chosen */}
+                      {cashierPaymentMethod === 'member' && (
+                        <div className="bg-[#121824]/80 border border-blue-500/20 p-3.5 rounded-xl flex flex-col gap-3 font-sans mt-2 text-left">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-white/5 pb-2">
+                            <div className="space-y-0.5 bg-transparent">
+                              <span className="text-[11px] text-blue-400 font-bold block tracking-wider uppercase">⭐️ 儲值卡結帳與快捷儲值 (Cashier Member Admin)</span>
+                              <p className="text-zinc-400 text-[10px]">
+                                {cashierSelectedOrder?.isMember 
+                                  ? `結帳單已綁定會員：${cashierSelectedOrder.customerName}` 
+                                  : '本結帳單尚未在點餐時綁定會員。預設載入沙貝忠實饕客會員進行餘額抵扣。'
+                                }
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Quick member top-up / list check */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {/* Left part: Member Balance Deduction Details */}
+                            <div className="bg-black/40 border border-white/5 p-3 rounded-xl space-y-2.5">
+                              <span className="text-[10px] text-blue-400 font-extrabold block uppercase tracking-wider">💳 餘額扣抵狀態</span>
+                              
+                              {(() => {
+                                const dbStr = localStorage.getItem('google-members-database');
+                                if (dbStr) {
+                                  try {
+                                    const db = JSON.parse(dbStr);
+                                    let vipEmail = 'topztar@gmail.com'; // Default mock email
+                                    
+                                    // If order has an owner, check their email
+                                    if (cashierSelectedOrder?.customerName) {
+                                      const matched = db.find((m: any) => m.name === cashierSelectedOrder.customerName);
+                                      if (matched) {
+                                        vipEmail = matched.email;
+                                      }
+                                    }
+                                    
+                                    const member = db.find((m: any) => m.email === vipEmail);
+                                    if (member) {
+                                      const hasEnough = member.balance >= cashierCalculatedTotals.total;
+                                      return (
+                                        <div className="space-y-2.5">
+                                          <div className="flex items-center space-x-2.5 bg-white/5 p-2 rounded-lg border border-white/5">
+                                            <img referrerPolicy="no-referrer" src={member.avatar || 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=150'} className="w-8 h-8 rounded-full object-cover border border-white/10" alt="" />
+                                            <div>
+                                              <p className="text-xs font-black text-white">{member.name}</p>
+                                              <p className="text-[9px] text-zinc-500 font-mono leading-none mt-0.5">{member.email}</p>
+                                            </div>
+                                          </div>
+                                          
+                                          <div className="grid grid-cols-2 gap-1.5 text-center">
+                                            <div className="bg-zinc-900 px-1.5 py-1 rounded border border-white/5">
+                                              <span className="text-[8px] text-zinc-500 block leading-none">當前帳存餘額</span>
+                                              <span className="text-xs font-mono font-bold text-emerald-400">NT$ {member.balance || 0}</span>
+                                            </div>
+                                            <div className="bg-zinc-900 px-1.5 py-1 rounded border border-white/5">
+                                              <span className="text-[8px] text-zinc-500 block leading-none">本次扣除金額</span>
+                                              <span className="text-xs font-mono font-bold text-rose-400">NT$ {cashierCalculatedTotals.total}</span>
+                                            </div>
+                                          </div>
+
+                                          <div className="flex items-center justify-between text-[11px] pt-1">
+                                            <span className="text-zinc-400">扣抵後剩餘：</span>
+                                            <span className="font-mono font-bold text-zinc-200">
+                                              NT$ {Math.max(0, (member.balance || 0) - cashierCalculatedTotals.total)}
+                                            </span>
+                                          </div>
+
+                                          {!hasEnough && (
+                                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-2 rounded text-[9px] font-bold">
+                                              ⚠️ 顧客儲值餘額不足！請先點擊右側進行【快捷現金增值】以補足差額扣抵。
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    }
+                                  } catch (e) {
+                                    console.error(e);
+                                  }
+                                }
+                                return <p className="text-xs text-zinc-500">無會員資料或初始化錯誤</p>;
+                              })()}
+                            </div>
+
+                            {/* Right part: Top up management */}
+                            <div className="bg-black/40 border border-white/5 p-3 rounded-xl space-y-2.5">
+                              <span className="text-[10px] text-zinc-300 font-extrabold block uppercase tracking-wider">💸 收銀台即時儲值 (Top-Up Engine)</span>
+                              
+                              <p className="text-[9px] text-zinc-400 leading-normal">
+                                顧客提供現場代收現金時，收銀員在此一鍵寫入儲值額：
+                              </p>
+
+                              <div className="grid grid-cols-2 gap-1.5">
+                                {[
+                                  { amt: 500, lbl: '＋儲值 $500' },
+                                  { amt: 1000, lbl: '＋儲值 $1000' },
+                                  { amt: 2000, lbl: '＋儲值 $2000' },
+                                  { amt: 3000, lbl: '＋儲值 $3000' }
+                                ].map((choice) => (
+                                  <button
+                                    key={`cashier-top-${choice.amt}`}
+                                    type="button"
+                                    onClick={() => {
+                                      const dbStr = localStorage.getItem('google-members-database');
+                                      if (dbStr) {
+                                        try {
+                                          const db = JSON.parse(dbStr);
+                                          let vipEmail = 'topztar@gmail.com';
+                                          
+                                          if (cashierSelectedOrder?.customerName) {
+                                            const matched = db.find((m: any) => m.name === cashierSelectedOrder.customerName);
+                                            if (matched) {
+                                              vipEmail = matched.email;
+                                            }
+                                          }
+                                          
+                                          const userIndex = db.findIndex((m: any) => m.email === vipEmail);
+                                          if (userIndex >= 0) {
+                                            db[userIndex].balance = (db[userIndex].balance || 0) + choice.amt;
+                                            localStorage.setItem('google-members-database', JSON.stringify(db));
+                                            window.dispatchEvent(new Event('local-points-updated'));
+                                            // Force state refresh
+                                            setCashierCashReceived(prev => prev + 1);
+                                            setTimeout(() => setCashierCashReceived(prev => prev - 1), 50);
+                                          }
+                                        } catch (e) {
+                                          console.error(e);
+                                        }
+                                      }
+                                    }}
+                                    className="py-1.5 text-[10px] font-sans font-black border border-[#E5B453]/20 hover:border-[#E5B453] hover:bg-[#E5B453]/10 bg-zinc-900 text-white rounded-lg transition active:scale-95 cursor-pointer text-center"
+                                  >
+                                    {choice.lbl}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Bottom Area: Calculation & Submit */}
@@ -2002,7 +2372,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       )}
 
                       {/* Cash handling drawer if cash is chosen */}
-                      {cashierPaymentMethod === 'cash' && (
+                      {false && cashierPaymentMethod === 'cash' && (
                         <div className="bg-black/40 border border-white/10 p-4 rounded-xl flex flex-col md:flex-row gap-5 font-sans mt-1.5 justify-between">
                           {/* Left Panel: Received Cash Calculations & Bill Notes selector */}
                           <div className="flex-1 flex flex-col justify-between space-y-3">
@@ -2240,7 +2610,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       )}
 
                       {/* Member management drawer if member is chosen */}
-                      {cashierPaymentMethod === 'member' && (
+                      {false && cashierPaymentMethod === 'member' && (
                         <div className="bg-[#121824]/80 border border-blue-500/20 p-4 rounded-xl flex flex-col gap-4 font-sans mt-1.5 text-left">
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/5 pb-3">
                             <div className="space-y-1 bg-transparent">
