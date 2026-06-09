@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Order, OrderStatus, Language } from '../types';
-import { ChefHat, Printer, Trash2, Check, Flame, Ban, RefreshCw, Volume2, Wifi, Edit, Save, Settings } from 'lucide-react';
+import { ChefHat, Printer, Trash2, Check, Flame, Ban, RefreshCw, Volume2, Wifi, Edit, Save, Settings, X } from 'lucide-react';
 
 interface KitchenDisplaySystemProps {
   currentLang: Language;
@@ -11,6 +11,7 @@ interface KitchenDisplaySystemProps {
   printerIp: string;
   onUpdatePrinterIp: (ip: string) => Promise<{ success: boolean; error?: string }>;
   onPrintTestPage: () => Promise<{ success: boolean; error?: string }>;
+  onUpdateTableNumber?: (orderId: string, tableNumber: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export const KitchenDisplaySystem: React.FC<KitchenDisplaySystemProps> = ({
@@ -22,9 +23,14 @@ export const KitchenDisplaySystem: React.FC<KitchenDisplaySystemProps> = ({
   printerIp,
   onUpdatePrinterIp,
   onPrintTestPage,
+  onUpdateTableNumber,
 }) => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active'>('active');
   const [beepSim, setBeepSim] = useState(false);
+
+  // Table number editing in KDS modal state
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const [editingTableValue, setEditingTableValue] = useState<string>('');
 
   // Printer configuration states
   const [isEditingIp, setIsEditingIp] = useState(false);
@@ -130,9 +136,62 @@ export const KitchenDisplaySystem: React.FC<KitchenDisplaySystemProps> = ({
                         <span className="bg-white/5 border border-white/10 text-[#E5B453] font-mono font-bold text-xs px-2.5 py-0.5 rounded">
                           {order.id}
                         </span>
-                        <span className="font-bold text-base text-white font-serif">
-                          {order.tableNumber} 桌
-                        </span>
+                        {editingOrderId === order.id ? (
+                          <div className="flex items-center gap-1 bg-black/40 border border-[#E5B453]/30 px-1.5 py-0.5 rounded-lg">
+                            <input
+                              type="text"
+                              value={editingTableValue}
+                              onChange={(e) => setEditingTableValue(e.target.value)}
+                              className="bg-black text-white font-bold text-xs rounded px-1.5 py-0.5 w-20 focus:outline-none focus:ring-1 focus:ring-[#E5B453]"
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (onUpdateTableNumber) {
+                                  const res = await onUpdateTableNumber(order.id, editingTableValue);
+                                  if (res && !res.success) {
+                                    alert(res.error || '無法變更桌號');
+                                  } else {
+                                    order.tableNumber = editingTableValue;
+                                  }
+                                } else {
+                                  order.tableNumber = editingTableValue;
+                                }
+                                setEditingOrderId(null);
+                              }}
+                              className="bg-[#E5B453] hover:bg-amber-400 text-black rounded p-1 cursor-pointer transition flex items-center justify-center font-bold"
+                              title="確認 Save"
+                            >
+                              <Check size={11} className="stroke-[3]" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingOrderId(null)}
+                              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-350 rounded p-1 cursor-pointer transition flex items-center justify-center font-bold"
+                              title="取消 Cancel"
+                            >
+                              <X size={11} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-1.5">
+                            <span className="font-bold text-base text-white font-serif">
+                              {order.tableNumber} {order.tableNumber.includes('外帶') ? '' : '桌'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingOrderId(order.id);
+                                setEditingTableValue(order.tableNumber);
+                              }}
+                              className="text-white/40 hover:text-[#E5B453] hover:bg-white/5 p-1 rounded transition cursor-pointer"
+                              title="變更桌號 (Change Table)"
+                            >
+                              <Edit size={12} />
+                            </button>
+                          </div>
+                        )}
                       </div>
                       <span className="text-[10px] text-white/40 font-mono block mt-1">
                         下單: {new Date(order.createdAt).toLocaleTimeString()}

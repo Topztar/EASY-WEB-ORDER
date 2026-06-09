@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Language, MenuItem, Ingredient, Order, OrderStatus, OrderItem, Category, TableConfig } from './types';
+import { Language, MenuItem, Ingredient, Order, OrderStatus, OrderItem, Category, TableConfig, OperatingHourSlot } from './types';
 
 import { TRANSLATIONS } from './data';
 import { LanguageSelector } from './components/LanguageSelector';
@@ -55,6 +55,11 @@ export default function App() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tables, setTables] = useState<TableConfig[]>([]);
+  const [minSpend, setMinSpend] = useState<number>(200);
+  const [operatingHours, setOperatingHours] = useState<OperatingHourSlot[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [restDays, setRestDays] = useState<string[]>([]);
+  const [customerNotice, setCustomerNotice] = useState<string>('');
 
   const [printLogs, setPrintLogs] = useState<any[]>([]);
   const [printerIp, setPrinterIp] = useState<string>('10.0.0.124');
@@ -111,7 +116,7 @@ export default function App() {
       };
 
       // Parallel REST calls with localized connection protection
-      const [menuRes, ingRes, ordRes, printRes, notifRes, alyRes, catRes, tablesRes, printerRes] = await Promise.all([
+      const [menuRes, ingRes, ordRes, printRes, notifRes, alyRes, catRes, tablesRes, printerRes, minSpendRes, opHoursRes, noticeRes] = await Promise.all([
         safeFetch('/api/menu', []),
         safeFetch('/api/ingredients', []),
         safeFetch('/api/orders', []),
@@ -121,6 +126,9 @@ export default function App() {
         safeFetch('/api/categories', []),
         safeFetch('/api/tables', []),
         safeFetch('/api/printer/config', {}),
+        safeFetch('/api/settings/min-spend', { minSpend: 200 }),
+        safeFetch('/api/settings/operating-hours', {}),
+        safeFetch('/api/settings/customer-notice', {}),
       ]);
 
       const safeJson = async (res: Response, fallback: any, label: string) => {
@@ -142,7 +150,7 @@ export default function App() {
         }
       };
 
-      const [menuData, ingData, ordData, printData, notifData, alyData, catData, tablesData, printerData] = await Promise.all([
+      const [menuData, ingData, ordData, printData, notifData, alyData, catData, tablesData, printerData, minSpendData, opHoursData, noticeData] = await Promise.all([
         safeJson(menuRes, [], 'menu'),
         safeJson(ingRes, [], 'ingredients'),
         safeJson(ordRes, [], 'orders'),
@@ -152,6 +160,9 @@ export default function App() {
         safeJson(catRes, [], 'categories'),
         safeJson(tablesRes, [], 'tables'),
         safeJson(printerRes, {}, 'printer-config'),
+        safeJson(minSpendRes, { minSpend: 200 }, 'min-spend'),
+        safeJson(opHoursRes, {}, 'operating-hours'),
+        safeJson(noticeRes, {}, 'customer-notice'),
       ]);
 
       setMenuItems(menuData);
@@ -159,6 +170,21 @@ export default function App() {
       setOrders(ordData);
       setPrintLogs(printData);
       setPrinterIp(printerData.ip || '10.0.0.124');
+      if (minSpendData && minSpendData.minSpend !== undefined) {
+        setMinSpend(minSpendData.minSpend);
+      }
+      if (opHoursData) {
+        if (opHoursData.slots) {
+          setOperatingHours(opHoursData.slots);
+        }
+        if (opHoursData.restDays) {
+          setRestDays(opHoursData.restDays);
+        }
+        setIsOpen(opHoursData.isOpen ?? true);
+      }
+      if (noticeData && noticeData.notice !== undefined) {
+        setCustomerNotice(noticeData.notice);
+      }
       if (Array.isArray(notifData)) {
         setPushNotifications(notifData.filter((n: any) => !n.isRead)); // show only unread notifications
       }
@@ -196,7 +222,8 @@ export default function App() {
   const handlePlaceOrder = async (orderData: {
     tableNumber: string;
     items: OrderItem[];
-    paymentMethod: 'cash' | 'credit' | 'linepay';
+    paymentMethod: 'cash' | 'credit' | 'member' | 'linepay';
+    guestCount?: number;
   }) => {
     try {
       const res = await fetch('/api/orders', {
@@ -244,6 +271,25 @@ export default function App() {
       await fetchData();
     } catch (err) {
       console.error('[Sabay Chef-KDS Update error]', err);
+    }
+  };
+
+  // 2.3 Order Table Number / Takeout Modifier (Admin/Cashier View Override)
+  const handleUpdateTableNumber = async (orderId: string, tableNumber: string) => {
+    try {
+      const res = await fetch(`/api/orders/${orderId}/table-number`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tableNumber }),
+      });
+      if (res.ok) {
+        await fetchData();
+        return { success: true };
+      }
+      return { success: false, error: '後台修改桌席/外帶失敗' };
+    } catch (err: any) {
+      console.error('[Sabay Update table error]', err);
+      return { success: false, error: err.message || '網路連線錯誤' };
     }
   };
 
@@ -470,6 +516,73 @@ export default function App() {
     } catch (err: any) {
       console.error('[Delete Table error]', err);
       return { success: false, error: err.message || '連線錯誤' };
+    }
+  };
+
+  const handleUpdateMinSpend = async (newVal: number) => {
+    try {
+      const res = await fetch('/api/settings/min-spend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ minSpend: newVal }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.minSpend !== undefined) {
+          setMinSpend(data.minSpend);
+          return { success: true };
+        }
+      }
+      return { success: false, error: '無法更新低消設定' };
+    } catch (e: any) {
+      console.error('[Update Min Spend Error]', e);
+      return { success: false, error: e.message || '連線錯誤' };
+    }
+  };
+
+  const handleUpdateOperatingHours = async (slots: OperatingHourSlot[], restDays?: string[]) => {
+    try {
+      const res = await fetch('/api/settings/operating-hours', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slots, restDays }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.slots) {
+          setOperatingHours(data.slots);
+          if (data.restDays) {
+            setRestDays(data.restDays);
+          }
+          setIsOpen(data.isOpen ?? true);
+          return { success: true };
+        }
+      }
+      return { success: false, error: '無法更新營業時間設定' };
+    } catch (e: any) {
+      console.error('[Update Operating Hours Error]', e);
+      return { success: false, error: e.message || '連線錯誤' };
+    }
+  };
+
+  const handleUpdateCustomerNotice = async (notice: string) => {
+    try {
+      const res = await fetch('/api/settings/customer-notice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notice }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.notice !== undefined) {
+          setCustomerNotice(data.notice);
+          return { success: true };
+        }
+      }
+      return { success: false, error: '無法更新顧客注意事項' };
+    } catch (e: any) {
+      console.error('[Update Customer Notice Error]', e);
+      return { success: false, error: e.message || '連線錯誤' };
     }
   };
 
@@ -798,6 +911,7 @@ export default function App() {
                   printerIp={printerIp}
                   onUpdatePrinterIp={handleUpdatePrinterIp}
                   onPrintTestPage={handlePrintTestPage}
+                  onUpdateTableNumber={handleUpdateTableNumber}
                 />
               ) : (
                 <ManagerDashboard
@@ -822,7 +936,15 @@ export default function App() {
                   onEditTable={handleEditTable}
                   onDeleteTable={handleDeleteTable}
                   onPayOrder={handlePayOrder}
+                  onUpdateTableNumber={handleUpdateTableNumber}
                   defaultSubTab={activeTab === 'cashier' ? 'cashier' : undefined}
+                  minSpend={minSpend}
+                  onUpdateMinSpend={handleUpdateMinSpend}
+                  operatingHours={operatingHours}
+                  restDays={restDays}
+                  onUpdateOperatingHours={handleUpdateOperatingHours}
+                  customerNotice={customerNotice}
+                  onUpdateCustomerNotice={handleUpdateCustomerNotice}
                 />
               )}
             </div>
@@ -840,6 +962,11 @@ export default function App() {
               pushNotifications={pushNotifications}
               onMarkNotificationRead={handleMarkNotificationRead}
               inventoryWarnings={analytics.stockWarnings}
+              minSpend={minSpend}
+              isOpen={isOpen}
+              customerNotice={customerNotice}
+              operatingHours={operatingHours}
+              restDays={restDays}
             />
           </div>
         )}
@@ -851,28 +978,19 @@ export default function App() {
           <span>Designed by</span>
           <span className="font-extrabold text-white/95 tracking-widest drop-shadow-[0_0_8px_rgba(229,180,83,0.3)]">FlyShine A.S.R. System Technology.</span>
         </p>
-        <div className="flex items-center justify-center space-x-4 pt-1">
-          {currentPath !== '/staff-login' ? (
-            <button
-              type="button"
-              id="footer-staff-login-link"
-              onClick={() => navigateTo('/staff-login')}
-              className="text-white/[0.04] hover:text-white/10 text-[9px] font-mono tracking-widest uppercase cursor-pointer transition py-0.5 px-1 rounded"
-            >
-              System Management Portal
-            </button>
-          ) : (
-            <button
-              type="button"
-              id="footer-customer-portal-link"
-              onClick={() => navigateTo('/')}
-              className="text-[#E5B453]/30 hover:text-[#E5B453] text-[9px] font-mono tracking-widest uppercase cursor-pointer transition py-0.5 px-1 rounded flex items-center space-x-1"
-            >
-              <Smartphone size={11} />
-              <span>Customer View</span>
-            </button>
-          )}
-        </div>
+         {currentPath === '/staff-login' && (
+           <div className="flex items-center justify-center space-x-4 pt-1">
+             <button
+               type="button"
+               id="footer-customer-portal-link"
+               onClick={() => navigateTo('/')}
+               className="text-[#E5B453]/30 hover:text-[#E5B453] text-[9px] font-mono tracking-widest uppercase cursor-pointer transition py-0.5 px-1 rounded flex items-center space-x-1"
+             >
+               <Smartphone size={11} />
+               <span>Customer View</span>
+             </button>
+           </div>
+         )}
         <div className="text-[9px] text-[#E5B453]/20 italic font-mono uppercase tracking-widest pt-1">
           A.S.R. Cloud Engine v4.2 // Secured Connection Terminal
         </div>

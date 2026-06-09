@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { MenuItem, OrderItem, FoodCustomization, Order, Language, Category, TableConfig } from '../types';
 import { TRANSLATIONS } from '../data';
 import { ShoppingCart, Clock, Check, AlertTriangle, ChevronRight, HelpCircle, X, Sparkles, BellRing, QrCode, Coins, Plus, Minus } from 'lucide-react';
@@ -12,13 +12,19 @@ interface CustomerOrderViewProps {
   onPlaceOrder: (orderData: {
     tableNumber: string;
     items: OrderItem[];
-    paymentMethod: 'cash' | 'credit' | 'linepay';
+    paymentMethod: 'cash' | 'credit' | 'member' | 'linepay';
+    guestCount?: number;
   }) => Promise<Order | null>;
   lineProfile: any;
   activeOrders: Order[];
   pushNotifications: any[];
   onMarkNotificationRead: (id: string) => void;
   inventoryWarnings: any[];
+  minSpend?: number;
+  isOpen?: boolean;
+  customerNotice?: string;
+  operatingHours?: any[];
+  restDays?: string[];
 }
 
 export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
@@ -32,12 +38,29 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   pushNotifications,
   onMarkNotificationRead,
   inventoryWarnings,
+  minSpend = 200,
+  isOpen = true,
+  customerNotice = '',
+  operatingHours = [],
+  restDays = [],
 }) => {
+  const isTaiwanRestDay = useMemo(() => {
+    const dObj = new Date();
+    const utcTime = dObj.getTime() + (dObj.getTimezoneOffset() * 60000);
+    const localDate = new Date(utcTime + (3600000 * 8));
+    const yr = localDate.getFullYear();
+    const mo = String(localDate.getMonth() + 1).padStart(2, '0');
+    const dy = String(localDate.getDate()).padStart(2, '0');
+    const taiwanDateStr = `${yr}-${mo}-${dy}`;
+    return restDays.includes(taiwanDateStr);
+  }, [restDays]);
+
   const [selectedTable, setSelectedTable] = useState('5');
   const [selectedCategory, setSelectedCategory] = useState('tomyum');
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState<MenuItem | null>(null);
+  const [guestCount, setGuestCount] = useState<number>(2);
   const [qrScannedInfo, setQrScannedInfo] = useState<string | null>(null);
   const [urlProcessed, setUrlProcessed] = useState(false);
   const [isTableFixed, setIsTableFixed] = useState(false);
@@ -118,7 +141,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   const [customNotes, setCustomNotes] = useState<string>('');
   const [qty, setQty] = useState<number>(1);
 
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'credit' | 'member'>('cash');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'credit' | 'member' | 'linepay'>('cash');
   const [orderSentSuccess, setOrderSentSuccess] = useState<string | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
 
@@ -438,6 +461,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   };
 
   const handleAddToCart = () => {
+    if (!isOpen) return;
     if (!selectedDetailItem) return;
 
     // Calculate item markup if any
@@ -483,6 +507,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   };
 
   const handleQuickAddToCart = (item: MenuItem) => {
+    if (!isOpen) return;
     const isSpicyCategory = !item.isNotSpicy;
     const isSweetCategory = item.category === 'drinks' || item.category === 'sweets';
     
@@ -505,6 +530,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   };
 
   const handleAddToCartFromAi = (item: MenuItem, spiciness: number, sweetness: number) => {
+    if (!isOpen) return;
     const newOrderItem: OrderItem = {
       id: `cart-ai-${Math.floor(1000 + Math.random() * 9000)}-${Date.now()}`,
       menuItemId: item.id,
@@ -532,14 +558,20 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
 
   // Google member points program (no subtotal discount)
   const discountedSubtotal = cartSubtotal;
-  // credit card payment adds 10% service charge
-  const expressFee = paymentMethod === 'credit' ? Math.round(discountedSubtotal * 0.1) : 0;
+  // credit card or mobile payment adds 10% service charge
+  const expressFee = (paymentMethod === 'credit' || paymentMethod === 'linepay') ? Math.round(discountedSubtotal * 0.1) : 0;
   const cartTotal = discountedSubtotal + expressFee;
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     setOrderError(null);
     setOrderSentSuccess(null);
+
+    const hasTopupItem = cart.some(it => it.id.startsWith('topup-') || (it.menuItemId && it.menuItemId.startsWith('item-topup-')));
+    if (hasTopupItem && paymentMethod === 'member') {
+      setOrderError('您的購物車中含有「會員線上儲值」加值商品，請選擇「現金」、「信用卡」或「LINE Pay」付款！您無法使用儲值餘額支付來購買儲值金商品。');
+      return;
+    }
 
     if (paymentMethod === 'member') {
       if (!lineProfile || !lineProfile.email) {
@@ -556,12 +588,13 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       tableNumber: selectedTable,
       items: cart,
       paymentMethod,
+      guestCount: !selectedTable.includes('外帶') ? guestCount : undefined,
     });
 
     if (actual) {
       setOrderSentSuccess(actual.id);
 
-      // Deduct Google Member Balance
+      // Deduct Google Member Balance for normal orders
       if (paymentMethod === 'member' && lineProfile && lineProfile.email) {
         const dbStr = localStorage.getItem('google-members-database');
         if (dbStr) {
@@ -576,6 +609,30 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
             }
           } catch (e) {
             console.error('[Deduct Balance Error]', e);
+          }
+        }
+      }
+
+      // Add purchased top-up values to membership balance
+      const totalTopupAmt = cart
+        .filter(it => it.id.startsWith('topup-') || (it.menuItemId && it.menuItemId.startsWith('item-topup-')))
+        .reduce((sum, it) => sum + (it.price * it.qty), 0);
+
+      if (totalTopupAmt > 0 && lineProfile && lineProfile.email) {
+        const dbStr = localStorage.getItem('google-members-database');
+        if (dbStr) {
+          try {
+            const db = JSON.parse(dbStr);
+            const userIndex = db.findIndex((m: any) => m.email === lineProfile.email);
+            if (userIndex >= 0) {
+              db[userIndex].balance = (db[userIndex].balance || 0) + totalTopupAmt;
+              localStorage.setItem('google-members-database', JSON.stringify(db));
+              localStorage.setItem(`google-balance-${lineProfile.email}`, String(db[userIndex].balance));
+              setUserBalance(db[userIndex].balance);
+              window.dispatchEvent(new Event('local-points-updated'));
+            }
+          } catch (e) {
+            console.error('[Credit Topup Balance Error]', e);
           }
         }
       }
@@ -627,6 +684,48 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
 
   return (
     <div className="space-y-6" id="customer-order-panel">
+      {/* 📣 Customer Scrolling Notice */}
+      {customerNotice && (
+        <div className="w-full bg-thai-gold/10 border border-thai-gold/20 rounded-full overflow-hidden py-1.5 px-4 shadow-sm flex items-center space-x-2 text-thai-gold text-xs font-sans">
+          <span className="shrink-0 font-extrabold bg-[#E5B453] text-[#0F0F0F] rounded-full px-2.5 py-0.5 text-[10px] tracking-wide flex items-center gap-1">
+            📢 公告 Notice
+          </span>
+          <div className="flex-1 overflow-hidden relative">
+            <div className="animate-marquee whitespace-nowrap py-0.5 hover:[animation-play-state:paused] flex gap-8">
+              <span className="font-extrabold pr-4">{customerNotice}</span>
+              <span className="font-extrabold pr-4">{customerNotice}</span>
+              <span className="font-extrabold pr-4">{customerNotice}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🛑 Store Closed Warning Board */}
+      {!isOpen && (
+        <div className="bg-rose-950/20 border border-rose-500/30 text-rose-300 rounded-3xl p-4 sm:p-5 flex flex-col md:flex-row items-center gap-3.5 shadow-lg select-none font-sans">
+          <div className="w-12 h-12 bg-rose-500/15 border border-rose-500/25 rounded-2xl flex items-center justify-center text-rose-400 shrink-0">
+            <AlertTriangle size={24} className="animate-bounce" />
+          </div>
+          <div className="text-left flex-1 space-y-1">
+            <h5 className="font-extrabold text-sm sm:text-base text-rose-300">
+              {isTaiwanRestDay 
+                ? '● 今日公休店休中 Rest Day / Holiday - Browsing Only' 
+                : '● 店鋪休息中 (僅供瀏覽餐點) Store Closed - Browsing Only'}
+            </h5>
+            <p className="text-[11px] sm:text-xs text-rose-400/80 leading-relaxed">
+              {isTaiwanRestDay 
+                ? '今日為設定的特殊休假公休日，全天不提供購物車點餐服務。系統已鎖定點餐與加點功能，您可以自由瀏覽菜單與菜色內容！'
+                : '當前不在設定 of 合法營業時間內。系統已鎖定購物車加點與點餐結帳功能，您可以自由流覽菜單餐點與價格。'}
+              {!isTaiwanRestDay && operatingHours && operatingHours.length > 0 && (
+                <span className="block mt-1 text-rose-400 font-mono font-bold text-[10px] sm:text-[11px]">
+                  ⏰ 營業時段 Operating Hours: {operatingHours.filter((s:any) => s.isActive).map((s:any) => `${s.name} (${s.start} - ${s.end})`).join('、')}
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Table QR Simulation indicator Bar */}
       <div className="bg-thai-charcoal border border-thai-gold/20 text-white rounded-3xl p-3 sm:p-4 flex flex-row items-center justify-between gap-2.5 sm:gap-4 shadow-xl select-none">
         <div className="flex items-center space-x-2.5 sm:space-x-3.5 flex-1 min-w-0">
@@ -691,44 +790,78 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
         </div>
       </div>
 
-      {/* 🚀 QR Code Simulator */}
-      <div className="bg-black/30 border border-white/5 rounded-3xl p-4.5 space-y-3 text-left">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-[#E5B453] flex items-center space-x-1.5 font-sans">
-            <QrCode size={14} className="text-[#E5B453]" />
-            <span>📲 點餐二維碼模擬器 QR Code Scan Simulator</span>
-          </p>
-          <span className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-full">內用桌暨外帶單一 QR 碼</span>
-        </div>
-        <p className="text-[11px] text-white/50 leading-relaxed font-sans">
-          在店面營運中，顧客可直接用手機掃描設定好的 QR 碼進行免接觸點餐。請隨意點選下方按鈕模擬顧客掃描：
-        </p>
-        
-        <div className="flex flex-wrap gap-2 pt-1">
-          {/* Takeout QR simulator */}
-          <button
-            type="button"
-            onClick={() => handleSimulateScan('takeout')}
-            className="flex items-center space-x-1.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-[11px] px-3 py-2 rounded-xl active:scale-95 transition cursor-pointer shadow-md shadow-rose-955/20 border border-rose-500/10"
-          >
-            <QrCode size={13} className="animate-spin-slow" />
-            <span>掃描外帶單一 QR 碼 (號碼自動累加)</span>
-          </button>
-
-          {/* Dine-in tables list */}
-          {tables.map((t) => (
+      {!selectedTable.includes('外帶') && (
+        <div className="bg-thai-charcoal border border-white/5 text-white rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg select-none">
+          <div className="flex items-center space-x-3 text-left">
+            <div className="w-10 h-10 bg-thai-gold/10 border border-thai-gold/30 rounded-2xl flex items-center justify-center text-[#E5B453]">
+              <span className="text-lg font-bold">👤</span>
+            </div>
+            <div>
+              <h5 className="font-bold text-white text-sm">用餐人數 Guest Count</h5>
+              <p className="text-[11px] text-white/50">內用低消 NT$ {minSpend}/人 (每桌低消依人數累計)</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-3 bg-thai-dark/50 p-1.5 rounded-2xl border border-slate-700">
             <button
-              key={t.id}
-              type="button"
-              onClick={() => handleSimulateScan(t.id)}
-              className="flex items-center space-x-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white font-bold text-[11px] px-2.5 py-2 rounded-xl active:scale-95 transition cursor-pointer"
+              onClick={() => setGuestCount(prev => Math.max(1, prev - 1))}
+              className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition flex items-center justify-center font-bold text-white text-lg"
             >
-              <QrCode size={12} className="text-[#E5B453]/80" />
-              <span>內用 {t.id} 桌</span>
+              -
             </button>
-          ))}
+            <span className="w-12 text-center text-sm font-extrabold font-mono text-thai-gold">
+              {guestCount} 人
+            </span>
+            <button
+              onClick={() => setGuestCount(prev => Math.min(20, prev + 1))}
+              className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition flex items-center justify-center font-bold text-white text-lg"
+            >
+              +
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* 🚀 QR Code Simulator */}
+      {!isTableFixed && (
+        <div className="bg-black/30 border border-white/5 rounded-3xl p-4.5 space-y-3 text-left">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-[#E5B453] flex items-center space-x-1.5 font-sans">
+              <QrCode size={14} className="text-[#E5B453]" />
+              <span>📲 點餐二維碼模擬器 QR Code Scan Simulator</span>
+            </p>
+            <span className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-full">內用桌暨外帶單一 QR 碼</span>
+          </div>
+          <p className="text-[11px] text-white/50 leading-relaxed font-sans">
+            在店面營運中，顧客可直接用手機掃描設定好的 QR 碼進行免接觸點餐。請隨意點選下方按鈕模擬顧客掃描：
+          </p>
+          
+          <div className="flex flex-wrap gap-2 pt-1">
+            {/* Takeout QR simulator */}
+            <button
+              type="button"
+              onClick={() => handleSimulateScan('takeout')}
+              className="flex items-center space-x-1.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-[11px] px-3 py-2 rounded-xl active:scale-95 transition cursor-pointer shadow-md shadow-rose-955/20 border border-rose-500/10"
+            >
+              <QrCode size={13} className="animate-spin-slow" />
+              <span>掃描外帶單一 QR 碼 (號碼自動累加)</span>
+            </button>
+
+            {/* Dine-in tables list */}
+            {tables.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => handleSimulateScan(t.id)}
+                className="flex items-center space-x-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white font-bold text-[11px] px-2.5 py-2 rounded-xl active:scale-95 transition cursor-pointer"
+              >
+                <QrCode size={12} className="text-[#E5B453]/80" />
+                <span>內用 {t.id} 桌</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Scanned table notification banner */}
       {qrScannedInfo && (
@@ -860,48 +993,6 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                   NT$ {userBalance.toLocaleString()}
                 </span>
               </div>
-            </div>
-          </div>
-
-          {/* 會員快速儲值功能 (Top-Up Panel) */}
-          <div className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 font-sans relative z-10">
-            <div className="text-left">
-              <span className="text-white font-bold text-xs tracking-wide">💸 會員快捷線上儲值 (Instant Member Deposit)</span>
-              <p className="text-slate-400 text-[10px] mt-0.5">點擊下方快速加值，免人工刷卡，即時入帳。扣抵餘額下單同享現金價優惠！</p>
-            </div>
-            <div className="flex flex-wrap gap-1.5 justify-end w-full sm:w-auto">
-              {[
-                { amt: 500, label: '＋500' },
-                { amt: 1000, label: '＋1000' },
-                { amt: 2000, label: '＋2000' },
-                { amt: 3000, label: '＋3000' }
-              ].map((top) => (
-                <button
-                  key={`customer-topup-${top.amt}`}
-                  type="button"
-                  onClick={() => {
-                    const dbStr = localStorage.getItem('google-members-database');
-                    if (dbStr) {
-                      try {
-                        const db = JSON.parse(dbStr);
-                        const userIndex = db.findIndex((m: any) => m.email === lineProfile.email);
-                        if (userIndex >= 0) {
-                          db[userIndex].balance = (db[userIndex].balance || 0) + top.amt;
-                          localStorage.setItem('google-members-database', JSON.stringify(db));
-                          localStorage.setItem(`google-balance-${lineProfile.email}`, String(db[userIndex].balance));
-                          setUserBalance(db[userIndex].balance);
-                          window.dispatchEvent(new Event('local-points-updated'));
-                        }
-                      } catch (e) {
-                        console.error('[Top-up error]', e);
-                      }
-                    }
-                  }}
-                  className="px-3 py-1.5 text-xs text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500 hover:text-black border border-emerald-500/20 hover:border-transparent rounded-lg transition-all duration-150 cursor-pointer active:scale-95 font-black whitespace-nowrap"
-                >
-                  {top.label}
-                </button>
-              ))}
             </div>
           </div>
 
@@ -1095,7 +1186,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       </div>
 
       {/* Floating View Shopping Cart Bar Trigger (if items present) */}
-      {cart.length > 0 && (
+      {cart.length > 0 && isOpen && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 z-40 animate-slide-up" id="floating-cart-bar">
           <button
             id="view-cart-trigger"
@@ -1238,21 +1329,6 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                 </div>
               )}
 
-              {/* Custom notes */}
-              <div>
-                <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-1.5">
-                  特殊備註 (例如：不要洋蔥、另外加辣粉)
-                </label>
-                <input
-                  type="text"
-                  id="customization-notes-input"
-                  value={customNotes}
-                  onChange={(e) => setCustomNotes(e.target.value)}
-                  placeholder="請在此輸入備註事項..."
-                  className="w-full bg-black/40 border border-white/10 focus:border-[#E5B453] focus:outline-none rounded-xl px-4 py-3 text-sm text-white font-sans"
-                />
-              </div>
-
               {/* Alert Warning for Ingredients if too low */}
               {inventoryWarnings.length > 0 && (
                 <p className="text-[10px] text-amber-400 bg-amber-500/10 rounded-lg p-2.5 flex items-center space-x-1 font-semibold border border-amber-500/20 leading-relaxed">
@@ -1271,14 +1347,24 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                 </p>
               </div>
 
-              <button
-                id="add-to-cart-confirm"
-                onClick={handleAddToCart}
-                className="bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black px-3 min-[360px]:px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition flex items-center space-x-1.5 sm:space-x-2 active:scale-95 cursor-pointer text-[10px] min-[360px]:text-xs sm:text-sm whitespace-nowrap"
-              >
-                <ShoppingCart size={12} className="sm:size-[14px]" />
-                <span>加入購物車並備餐</span>
-              </button>
+              {isOpen ? (
+                <button
+                  id="add-to-cart-confirm"
+                  onClick={handleAddToCart}
+                  className="bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black px-3 min-[360px]:px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition flex items-center space-x-1.5 sm:space-x-2 active:scale-95 cursor-pointer text-[10px] min-[360px]:text-xs sm:text-sm whitespace-nowrap"
+                >
+                  <ShoppingCart size={12} className="sm:size-[14px]" />
+                  <span>加入購物車並備餐</span>
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="bg-zinc-850 text-zinc-500 font-bold px-3 min-[360px]:px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl flex items-center space-x-1.5 sm:space-x-2 text-[10px] min-[360px]:text-xs sm:text-sm whitespace-nowrap border border-white/5 cursor-not-allowed"
+                >
+                  <Clock size={12} />
+                  <span>休息中 Closed</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1379,10 +1465,11 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                     <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">
                       支付方式 Payment Method
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {[
                         { code: 'cash', label: '現金支付', spec: '現場免加額/有優惠' },
-                        { code: 'credit', label: '信用卡隨', spec: '均含服務加收10%' },
+                        { code: 'credit', label: '信用卡支付', spec: '均含服務加收10%' },
+                        { code: 'linepay', label: 'TWQR支付', spec: '預設服務費10%' },
                         { code: 'member', label: '會員儲值支付', spec: '扣抵會員帳戶餘額' }
                       ].map((pm) => (
                         <button
@@ -1417,9 +1504,9 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                       </div>
                     )}
 
-                    {paymentMethod === 'credit' && (
+                    {(paymentMethod === 'credit' || paymentMethod === 'linepay') && (
                       <div className="flex justify-between text-white/60">
-                        <span>信用卡服務加成 (10%)</span>
+                        <span>{paymentMethod === 'linepay' ? 'TWQR支付預設服務費 (10%)' : '信用卡服務加成 (10%)'}</span>
                         <span className="font-mono">+ NT$ {expressFee}</span>
                       </div>
                     )}
@@ -1721,15 +1808,17 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                                   onClick={() => setSelectedDetailItem(item)}
                                   className="bg-white/5 hover:bg-white/10 text-white/80 font-black text-[10px] px-2.5 py-1.5 rounded-lg cursor-pointer transition active:scale-95 border border-white/10"
                                 >
-                                  詳情/調整
+                                  {isOpen ? '詳情/調整' : '點擊瀏覽'}
                                 </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleQuickAddToCart(item)}
-                                  className="bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black text-[10px] px-2.5 py-1.5 rounded-lg cursor-pointer transition active:scale-95 shadow-md shadow-[#E5B453]/10"
-                                >
-                                  直接加點
-                                </button>
+                                {isOpen && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickAddToCart(item)}
+                                    className="bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black text-[10px] px-2.5 py-1.5 rounded-lg cursor-pointer transition active:scale-95 shadow-md shadow-[#E5B453]/10"
+                                  >
+                                    直接加點
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1821,15 +1910,17 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                                 onClick={() => setSelectedDetailItem(item)}
                                 className="bg-white/5 hover:bg-white/10 text-white/80 font-black text-[10px] px-2.5 py-1.5 rounded-lg cursor-pointer transition active:scale-95 border border-white/10"
                               >
-                                詳情/調整
+                                {isOpen ? '詳情/調整' : '點擊瀏覽'}
                               </button>
-                              <button
-                                type="button"
-                                onClick={() => handleQuickAddToCart(item)}
-                                className="bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black text-[10px] px-2.5 py-1.5 rounded-lg cursor-pointer transition active:scale-95 shadow-md shadow-[#E5B453]/10"
-                              >
-                                直接加點
-                              </button>
+                              {isOpen && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickAddToCart(item)}
+                                  className="bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black text-[10px] px-2.5 py-1.5 rounded-lg cursor-pointer transition active:scale-95 shadow-md shadow-[#E5B453]/10"
+                                >
+                                  直接加點
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>

@@ -50,9 +50,10 @@ export interface Order {
   createdAt: string;
   customerName: string;
   customerAvatar: string;
-  paymentMethod: 'cash' | 'credit' | 'member';
+  paymentMethod: 'cash' | 'credit' | 'member' | 'linepay';
   isMember: boolean;
   isPaid?: boolean;
+  guestCount?: number;
 }
 
 export interface Ingredient {
@@ -87,3 +88,13 @@ export interface TableConfig {
   id: string;
   qrCodeUrl: string;
 }
+
+export interface OperatingHourSlot {
+  id: string;
+  name: string;
+  start: string; // "HH:MM"
+  end: string;   // "HH:MM"
+  days: number[]; // days of week, 0-6 (0 is Sunday, 6 is Saturday)
+  isActive: boolean;
+}
+

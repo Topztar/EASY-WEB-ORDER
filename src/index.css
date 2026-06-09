@@ -41,3 +41,20 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(223, 179, 62, 0.4);
 }
+
+/* Marquee animation classes */
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
