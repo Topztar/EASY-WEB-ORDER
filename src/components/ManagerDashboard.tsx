@@ -93,7 +93,7 @@ interface ManagerDashboardProps {
       isPaid?: boolean;
     }
   ) => Promise<void>;
-  defaultSubTab?: 'stats' | 'orders' | 'inventory' | 'menu' | 'members' | 'cashier';
+  defaultSubTab?: 'stats' | 'orders' | 'inventory' | 'menu' | 'members' | 'cashier' | 'printer' | 'options' | 'eod';
   minSpend?: number;
   onUpdateMinSpend?: (newVal: number) => Promise<{ success: boolean; error?: string }>;
   operatingHours?: any[];
@@ -102,6 +102,7 @@ interface ManagerDashboardProps {
   customerNotice?: string;
   onUpdateCustomerNotice?: (notice: string) => Promise<{ success: boolean; error?: string }>;
   onUpdateTableNumber?: (orderId: string, tableNumber: string) => Promise<{ success: boolean; error?: string }>;
+  staffPin?: string;
 }
 
 export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
@@ -136,9 +137,10 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   onUpdateOperatingHours,
   customerNotice = '',
   onUpdateCustomerNotice,
+  staffPin,
 }) => {
   // Navigation Tabs
-  const [activeSubTab, setActiveSubTab] = useState<'stats' | 'orders' | 'inventory' | 'menu' | 'members' | 'cashier'>(defaultSubTab || 'stats');
+  const [activeSubTab, setActiveSubTab] = useState<'stats' | 'orders' | 'inventory' | 'menu' | 'members' | 'cashier' | 'printer' | 'options' | 'eod'>(defaultSubTab || 'stats');
 
   useEffect(() => {
     if (defaultSubTab) {
@@ -156,6 +158,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [takeoutStatus, setTakeoutStatus] = useState({ sequence: 0, lastResetDate: '' });
   const [selectedQrPreviewId, setSelectedQrPreviewId] = useState<string>('1');
   const [copiedTableId, setCopiedTableId] = useState<string | null>(null);
+  const [tableToDeleteId, setTableToDeleteId] = useState<string | null>(null);
 
   // PIN security states
   const [currentPinInput, setCurrentPinInput] = useState('');
@@ -182,20 +185,37 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [noticeError, setNoticeError] = useState<string | null>(null);
   const [noticeSuccess, setNoticeSuccess] = useState<string | null>(null);
 
+  // Refs to prevent periodic polling from disrupting active inputs
+  const prevOperatingHoursRef = React.useRef<string>(JSON.stringify(operatingHours));
+  const prevRestDaysRef = React.useRef<string>(JSON.stringify(restDays));
+  const prevCustomerNoticeRef = React.useRef<string>(customerNotice);
+  const prevMinSpendRef = React.useRef<number>(minSpend);
+
   // Active Order Table/Takeout editing states
   const [editingOrderTableId, setEditingOrderTableId] = useState<string | null>(null);
   const [editingOrderTableValue, setEditingOrderTableValue] = useState<string>('');
 
   useEffect(() => {
-    setTempOperatingHours(operatingHours);
+    const currentStr = JSON.stringify(operatingHours);
+    if (currentStr !== prevOperatingHoursRef.current) {
+      setTempOperatingHours(operatingHours);
+      prevOperatingHoursRef.current = currentStr;
+    }
   }, [operatingHours]);
 
   useEffect(() => {
-    setTempRestDays(restDays);
+    const currentStr = JSON.stringify(restDays);
+    if (currentStr !== prevRestDaysRef.current) {
+      setTempRestDays(restDays);
+      prevRestDaysRef.current = currentStr;
+    }
   }, [restDays]);
 
   useEffect(() => {
-    setTempCustomerNotice(customerNotice);
+    if (customerNotice !== prevCustomerNoticeRef.current) {
+      setTempCustomerNotice(customerNotice);
+      prevCustomerNoticeRef.current = customerNotice;
+    }
   }, [customerNotice]);
 
   const handleSaveOperatingHoursLocal = async (updatedSlots: any[], updatedRestDays: string[]) => {
@@ -205,6 +225,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       const res = await onUpdateOperatingHours(updatedSlots, updatedRestDays);
       if (res.success) {
         setOpHoursSuccess('營業時間與公休日排程配置已成功儲存！');
+        prevOperatingHoursRef.current = JSON.stringify(updatedSlots);
+        prevRestDaysRef.current = JSON.stringify(updatedRestDays);
       } else {
         setOpHoursError(res.error || '儲存營業時間及公休設定失敗');
       }
@@ -218,6 +240,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       const res = await onUpdateCustomerNotice(tempCustomerNotice);
       if (res.success) {
         setNoticeSuccess('顧客注意事項已成功更新！');
+        prevCustomerNoticeRef.current = tempCustomerNotice;
       } else {
         setNoticeError(res.error || '更新注意事項失敗');
       }
@@ -225,7 +248,10 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   };
 
   useEffect(() => {
-    setTempMinSpend(minSpend);
+    if (minSpend !== prevMinSpendRef.current) {
+      setTempMinSpend(minSpend);
+      prevMinSpendRef.current = minSpend;
+    }
   }, [minSpend]);
 
   const handleSaveMinSpend = async () => {
@@ -235,6 +261,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       const res = await onUpdateMinSpend(tempMinSpend);
       if (res.success) {
         setMinSpendSaveSuccess('低消門檻已成功更新！');
+        prevMinSpendRef.current = tempMinSpend;
       } else {
         setMinSpendSaveError(res.error || '無法更新狀態');
       }
@@ -290,6 +317,61 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     if (!selectedCashierOrderId) return null;
     return orders.find(o => o.id === selectedCashierOrderId) || null;
   }, [orders, selectedCashierOrderId]);
+
+  // Cashier item addition dropdown state
+  const [cashierNewItemInput, setCashierNewItemInput] = useState<string>('');
+
+  const handleCashierQtyChange = async (itemId: string, delta: number) => {
+    if (!cashierSelectedOrder || !onUpdateOrderItems) return;
+    const updatedItems = cashierSelectedOrder.items.map((it: any) => {
+      if (it.id === itemId) {
+        return { ...it, qty: it.qty + delta };
+      }
+      return it;
+    }).filter((it: any) => it.qty > 0);
+
+    await onUpdateOrderItems(cashierSelectedOrder.id, updatedItems);
+  };
+
+  const handleCashierRemoveItem = async (itemId: string) => {
+    if (!cashierSelectedOrder || !onUpdateOrderItems) return;
+    const updatedItems = cashierSelectedOrder.items.filter((it: any) => it.id !== itemId);
+    await onUpdateOrderItems(cashierSelectedOrder.id, updatedItems);
+  };
+
+  const handleCashierAddMenuItem = async (menuItemId: string) => {
+    if (!cashierSelectedOrder || !onUpdateOrderItems) return;
+    const dish = menuItems.find((m: any) => m.id === menuItemId);
+    if (!dish) return;
+
+    const existing = cashierSelectedOrder.items.find((it: any) => it.menuItemId === menuItemId);
+    let updatedItems;
+    if (existing) {
+      updatedItems = cashierSelectedOrder.items.map((it: any) => {
+        if (it.menuItemId === menuItemId) {
+          return { ...it, qty: it.qty + 1 };
+        }
+        return it;
+      });
+    } else {
+      const newItem = {
+        id: `oi-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        menuItemId: dish.id,
+        name: dish.name,
+        price: dish.price,
+        qty: 1,
+        customization: {
+          sweetness: 2,
+          spiciness: 1,
+          notes: '櫃檯收銀加點',
+        }
+      };
+      updatedItems = [...cashierSelectedOrder.items, newItem];
+    }
+
+    await onUpdateOrderItems(cashierSelectedOrder.id, updatedItems);
+    setCashierNewItemInput('');
+  };
 
   useEffect(() => {
     if (cashierSelectedOrder) {
@@ -409,7 +491,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         amountPaid: cashierPaymentMethod === 'cash' ? cashierCashReceived : cashierCalculatedTotals.total,
         changeProvided: change,
         paymentMethod: cashierPaymentMethod,
-        staffPin: '8888',
+        staffPin: staffPin || '888888',
         checkoutTime: new Date().toISOString()
       };
 
@@ -575,7 +657,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         amountPaid: selectedOrder.paymentMethod === 'cash' ? cashReceivedInput : selectedOrder.total,
         changeProvided: change,
         paymentMethod: selectedOrder.paymentMethod,
-        staffPin: '8888',
+        staffPin: staffPin || '888888',
         checkoutTime: new Date().toISOString()
       };
 
@@ -626,6 +708,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [itemDescEn, setItemDescEn] = useState('');
   const [hasNoodles, setHasNoodles] = useState(false);
   const [isNotSpicy, setIsNotSpicy] = useState(false);
+  const [customAddOns, setCustomAddOns] = useState<any[]>([]);
 
   // Category Creation/Editing states
   const [isCatFormOpen, setIsCatFormOpen] = useState(false);
@@ -646,6 +729,119 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [promoMessage, setPromoMessage] = useState('今日九點後，到店綁定會員下單，兩串炭烤雞肉串免費送，數量有限點完為止！');
   const [promoBadge, setPromoBadge] = useState('🔥 限量狂狂');
   const [pushSentConfirm, setPushSentConfirm] = useState(false);
+
+  // Option Rules States
+  const [globalRules, setGlobalRules] = useState<any[]>([]);
+  const [newRuleName, setNewRuleName] = useState('');
+  const [newRuleCategory, setNewRuleCategory] = useState('加配料');
+  const [newRulePrice, setNewRulePrice] = useState(20);
+
+  // Printer Configuration States
+  const [kitchenPrinter, setKitchenPrinter] = useState({
+    connectionType: 'IP',
+    ip: '192.168.1.101',
+    usbPort: 'USB001',
+    width: '80mm',
+    fontSizeFactor: 1.0,
+    restaurantName: '沙貝燒烤 泰式廚房',
+    printTelephone: '02-1234-5678',
+    printAddress: '台北市信義區泰式一番街8號',
+    printTimeEnabled: true,
+    headerPrefix: '★★★ 廚房工作備餐單 ★★★',
+    footerSuffix: '請主廚盡速配餐出餐！'
+  });
+  const [billPrinter, setBillPrinter] = useState({
+    connectionType: 'USB',
+    ip: '192.168.1.102',
+    usbPort: 'USB002',
+    width: '58mm',
+    fontSizeFactor: 0.8,
+    restaurantName: '沙貝燒烤 SABAY BBQ',
+    printTelephone: '02-1234-5678',
+    printAddress: '台北市信義區泰式一番街8號',
+    printTimeEnabled: true,
+    headerPrefix: '★★★ 顧客結帳明細單 ★★★',
+    footerSuffix: '謝謝光臨，歡迎再度光臨！'
+  });
+
+  const [printerSaveSuccess, setPrinterSaveSuccess] = useState<string | null>(null);
+
+  const fetchGlobalRules = async () => {
+    try {
+      const res = await fetch('/api/option-rules');
+      if (res.ok) {
+        const data = await res.json();
+        setGlobalRules(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchPrinterSettings = async () => {
+    try {
+      const res = await fetch('/api/printer/settings');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.kitchen) setKitchenPrinter(data.kitchen);
+        if (data.bill) setBillPrinter(data.bill);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSavePrinters = async () => {
+    try {
+      const res = await fetch('/api/printer/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kitchen: kitchenPrinter, bill: billPrinter })
+      });
+      if (res.ok) {
+        setPrinterSaveSuccess('✅ 印表機與硬體設定儲存成功！');
+        setTimeout(() => setPrinterSaveSuccess(null), 3000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleAddGlobalRule = async () => {
+    if (!newRuleName.trim()) {
+      alert('請輸入名稱！');
+      return;
+    }
+    try {
+      const res = await fetch('/api/option-rules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newRuleName, category: newRuleCategory, price: newRulePrice })
+      });
+      if (res.ok) {
+        setNewRuleName('');
+        fetchGlobalRules();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDeleteGlobalRule = async (id: string) => {
+    try {
+      const res = await fetch(`/api/option-rules/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchGlobalRules();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchGlobalRules();
+    fetchPrinterSettings();
+  }, []);
 
   // Polling servers
   useEffect(() => {
@@ -771,8 +967,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       setPinChangeError('兩次輸入的新金鑰不一致！');
       return;
     }
-    if (!/^\d{4}$/.test(newPinInput)) {
-      setPinChangeError('新金鑰必須為 4 位半形數字！');
+    if (!/^\d{6}$/.test(newPinInput)) {
+      setPinChangeError('新金鑰必須為 6 位半形數字！');
       return;
     }
     setPinChangeLoading(true);
@@ -1092,6 +1288,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     setItemDescEn('');
     setHasNoodles(false);
     setIsNotSpicy(false);
+    setCustomAddOns([]);
     setIsFormOpen(true);
   };
 
@@ -1106,6 +1303,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     setItemDescEn(item.description?.en || '');
     setHasNoodles(!!item.hasNoodlesOption);
     setIsNotSpicy(!!item.isNotSpicy);
+    setCustomAddOns(Array.isArray(item.customAddOns) ? [...item.customAddOns] : []);
     setIsFormOpen(true);
   };
 
@@ -1124,6 +1322,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       available: true,
       hasNoodlesOption: hasNoodles,
       isNotSpicy: isNotSpicy,
+      customAddOns: customAddOns,
     };
     if (editingItem) {
       if (onEditMenuItem) {
@@ -1166,7 +1365,10 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
             { id: 'orders', label: '💳 帳務核數與細單', desc: '日/周/月、自訂區間銷售合算，明細登錄核對' },
             { id: 'inventory', label: '📦 進銷存與耗損', desc: '原料庫存流動日誌、安全警量、盤損核對調整' },
             { id: 'menu', label: '🍜 菜品與類別編輯', desc: '菜單單品與可售狀態、客製選項、全店類別更新' },
-            { id: 'members', label: '⚙️ 會員、桌席與系統', desc: 'Google 會員統計、桌席二維碼、員工PIN變更' }
+            { id: 'members', label: '⚙️ 會員、桌席與系統', desc: 'Google 會員統計、桌席二維碼、員工PIN變更' },
+            { id: 'printer', label: '🖨️ 印表機與硬體', desc: '分離雙機：廚房印表機、帳單印表機寬度與連線' },
+            { id: 'options', label: '🧩 客製選項管理器', desc: '設定全店客製選項規則 (例如：加河粉、熟度、辣度)' },
+            { id: 'eod', label: '🏁 每日關帳結算', desc: '連動「數據庫存」與今日營業核對，登錄銷帳、變更支付、列印預覽' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1646,7 +1848,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       })()}
 
                       {/* Items Brief */}
-                      <div className="bg-black/30 border border-white/5 rounded-xl p-3 space-y-2">
+                      <div className="bg-black/30 border border-white/5 rounded-xl p-3 space-y-3">
                         <span className="text-[10px] text-zinc-500 block font-bold tracking-wider uppercase">
                           🍽️ 點餐菜品明細 ({cashierSelectedOrder.items.length} 項)
                         </span>
@@ -1665,11 +1867,63 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                                   </span>
                                 )}
                               </div>
-                              <span className="font-mono text-white/50 text-xs">
-                                NT$ {it.price * it.qty}
-                              </span>
+                              <div className="flex items-center space-x-2 shrink-0">
+                                {/* Qty adjustments */}
+                                <div className="flex items-center bg-black/40 rounded-lg p-0.5 border border-white/5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCashierQtyChange(it.id, -1)}
+                                    className="p-1 hover:bg-white/5 rounded text-zinc-400 hover:text-white transition cursor-pointer"
+                                    title="減少"
+                                  >
+                                    <Minus size={10} />
+                                  </button>
+                                  <span className="px-1 text-[10px] font-black text-white min-w-[12px] text-center">{it.qty}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCashierQtyChange(it.id, 1)}
+                                    className="p-1 hover:bg-white/5 rounded text-zinc-400 hover:text-white transition cursor-pointer"
+                                    title="增加"
+                                  >
+                                    <Plus size={10} />
+                                  </button>
+                                </div>
+                                {/* Remove button */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleCashierRemoveItem(it.id)}
+                                  className="p-1 hover:bg-red-500/15 rounded text-red-400 hover:text-red-300 transition cursor-pointer"
+                                  title="移除"
+                                >
+                                  <Trash2 size={11} />
+                                </button>
+                                <span className="font-mono text-white/50 text-xs min-w-[55px] text-right">
+                                  NT$ {it.price * it.qty}
+                                </span>
+                              </div>
                             </div>
                           ))}
+                        </div>
+
+                        {/* Dropdown to add custom new item */}
+                        <div className="pt-2 border-t border-white/5 flex gap-2 items-center">
+                          <label className="text-[10px] text-zinc-400 shrink-0 font-bold">加點餐點：</label>
+                          <select
+                            value={cashierNewItemInput}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                handleCashierAddMenuItem(e.target.value);
+                              }
+                            }}
+                            className="flex-1 bg-black/60 border border-white/10 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#E5B453]"
+                          >
+                            <option value="">-- 🔎 選擇加點品項 (Add Dish) --</option>
+                            {menuItems && menuItems.filter(item => item.isAvailable !== false).map((item) => (
+                              <option key={item.id} value={item.id}>
+                                {item.name.zh} (+NT$ {item.price})
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
 
@@ -1962,7 +2216,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                                     min="0"
                                     id="cashier-received-amt-input"
                                     value={cashierCashReceived === 0 ? '' : cashierCashReceived}
-                                    onChange={(e) => setCashierCashReceived(parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => setCashierCashReceived(parseFloat(e.target.value.replace(/\D/g, '')) || 0)}
                                     className="w-full bg-[#161616] border border-white/10 rounded-lg py-1.5 px-2.5 pl-10 text-white font-mono text-sm font-extrabold focus:outline-none focus:border-[#E5B453] transition"
                                   />
                                 </div>
@@ -2625,7 +2879,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                                     min="0"
                                     id="cashier-received-amt-input"
                                     value={cashierCashReceived === 0 ? '' : cashierCashReceived}
-                                    onChange={(e) => setCashierCashReceived(parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => setCashierCashReceived(parseFloat(e.target.value.replace(/\D/g, '')) || 0)}
                                     className="w-full bg-[#161616] border border-white/10 rounded-xl py-2 px-3 pl-11 text-white font-mono text-base font-extrabold focus:outline-none focus:border-[#E5B453] transition"
                                   />
                                 </div>
@@ -3692,25 +3946,48 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       <p className="font-extrabold text-white">{tb.id} 號桌位</p>
                       <p className="text-[10px] text-zinc-500 truncate max-w-[150px]" title={tb.qrCodeUrl}>連結: {tb.qrCodeUrl}</p>
                     </div>
-                    <div className="flex space-x-1">
-                      <button
-                        type="button"
-                        onClick={() => triggerEditTableMode(tb)}
-                        className="p-1 hover:bg-white/5 rounded text-[#E5B453] cursor-pointer"
-                      >
-                        <Edit size={12} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          if (window.confirm(`⚠️ 確定要刪除第 ${tb.id} 號桌席定位和其條碼連結嗎？`)) {
-                            await onDeleteTable(tb.id);
-                          }
-                        }}
-                        className="p-1 hover:bg-rose-500/10 rounded text-rose-400 cursor-pointer"
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                    <div className="flex items-center space-x-1.5">
+                      {tableToDeleteId === tb.id ? (
+                        <div className="flex items-center space-x-1 bg-rose-500/10 border border-rose-500/20 py-0.5 px-1.5 rounded-lg">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await onDeleteTable(tb.id);
+                              setTableToDeleteId(null);
+                            }}
+                            className="text-rose-400 hover:text-rose-300 font-extrabold text-[10px] cursor-pointer"
+                          >
+                            確定刪除
+                          </button>
+                          <span className="text-zinc-600 text-[9px]">|</span>
+                          <button
+                            type="button"
+                            onClick={() => setTableToDeleteId(null)}
+                            className="text-zinc-400 hover:text-white text-[10px] cursor-pointer"
+                          >
+                            取消
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => triggerEditTableMode(tb)}
+                            className="p-1 hover:bg-white/5 rounded text-[#E5B453] cursor-pointer"
+                            title="編輯桌次 QR 碼"
+                          >
+                            <Edit size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setTableToDeleteId(tb.id)}
+                            className="p-1 hover:bg-rose-500/10 rounded text-rose-400 cursor-pointer"
+                            title="刪除客座"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -3721,18 +3998,18 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
             <div className="bg-[#161616] border border-white/10 rounded-xl p-5 space-y-4">
               <div className="border-b border-white/5 pb-2">
                 <span className="text-[10px] font-bold text-[#E5B453] tracking-widest block uppercase">安全鑰控制與系統加密安全</span>
-                <h4 className="font-bold text-sm mt-0.5">變更 4 位數員工解鎖解鎖金鑰 PIN Changer</h4>
+                <h4 className="font-bold text-sm mt-0.5">變更 6 位數員工解鎖解鎖金鑰 PIN Changer</h4>
               </div>
               <form onSubmit={handlePinChangeSubmit} className="space-y-4 text-xs">
                 {pinChangeError && <div className="p-2 bg-rose-500/10 text-rose-400 text-[11px] font-bold rounded-lg">⚠️ {pinChangeError}</div>}
                 {pinChangeSuccess && <div className="p-2 bg-emerald-500/10 text-emerald-400 text-[11px] font-bold rounded-lg">🎯 {pinChangeSuccess}</div>}
                 <div className="space-y-1">
-                  <label className="text-zinc-400 block">目前解鎖金鑰 Current PIN (預設為 8888)</label>
+                  <label className="text-zinc-400 block">目前解鎖金鑰 Current PIN (預設為 888888)</label>
                   <input
                     type="password"
                     required
-                    maxLength={4}
-                    pattern="\d{4}"
+                    maxLength={6}
+                    pattern="\d{6}"
                     value={currentPinInput}
                     onChange={(e) => setCurrentPinInput(e.target.value.replace(/\D/g, ''))}
                     className="w-full bg-black border border-white/10 rounded-lg px-2.5 py-1.5 font-mono text-center tracking-widest text-[14px]"
@@ -3745,12 +4022,12 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     <input
                       type="password"
                       required
-                      maxLength={4}
-                      pattern="\d{4}"
+                      maxLength={6}
+                      pattern="\d{6}"
                       value={newPinInput}
                       onChange={(e) => setNewPinInput(e.target.value.replace(/\D/g, ''))}
                       className="w-full bg-black border border-white/10 rounded-lg px-2.5 py-1.5 font-mono text-center tracking-widest text-[14px]"
-                      placeholder="全新 4 碼"
+                      placeholder="全新 6 碼"
                     />
                   </div>
                   <div className="space-y-1">
@@ -3758,8 +4035,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     <input
                       type="password"
                       required
-                      maxLength={4}
-                      pattern="\d{4}"
+                      maxLength={6}
+                      pattern="\d{6}"
                       value={confirmPinInput}
                       onChange={(e) => setConfirmPinInput(e.target.value.replace(/\D/g, ''))}
                       className="w-full bg-black border border-white/10 rounded-lg px-2.5 py-1.5 font-mono text-center tracking-widest text-[14px]"
@@ -3789,10 +4066,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 <div className="space-y-1">
                   <label className="text-zinc-400 block">當前每人最低消費金額 (NT$)</label>
                   <input
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={tempMinSpend}
-                    onChange={(e) => setTempMinSpend(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                    onChange={(e) => setTempMinSpend(Math.max(0, parseInt(e.target.value.replace(/\D/g, ''), 10) || 0))}
                     className="w-full bg-black border border-white/10 rounded-lg px-2.5 py-1.5 font-mono text-center text-white tracking-wide text-sm"
                     placeholder="例如: 200"
                   />
@@ -3807,8 +4085,43 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </div>
             </div>
 
-            {/* 時段營業時間設定 (精確到分鐘) */}
+            {/* 客戶注意事項欄位 */}
             <div className="bg-[#161616] border border-white/10 rounded-xl p-5 space-y-4 font-sans text-left">
+              <div className="border-b border-white/5 pb-2">
+                <span className="text-[10px] font-bold text-[#E5B453] tracking-widest block uppercase">客席資訊與跑馬燈公告</span>
+                <h4 className="font-bold text-sm mt-0.5">滾動式客席注意事項公告 Customer Scrolling Notice</h4>
+              </div>
+              <div className="space-y-3.5 text-xs">
+                {noticeError && <div className="p-2 bg-rose-500/10 text-rose-400 text-[11px] font-bold rounded-lg border border-rose-500/20">⚠️ {noticeError}</div>}
+                {noticeSuccess && <div className="p-2 bg-emerald-500/10 text-emerald-400 text-[11px] font-bold rounded-lg border border-emerald-500/20">🎯 {noticeSuccess}</div>}
+                
+                <p className="text-[11px] text-zinc-400 leading-normal">
+                  此訊息會以「滾動式跑馬燈」在所有顧客桌別的點餐頁面最上方即時輪播，適合填寫：最新優惠、滿額贈禮、低消或限時說明。
+                </p>
+
+                <div className="space-y-1">
+                  <label className="text-zinc-500 block font-semibold">公告內容 (字數不限，支援英文及多語系跑馬輪播)</label>
+                  <textarea
+                    rows={3}
+                    value={tempCustomerNotice}
+                    onChange={(e) => setTempCustomerNotice(e.target.value)}
+                    className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white leading-relaxed text-xs focus:ring-1 focus:ring-[#E5B453] focus:outline-none focus:border-[#E5B453]"
+                    placeholder="輸入你要在頂部跑馬燈輪播的消息..."
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveCustomerNotice}
+                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-lg active:scale-95 cursor-pointer text-[12px] shadow-sm tracking-wide transition flex items-center justify-center gap-1"
+                >
+                  <span>💾 儲存並即時推播公告</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 時段營業時間設定 (精確到分鐘) */}
+            <div className="bg-[#161616] border border-white/10 rounded-xl p-5 space-y-4 font-sans text-left md:col-span-2">
               <div className="border-b border-white/5 pb-2">
                 <span className="text-[10px] font-bold text-[#E5B453] tracking-widest block uppercase">營業控制與點餐時間鎖定</span>
                 <h4 className="font-bold text-sm mt-0.5">時段營業時間設定 Custom Operating Hours (精確到分鐘)</h4>
@@ -4024,41 +4337,6 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     <span>💾 儲存營業時間與公休日配置</span>
                   </button>
                 </div>
-              </div>
-            </div>
-
-            {/* 客戶注意事項欄位 */}
-            <div className="bg-[#161616] border border-white/10 rounded-xl p-5 space-y-4 font-sans text-left">
-              <div className="border-b border-white/5 pb-2">
-                <span className="text-[10px] font-bold text-[#E5B453] tracking-widest block uppercase">客席資訊與跑馬燈公告</span>
-                <h4 className="font-bold text-sm mt-0.5">滾動式客席注意事項公告 Customer Scrolling Notice</h4>
-              </div>
-              <div className="space-y-3.5 text-xs">
-                {noticeError && <div className="p-2 bg-rose-500/10 text-rose-400 text-[11px] font-bold rounded-lg border border-rose-500/20">⚠️ {noticeError}</div>}
-                {noticeSuccess && <div className="p-2 bg-emerald-500/10 text-emerald-400 text-[11px] font-bold rounded-lg border border-emerald-500/20">🎯 {noticeSuccess}</div>}
-                
-                <p className="text-[11px] text-zinc-400 leading-normal">
-                  此訊息會以「滾動式跑馬燈」在所有顧客桌別的點餐頁面最上方即時輪播，適合填寫：最新優惠、滿額贈禮、低消或限時說明。
-                </p>
-
-                <div className="space-y-1">
-                  <label className="text-zinc-500 block font-semibold">公告內容 (字數不限，支援英文及多語系跑馬輪播)</label>
-                  <textarea
-                    rows={3}
-                    value={tempCustomerNotice}
-                    onChange={(e) => setTempCustomerNotice(e.target.value)}
-                    className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white leading-relaxed text-xs focus:ring-1 focus:ring-[#E5B453] focus:outline-none focus:border-[#E5B453]"
-                    placeholder="輸入你要在頂部跑馬燈輪播的消息..."
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleSaveCustomerNotice}
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-lg active:scale-95 cursor-pointer text-[12px] shadow-sm tracking-wide transition flex items-center justify-center gap-1"
-                >
-                  <span>💾 儲存並即時推播公告</span>
-                </button>
               </div>
             </div>
           </div>
@@ -4377,6 +4655,755 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
           </div>
         </div>
       )}
+
+
+      {/* ==================== SCREEN SUBTAB: PRINTER SETTINGS ==================== */}
+      {activeSubTab === 'printer' && (
+        <div className="space-y-6 animate-fadeIn text-left font-sans" id="subtab-section-printer">
+          <div className="bg-[#161616] border border-white/10 rounded-xl p-5 space-y-4">
+            <div className="flex items-center space-x-2 border-b border-white/5 pb-2">
+              <span className="text-xl">🖨️</span>
+              <div>
+                <h4 className="font-bold text-sm text-white">印表機與硬體規格管理器 (Printer Setup Center)</h4>
+                <p className="text-white/40 text-xs">分離設置廚房KDS備餐印表機與前台帳單收銀印表機，不同模組各司其職，隨寬度自適應縮放字體大小。</p>
+              </div>
+            </div>
+
+            {printerSaveSuccess && (
+              <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold rounded-xl text-center text-xs">
+                {printerSaveSuccess}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* 1. KDS Kitchen Printer config */}
+              <div className="bg-black/40 border border-[#E5B453]/20 p-4 rounded-xl space-y-4">
+                <span className="text-xs text-[#E5B453] font-extrabold block uppercase tracking-wider">🍳 廚房 KDS 工作票印表機</span>
+                
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <label className="text-zinc-400 block mb-1">連接方式 Connection Type</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['USB', 'IP'].map(type => (
+                        <button
+                          key={`kit-conn-${type}`}
+                          type="button"
+                          onClick={() => setKitchenPrinter({ ...kitchenPrinter, connectionType: type as any })}
+                          className={`py-1.5 rounded-lg border font-bold text-center cursor-pointer ${
+                            kitchenPrinter.connectionType === type
+                              ? 'bg-[#E5B453]/20 border-[#E5B453] text-[#E5B453]'
+                              : 'bg-zinc-900 border-white/5 text-zinc-400'
+                          }`}
+                        >
+                          {type === 'USB' ? '🔌 USB 連線' : '🌐 網路 IP 連線'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {kitchenPrinter.connectionType === 'IP' ? (
+                    <div>
+                      <label className="text-zinc-400 block mb-1">印表機固定 IP 位址</label>
+                      <input
+                        type="text"
+                        value={kitchenPrinter.ip}
+                        onChange={(e) => setKitchenPrinter({ ...kitchenPrinter, ip: e.target.value })}
+                        className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white font-mono"
+                        placeholder="例如: 192.168.1.101"
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="text-zinc-400 block mb-1">USB 埠位置 USB Port (ComPath)</label>
+                      <input
+                        type="text"
+                        value={kitchenPrinter.usbPort}
+                        onChange={(e) => setKitchenPrinter({ ...kitchenPrinter, usbPort: e.target.value })}
+                        className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white font-mono"
+                        placeholder="例如: USB001, /dev/usb/lp0"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">紙張出單寬度 Width Specs</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['58mm', '80mm'].map(w => (
+                        <button
+                          key={`kit-w-${w}`}
+                          type="button"
+                          onClick={() => setKitchenPrinter({ ...kitchenPrinter, width: w as any, fontSizeFactor: w === '58mm' ? 0.8 : 1.0 })}
+                          className={`py-1.5 rounded-lg border font-bold text-center cursor-pointer ${
+                            kitchenPrinter.width === w
+                              ? 'bg-amber-400/20 border-amber-400 text-amber-300'
+                              : 'bg-zinc-900 border-white/5 text-zinc-400'
+                          }`}
+                        >
+                          {w} {w === '58mm' ? '(縮放 0.8x)' : '(標準 1.0x)'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">出單字體縮放比例 Font Scale</label>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2.0"
+                      step="0.1"
+                      value={kitchenPrinter.fontSizeFactor}
+                      onChange={(e) => setKitchenPrinter({ ...kitchenPrinter, fontSizeFactor: parseFloat(e.target.value) })}
+                      className="w-full accent-[#E5B453]"
+                    />
+                    <div className="flex justify-between font-mono text-[10px] text-zinc-500 mt-1">
+                      <span>最小(0.5x)</span>
+                      <span className="text-[#E5B453] font-bold">當前: {kitchenPrinter.fontSizeFactor}x</span>
+                      <span>最大(2.0x)</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">自訂列印抬頭 (廚房名稱)</label>
+                    <input
+                      type="text"
+                      value={kitchenPrinter.restaurantName}
+                      onChange={(e) => setKitchenPrinter({ ...kitchenPrinter, restaurantName: e.target.value })}
+                      className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">表頭自訂引言 Pre-title Message</label>
+                    <input
+                      type="text"
+                      value={kitchenPrinter.headerPrefix}
+                      onChange={(e) => setKitchenPrinter({ ...kitchenPrinter, headerPrefix: e.target.value })}
+                      className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">表尾注意事項 Footer Warning</label>
+                    <input
+                      type="text"
+                      value={kitchenPrinter.footerSuffix}
+                      onChange={(e) => setKitchenPrinter({ ...kitchenPrinter, footerSuffix: e.target.value })}
+                      className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Front Receipt/Bill Printer config */}
+              <div className="bg-black/40 border border-blue-500/20 p-4 rounded-xl space-y-4">
+                <span className="text-xs text-blue-400 font-extrabold block uppercase tracking-wider">🧾 前台帳單與收銀明細印表機</span>
+                
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <label className="text-zinc-400 block mb-1">連接方式 Connection Type</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['USB', 'IP'].map(type => (
+                        <button
+                          key={`bill-conn-${type}`}
+                          type="button"
+                          onClick={() => setBillPrinter({ ...billPrinter, connectionType: type as any })}
+                          className={`py-1.5 rounded-lg border font-bold text-center cursor-pointer ${
+                            billPrinter.connectionType === type
+                              ? 'bg-blue-500/20 border-blue-400 text-blue-300'
+                              : 'bg-zinc-900 border-white/5 text-zinc-400'
+                          }`}
+                        >
+                          {type === 'USB' ? '🔌 USB 連線' : '🌐 網路 IP 連線'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {billPrinter.connectionType === 'IP' ? (
+                    <div>
+                      <label className="text-zinc-400 block mb-1">印表機固定 IP 位址</label>
+                      <input
+                        type="text"
+                        value={billPrinter.ip}
+                        onChange={(e) => setBillPrinter({ ...billPrinter, ip: e.target.value })}
+                        className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white font-mono"
+                        placeholder="例如: 192.168.1.102"
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="text-zinc-400 block mb-1">USB 埠位置 USB Port (ComPath)</label>
+                      <input
+                        type="text"
+                        value={billPrinter.usbPort}
+                        onChange={(e) => setBillPrinter({ ...billPrinter, usbPort: e.target.value })}
+                        className="w-full bg-zinc-950 border border-white/10 rounded-lg p-2 text-white font-mono"
+                        placeholder="例如: USB002, /dev/usb/lp1"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">紙張出單寬度 Width Specs</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['58mm', '80mm'].map(w => (
+                        <button
+                          key={`bill-w-${w}`}
+                          type="button"
+                          onClick={() => setBillPrinter({ ...billPrinter, width: w as any, fontSizeFactor: w === '58mm' ? 0.8 : 1.0 })}
+                          className={`py-1.5 rounded-lg border font-bold text-center cursor-pointer ${
+                            billPrinter.width === w
+                              ? 'bg-blue-400/20 border-blue-400 text-blue-300'
+                              : 'bg-zinc-900 border-white/5 text-zinc-400'
+                          }`}
+                        >
+                          {w} {w === '58mm' ? '(縮放 0.8x)' : '(標準 1.0x)'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">出單字體縮放比例 Font Scale</label>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2.0"
+                      step="0.1"
+                      value={billPrinter.fontSizeFactor}
+                      onChange={(e) => setBillPrinter({ ...billPrinter, fontSizeFactor: parseFloat(e.target.value) })}
+                      className="w-full accent-blue-500"
+                    />
+                    <div className="flex justify-between font-mono text-[10px] text-zinc-500 mt-1">
+                      <span>最小(0.5x)</span>
+                      <span className="text-blue-400 font-bold">當前: {billPrinter.fontSizeFactor}x</span>
+                      <span>最大(2.0x)</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">抬頭餐廳名稱 Restaurant Name</label>
+                    <input
+                      type="text"
+                      value={billPrinter.restaurantName}
+                      onChange={(e) => setBillPrinter({ ...billPrinter, restaurantName: e.target.value })}
+                      className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-zinc-400 block mb-1">電話 Tel</label>
+                      <input
+                        type="text"
+                        value={billPrinter.printTelephone}
+                        onChange={(e) => setBillPrinter({ ...billPrinter, printTelephone: e.target.value })}
+                        className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white text-[11px]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-zinc-400 block mb-1">開啟出單時間戳</label>
+                      <div className="flex items-center h-9 pl-1">
+                        <input
+                          type="checkbox"
+                          id="bill-checkbox-time"
+                          checked={billPrinter.printTimeEnabled}
+                          onChange={(e) => setBillPrinter({ ...billPrinter, printTimeEnabled: e.target.checked })}
+                          className="w-4 h-4 text-blue-500 bg-[#161616] border-white/10 rounded focus:ring-0"
+                        />
+                        <label htmlFor="bill-checkbox-time" className="text-[11px] text-zinc-300 ml-2 cursor-pointer font-bold">列印時標記精確時間</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">列印餐廳地址 Address</label>
+                    <input
+                      type="text"
+                      value={billPrinter.printAddress}
+                      onChange={(e) => setBillPrinter({ ...billPrinter, printAddress: e.target.value })}
+                      className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white font-sans text-[11px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">表頭促銷首語 Header Slogan</label>
+                    <input
+                      type="text"
+                      value={billPrinter.headerPrefix}
+                      onChange={(e) => setBillPrinter({ ...billPrinter, headerPrefix: e.target.value })}
+                      className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-zinc-400 block mb-1">副聯結尾致謝辭 Thank You Message</label>
+                    <input
+                      type="text"
+                      value={billPrinter.footerSuffix}
+                      onChange={(e) => setBillPrinter({ ...billPrinter, footerSuffix: e.target.value })}
+                      className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-white/5 flex gap-2">
+              <button
+                type="button"
+                onClick={handleSavePrinters}
+                className="flex-1 py-3 bg-[#E5B453] hover:bg-amber-400 text-black font-black rounded-lg text-xs tracking-wider transition active:scale-95 cursor-pointer text-center"
+              >
+                💾 儲存並同步雙模組印表機設定 Store Printer Profiles
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== SCREEN SUBTAB: MENU OPTION RULES MANAGER ==================== */}
+      {activeSubTab === 'options' && (
+        <div className="space-y-6 animate-fadeIn text-left font-sans" id="subtab-section-options">
+          <div className="bg-[#161616] border border-white/10 rounded-xl p-5 space-y-4">
+            <div className="flex items-center space-x-2 border-b border-white/5 pb-2">
+              <span className="text-xl">🧩</span>
+              <div>
+                <h4 className="font-bold text-sm text-white">餐點客製附加選項規則管理器 (Global Choice Rules Manager)</h4>
+                <p className="text-white/40 text-xs">在此建立全店共用客製選項規則。例如：加配料與價格、辣度熟度細則等，統一發布至餐點附加池中。</p>
+              </div>
+            </div>
+
+            {/* Create Rule Form */}
+            <div className="bg-[#202020] border border-white/5 p-4 rounded-xl space-y-3">
+              <span className="text-xs font-bold text-[#E5B453] tracking-widest block uppercase">➕ 新增一筆全域附加共用選項規則</span>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="space-y-1">
+                  <label className="text-zinc-400 text-[11px]">選項名稱 (e.g. 加河粉, 小鮮蝦)</label>
+                  <input
+                    type="text"
+                    value={newRuleName}
+                    onChange={(e) => setNewRuleName(e.target.value)}
+                    className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-xs text-white"
+                    placeholder="輸入例如：加河粉"
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-zinc-400 text-[11px]">客製項目分類</label>
+                  <select
+                    value={newRuleCategory}
+                    onChange={(e) => setNewRuleCategory(e.target.value)}
+                    className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-xs text-white"
+                  >
+                    <option value="加配料">加配料 (Extra Ingredients)</option>
+                    <option value="熟度調整">熟度調整 (Cooking Level)</option>
+                    <option value="辣度調整">辣度調整 (Spiciness)</option>
+                    <option value="主食更換">主食更換 (Main Carb)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-zinc-400 text-[11px]">額外附加價格 NT$</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={newRulePrice}
+                    onChange={(e) => setNewRulePrice(parseInt(e.target.value) || 0)}
+                    className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2 text-xs text-white font-mono"
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    type="button"
+                    onClick={handleAddGlobalRule}
+                    className="w-full h-9 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-lg text-xs leading-none transition active:scale-95 cursor-pointer"
+                  >
+                    新增此選項規則
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Rules DB List */}
+            <div className="space-y-2">
+              <span className="text-xs text-zinc-400 font-bold block uppercase tracking-wider">🗂️ 全店共用客製選項規則資料庫</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {globalRules.length === 0 ? (
+                  <p className="text-xs text-zinc-500 italic p-4">暫未建立任何全域加選選項</p>
+                ) : (
+                  globalRules.map((rule) => (
+                    <div key={rule.id} className="p-3 bg-zinc-900 border border-white/5 rounded-xl flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-[9px] font-bold text-[#E5B453] bg-[#E5B453]/10 px-1.5 py-0.5 rounded border border-[#E5B453]/20">
+                            {rule.category}
+                          </span>
+                          <span className="text-xs font-bold text-white leading-none">{rule.name}</span>
+                        </div>
+                        <p className="text-[10px] font-mono text-zinc-400">額外附帶價格: <span className="text-amber-300 font-extrabold">NT$ {rule.price}</span></p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteGlobalRule(rule.id)}
+                        className="text-[10px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-rose-400 hover:text-white px-2.5 py-1 rounded-lg transition active:scale-95 cursor-pointer"
+                      >
+                        刪除
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== SCREEN SUBTAB: EOD DAILY CHECKOUT ==================== */}
+      {activeSubTab === 'eod' && (() => {
+        const paidOrders = orders.filter(o => o.isPaid);
+        const unpaidOrders = orders.filter(o => !o.isPaid && o.status !== 'cancelled');
+        const totalRev = paidOrders.reduce((sum, ord) => sum + ord.total, 0);
+        const cashSum = paidOrders.filter(o => o.paymentMethod === 'cash').reduce((sum, ord) => sum + ord.total, 0);
+        const creditSum = paidOrders.filter(o => o.paymentMethod === 'credit').reduce((sum, ord) => sum + ord.total, 0);
+        const linepaySum = paidOrders.filter(o => o.paymentMethod === 'linepay').reduce((sum, ord) => sum + ord.total, 0);
+        const memberSum = paidOrders.filter(o => o.paymentMethod === 'member').reduce((sum, ord) => sum + ord.total, 0);
+
+        // Calculate quantities of each item sold
+        const itemQuants: { [name: string]: { zh: string; qty: number } } = {};
+        paidOrders.forEach(o => {
+          o.items.forEach(it => {
+            const label = it.name.zh;
+            if (!itemQuants[label]) {
+              itemQuants[label] = { zh: label, qty: 0 };
+            }
+            itemQuants[label].qty += it.qty;
+          });
+        });
+
+        // Calculate standard ingredient consumption based on recipes
+        const calculatedDeductions: { [ingId: string]: number } = {};
+        ingredients.forEach(ig => {
+          calculatedDeductions[ig.id] = 0;
+        });
+
+        paidOrders.forEach(o => {
+          o.items.forEach(it => {
+            const recipe = recipeCompositionMap[it.id];
+            if (recipe) {
+              recipe.forEach(rec => {
+                const ingObj = ingredients.find(ig => ig.name.zh === rec.name || ig.id === rec.name);
+                if (ingObj) {
+                  const match = rec.qty.match(/([\d\.]+)/);
+                  const amountPerItem = match ? parseFloat(match[1]) : 1;
+                  calculatedDeductions[ingObj.id] += amountPerItem * it.qty;
+                }
+              });
+            }
+          });
+        });
+
+        const handlePerformInventoryEodDeduction = async () => {
+          let successCount = 0;
+          try {
+            for (const ig of ingredients) {
+              const consumption = calculatedDeductions[ig.id] || 0;
+              if (consumption > 0) {
+                const res = await fetch('/api/inventory/adjust', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    ingredientId: ig.id,
+                    quantityChanged: -consumption,
+                    note: `EOD 每日關帳自動扣減：已售餐品配方消耗核銷`
+                  })
+                });
+                if (res.ok) {
+                  successCount++;
+                }
+              }
+            }
+            alert(`🎉 庫存連動扣除成功！已為您同步自動化核銷對應 ${successCount} 項餐品配方食材物料流向。`);
+            if (ingredients.length > 0) {
+              await onRestock(ingredients[0].id, 0); // Sync parent state
+            }
+            await fetchInventoryLogs();
+          } catch (err) {
+            console.error(err);
+            alert('❌ 自動配方庫存扣減時發生預期外錯誤');
+          }
+        };
+
+        const handleEodReceiptPrint = () => {
+          const lines = Object.entries(itemQuants).map(([lbl, val]) => `  • ${lbl.padEnd(16)} x${val.qty}`).join('\n');
+          const ingredientLines = ingredients.map(ig => {
+            const consumption = calculatedDeductions[ig.id] || 0;
+            return `  • ${ig.name.zh.padEnd(12)}: 剩餘 ${ig.stock} ${ig.unit} (今日已扣減 ${consumption} ${ig.unit})`;
+          }).join('\n');
+
+          const receiptBody = `
+========================================
+       沙貝燒烤 (每日營業結算日報表)
+========================================
+列印時間: ${new Date().toLocaleString()}
+報表日期: ${new Date().toLocaleDateString()}
+-----------------------------------------
+【今日營業數據加總】
+今日實收總額 (Net Revenue): NT$ ${totalRev} 元
+成功收款單數 (Paid Bills): ${paidOrders.length} 筆
+未收細單單數 (Unpaid Bills): ${unpaidOrders.length} 筆
+
+【付款方式明細匯總】
+  - 💵 現金收銀 (Cash):   NT$ ${cashSum} 元
+  - 💳 信用卡結 (Credit): NT$ ${creditSum} 元
+  - 🖥️ 行動支付 (TWQR):   NT$ ${linepaySum} 元
+  - 👤 會員儲值 (Member): NT$ ${memberSum} 元
+-----------------------------------------
+【餐點熱銷排行明細】
+${lines || '  (今天尚無完成收銀單商品)'}
+-----------------------------------------
+【連動數據庫存原料位變動】
+${ingredientLines || '  (尚無庫存異動記錄)'}
+-----------------------------------------
+設定店名: ${billPrinter.restaurantName}
+聯絡電話: ${billPrinter.printTelephone}
+店鋪地址: ${billPrinter.printAddress}
+========================================
+          `.trim();
+
+          const pWin = window.open();
+          if (pWin) {
+            pWin.document.write(`
+              <html>
+                <head>
+                  <title>SABAY 每日結帳報表 (EOD)</title>
+                  <style>
+                    body {
+                      font-family: monospace;
+                      background: #fff;
+                      color: #000;
+                      padding: 20px;
+                      font-size: ${billPrinter.width === '58mm' ? '12px' : '14px'};
+                      max-width: ${billPrinter.width === '58mm' ? '280px' : '400px'};
+                      margin: 0 auto;
+                      white-space: pre-wrap;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <pre>${receiptBody}</pre>
+                  <script>window.onload = function() { window.print(); }</script>
+                </body>
+              </html>
+            `);
+            pWin.document.close();
+          }
+        };
+
+        const handleCompleteEodAndLogout = () => {
+          alert('🏁 每日關帳作業與庫存對帳已核銷完畢，即將登出工作人員並鎖定客用介面！');
+          localStorage.removeItem('google-current-member');
+          localStorage.removeItem('line-profile');
+          window.location.href = '/';
+        };
+
+        return (
+          <div className="space-y-6 animate-fadeIn text-left font-sans" id="subtab-section-eod">
+            <div className="bg-[#161616] border border-white/10 rounded-xl p-5 space-y-4">
+              <div className="flex items-center space-x-2 border-b border-white/5 pb-2">
+                <span className="text-xl">🏁</span>
+                <div>
+                  <h4 className="font-bold text-sm text-white">沙貝每日關帳結核系統 (Daily Business EOD Checkout Portal)</h4>
+                  <p className="text-white/40 text-xs">執行每日店面關帳結算，一鍵更新餐點銷售與原料配銷，產印熱感報表與結存變更，強化營運動能。</p>
+                </div>
+              </div>
+
+              {/* Stats KPI Card in Checkout Panel */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+                <div className="text-center p-2.5 bg-zinc-900 border border-white/5 rounded-lg">
+                  <span className="text-[10px] text-zinc-500 block font-semibold">今日關帳實收金額</span>
+                  <span className="text-lg font-mono font-black text-[#E5B453]">NT$ {totalRev}</span>
+                </div>
+                <div className="text-center p-2.5 bg-zinc-900 border border-white/5 rounded-lg">
+                  <span className="text-[10px] text-zinc-500 block font-semibold">已收款單數</span>
+                  <span className="text-lg font-mono font-black text-white">{paidOrders.length} 筆</span>
+                </div>
+                <div className="text-center p-2.5 bg-zinc-900 border border-white/5 rounded-lg">
+                  <span className="text-[10px] text-zinc-500 block font-semibold">現金收訖 (Cash)</span>
+                  <span className="text-lg font-mono font-black text-emerald-400">NT$ {cashSum}</span>
+                </div>
+                <div className="text-center p-2.5 bg-zinc-900 border border-white/5 rounded-lg">
+                  <span className="text-[10px] text-zinc-500 block font-semibold">信用卡收訖 (Credit)</span>
+                  <span className="text-lg font-mono font-black text-blue-400">NT$ {creditSum}</span>
+                </div>
+                <div className="text-center p-2.5 bg-zinc-900 border border-white/5 rounded-lg">
+                  <span className="text-[10px] text-zinc-500 block font-semibold">TWQR/會員扣抵合計</span>
+                  <span className="text-lg font-mono font-black text-teal-400">NT$ {linepaySum + memberSum}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Column 1: Unpaid orders & Payment State transitions */}
+                <div className="bg-black/20 border border-white/5 rounded-xl p-4 space-y-4">
+                  <div className="space-y-0.5 border-b border-white/5 pb-2">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+                      ⏱️ 待核銷未收細單明細 ({unpaidOrders.length})
+                    </h5>
+                    <p className="text-[10px] text-zinc-500">此為今日仍維持未結帳狀態之點單，關帳前可一鍵變更支付方式或進行收銀狀態流轉。</p>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {unpaidOrders.length === 0 ? (
+                      <div className="text-center py-8 text-xs text-zinc-500 italic">
+                        🎉 太棒了！今日已無任何未結帳點單。
+                      </div>
+                    ) : (
+                      unpaidOrders.map(ord => (
+                        <div key={ord.id} className="p-3 bg-zinc-900/80 rounded-lg border border-white/5 text-xs text-zinc-300 space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="font-mono font-bold text-white">{ord.id.slice(-6).toUpperCase()} ({ord.tableNumber} 桌)</span>
+                            <span className="font-mono text-[#E5B453] font-black">NT$ {ord.total}</span>
+                          </div>
+                          
+                          <div className="flex gap-1.5 pt-1 border-t border-white/5">
+                            {(['cash', 'credit', 'linepay'] as const).map(pm => (
+                              <button
+                                key={pm}
+                                type="button"
+                                onClick={async () => {
+                                  if (onPayOrder) {
+                                    await onPayOrder(ord.id, {
+                                      paymentMethod: pm,
+                                      isPaid: true
+                                    });
+                                    alert(`💸 已將點單 ${ord.id.slice(-6).toUpperCase()} 修改為【已結款 (${pm === 'cash' ? '現金' : pm === 'credit' ? '信用卡' : 'TWQR'})】`);
+                                  }
+                                }}
+                                className="flex-1 py-1 rounded bg-zinc-800 hover:bg-[#E5B453] hover:text-black transition-colors text-[9px] font-black"
+                              >
+                                {pm === 'cash' ? '現結' : pm === 'credit' ? '刷卡' : 'TWQR'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Column 2: Inventory deductions analysis */}
+                <div className="bg-black/20 border border-white/5 rounded-xl p-4 space-y-4">
+                  <div className="space-y-0.5 border-b border-white/5 pb-2">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider">
+                      📦 連動「數據庫存」今日配餐配銷扣減
+                    </h5>
+                    <p className="text-[10px] text-zinc-500">系統即時比對已收款餐品之食材配方，模擬計算當日營業流失的理論庫存量。</p>
+                  </div>
+
+                  <div className="space-y-2.5 text-xs text-zinc-300">
+                    <div className="bg-zinc-900/60 p-3 rounded-lg border border-white/5 space-y-1.5 max-h-72 overflow-y-auto">
+                      {ingredients.map(ig => {
+                        const consumption = calculatedDeductions[ig.id] || 0;
+                        const isWarning = ig.stock - consumption <= ig.minThreshold;
+                        return (
+                          <div key={ig.id} className="flex justify-between items-center border-b border-white/5 pb-1">
+                            <span>{ig.name.zh}</span>
+                            <div className="text-right font-mono text-[11px]">
+                              <span className="text-zinc-500">今日應扣: </span>
+                              <span className="text-amber-400 font-bold pr-2">{consumption} {ig.unit}</span>
+                              <span className="text-zinc-500">預估剩餘: </span>
+                              <span className={isWarning ? 'text-rose-400 font-black' : 'text-zinc-300'}>
+                                {Math.max(0, Math.round((ig.stock - consumption) * 100) / 100)} {ig.unit}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handlePerformInventoryEodDeduction}
+                      className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-black rounded-lg text-xs tracking-wider transition active:scale-95 cursor-pointer uppercase text-center shadow-lg"
+                    >
+                      📊 連動扣減：一鍵對應「數據庫存」扣位
+                    </button>
+                  </div>
+                </div>
+
+                {/* Column 3: Print Receipt Preview layout */}
+                <div className="bg-black/20 border border-white/5 rounded-xl p-4 space-y-4">
+                  <div className="space-y-0.5 border-b border-white/5 pb-2">
+                    <h5 className="font-bold text-xs text-white uppercase tracking-wider">
+                      🖨️ 每日營業關帳日報表列印預覽
+                    </h5>
+                    <p className="text-[10px] text-zinc-500">根據當前設定之熱感式出單硬體寬度（目前：{billPrinter.width}），模擬產生實體對帳聯（含原料變動紀錄）。</p>
+                  </div>
+
+                  {/* Thermal paper simulator */}
+                  <div className="bg-zinc-950 border border-white/15 p-4 rounded-xl text-[10px] font-mono text-zinc-300 pointer-events-none select-none max-h-64 overflow-y-auto space-y-1 leading-tight">
+                    <p className="text-center font-bold text-white">沙貝燒烤 每日營業日報表</p>
+                    <p className="text-[9px] text-zinc-500 text-center">列印時間: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
+                    <div className="border-t border-dashed border-zinc-700 my-1"></div>
+                    <div className="flex justify-between">
+                      <span>今日實收總額 (Net):</span>
+                      <span className="font-bold text-[#E5B453]">NT$ {totalRev}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>成功收款單數:</span>
+                      <span>{paidOrders.length} 筆</span>
+                    </div>
+                    <div className="border-t border-dashed border-zinc-700 my-1"></div>
+                    <p className="text-[9px] text-[#E5B453] uppercase font-bold">付款方式細點明細:</p>
+                    <p>  💵 現金收銀 (Cash):   NT$ {cashSum}元</p>
+                    <p>  💳 信用卡結 (Credit): NT$ {creditSum}元</p>
+                    <p>  🖥️ 行動支付 (TWQR):   NT$ {linepaySum}元</p>
+                    <p>  👤 会員帳抵 (Member): NT$ {memberSum}元</p>
+                    <div className="border-t border-dashed border-zinc-700 my-1"></div>
+                    <p className="text-[9px] text-[#E5B453] uppercase font-bold">餐點累計熱售排行:</p>
+                    {Object.entries(itemQuants).length === 0 ? (
+                      <p className="italic text-zinc-650">  (今日尚無完成結帳商品)</p>
+                    ) : (
+                      Object.entries(itemQuants).map(([lbl, val]) => (
+                        <p key={lbl}>  • {lbl.slice(0, 10).padEnd(12)} x{val.qty}</p>
+                      ))
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleEodReceiptPrint}
+                    className="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-white/10 text-white font-bold rounded-lg text-xs transition active:scale-95 cursor-pointer uppercase text-center"
+                  >
+                    🖨️ 列印預覽並傳送至熱感印表機 (Print)
+                  </button>
+                </div>
+              </div>
+
+              {/* Action and Safe lock Gate */}
+              <div className="bg-[#202020] border border-rose-500/20 p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="text-left space-y-1">
+                  <span className="text-xs font-bold text-rose-400 tracking-widest block uppercase">🏁 安全結帳與登出強制安全鎖</span>
+                  <p className="text-[11px] text-zinc-400">執行總營業終結轉後，為求當日帳款安全，系統將自動清理當日點餐通道並登出，返回訪客用餐前台頁面。</p>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={handleCompleteEodAndLogout}
+                  className="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-lg text-xs tracking-wider transition active:scale-95 cursor-pointer uppercase text-center whitespace-nowrap shrink-0"
+                >
+                  🏁 立即執行每日總結帳登出 Exit Safely
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+
 
 
       {/* ========================================================================= */}
@@ -4970,7 +5997,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 </div>
                 <div className="space-y-1">
                   <label className="text-zinc-400">售價 Price (NT$)</label>
-                  <input type="number" required min={1} value={itemPrice} onChange={(e) => setItemPrice(Math.max(1, parseInt(e.target.value, 10)))} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white font-mono" />
+                  <input type="text" inputMode="numeric" pattern="[0-9]*" required value={itemPrice} onChange={(e) => setItemPrice(Math.max(1, parseInt(e.target.value.replace(/\D/g, ''), 10) || 1))} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white font-mono" />
                 </div>
               </div>
               <div className="space-y-1">
@@ -4985,13 +6012,117 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 <label className="text-zinc-400">英文寫法 Desc En</label>
                 <textarea rows={2} value={itemDescEn} onChange={(e) => setItemDescEn(e.target.value)} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white" />
               </div>
-              <div className="flex items-center space-x-2 text-left pt-1">
+               <div className="flex items-center space-x-2 text-left pt-1">
                 <input type="checkbox" id="checkbox-has-noodles" checked={hasNoodles} onChange={(e) => setHasNoodles(e.target.checked)} className="w-3.5 h-3.5 outline-none rounded bg-[#1e1e1e] border-white/10 text-amber-500 focus:ring-0 active:scale-95 transition" />
                 <label htmlFor="checkbox-has-noodles" className="text-zinc-300 font-bold cursor-pointer select-none">此餐品開啟自選細麵 / 米線 / 河粉選項</label>
               </div>
               <div className="flex items-center space-x-2 text-left pt-1">
                 <input type="checkbox" id="checkbox-is-not-spicy" checked={isNotSpicy} onChange={(e) => setIsNotSpicy(e.target.checked)} className="w-3.5 h-3.5 outline-none rounded bg-[#1e1e1e] border-white/10 text-amber-500 focus:ring-0 active:scale-95 transition" />
                 <label htmlFor="checkbox-is-not-spicy" className="text-zinc-300 font-bold cursor-pointer select-none">此餐品為【完全不辣】(不勾選則為預設香辣/可調辣度)</label>
+              </div>
+
+              {/* 自訂加選項目配置 panel (User customizable options) */}
+              <div className="space-y-2 border-t border-white/10 pt-3">
+                <label className="text-amber-400 font-bold block text-[11px] tracking-wider uppercase">可自訂單品附加選項 Custom Extra Add-Ons</label>
+                <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                  {customAddOns.length === 0 ? (
+                    <p className="text-[10px] text-zinc-500 italic">目前無自訂附加選項 (可使用下方控制列添加專屬加料或客製配件如: 加蛋, 加肉)</p>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {customAddOns.map((opt, idx) => (
+                        <div key={opt.id || idx} className="flex items-center justify-between bg-white/5 px-2.5 py-2 rounded-lg border border-white/10 text-[11px]">
+                          <span className="font-bold text-white/90">{opt.name}</span>
+                          <div className="flex items-center space-x-2.5">
+                            <span className="font-mono text-[#E5B453] font-bold">+NT$ {opt.price}</span>
+                            <button
+                              type="button"
+                              onClick={() => setCustomAddOns(customAddOns.filter((_, i) => i !== idx))}
+                              className="text-rose-400 hover:text-rose-300 font-bold active:scale-90 transition cursor-pointer px-1.5 py-0.5 rounded hover:bg-rose-500/10"
+                            >
+                              移除
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* 快速導入全域規則庫 */}
+                {globalRules.length > 0 && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-zinc-500 block">💡 快速點選匯入全域客製選項規則 (Quick Import Global Rules)：</span>
+                    <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto bg-[#0C0C0C] p-1.5 rounded-lg border border-white/5">
+                      {globalRules.map(gr => {
+                        const isAdded = customAddOns.some(o => o.name === gr.name);
+                        return (
+                          <button
+                            key={`quick-${gr.id}`}
+                            type="button"
+                            disabled={isAdded}
+                            onClick={() => {
+                              const newOption = {
+                                id: `addon-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                                name: gr.name,
+                                price: gr.price
+                              };
+                              setCustomAddOns([...customAddOns, newOption]);
+                            }}
+                            className={`px-2 py-0.5 rounded text-[10px] transition font-semibold flex items-center space-x-1 border ${
+                              isAdded
+                                ? 'bg-zinc-800/40 border-zinc-700/20 text-zinc-600 cursor-not-allowed'
+                                : 'bg-[#E5B453]/10 hover:bg-[#E5B453]/20 border-[#E5B453]/30 text-[#E5B453] cursor-pointer'
+                            }`}
+                          >
+                            <span>{gr.name} (+${gr.price})</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 增加選項輸入列 */}
+                <div className="flex items-center space-x-2 bg-black/40 p-2 rounded-xl border border-white/5 mt-1.5">
+                  <input
+                    type="text"
+                    id="new-opt-name"
+                    placeholder="例如: 加蛋 Add Egg, 加倍肉"
+                    className="flex-1 bg-[#222222] border border-white/10 rounded px-2.5 py-1 text-white text-[11px]"
+                  />
+                  <input
+                    type="number"
+                    id="new-opt-price"
+                    placeholder="金額"
+                    className="w-16 bg-[#222222] border border-white/10 rounded px-2 py-1 text-white font-mono text-[11px]"
+                    min="0"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nameInput = document.getElementById('new-opt-name') as HTMLInputElement;
+                      const priceInput = document.getElementById('new-opt-price') as HTMLInputElement;
+                      if (!nameInput || !priceInput) return;
+                      const name = nameInput.value.trim();
+                      const price = parseInt(priceInput.value, 10) || 0;
+                      if (!name) {
+                        alert('請輸入選項名稱！');
+                        return;
+                      }
+                      const newOption = {
+                        id: `addon-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                        name,
+                        price
+                      };
+                      setCustomAddOns([...customAddOns, newOption]);
+                      nameInput.value = '';
+                      priceInput.value = '';
+                    }}
+                    className="px-3 py-1 bg-[#E5B453] hover:bg-amber-400 text-slate-900 font-extrabold rounded text-[11px] active:scale-95 transition cursor-pointer shadow"
+                  >
+                    ➕ 新增
+                  </button>
+                </div>
               </div>
             </div>
             <div className="flex justify-end space-x-2 pt-3 border-t border-white/5">
@@ -5057,8 +6188,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
             {tableSuccess && <div className="p-2.5 bg-emerald-500/10 text-emerald-400 font-bold rounded">{tableSuccess}</div>}
             <div className="space-y-3.5 text-left">
               <div className="space-y-1">
-                <span className="text-zinc-500 block">桌鍵號碼 Table ID (如 6, 8, A1，保存後不改)</span>
-                <input type="text" required disabled={!!editingTableObj} value={tableIdInput} onChange={(e) => setTableIdInput(e.target.value)} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white font-mono font-bold" />
+                <span className="text-zinc-500 block">桌鍵號碼 Table ID (限阿拉伯數字，保存後不改)</span>
+                <input type="text" inputMode="numeric" pattern="[0-9]*" required disabled={!!editingTableObj} value={tableIdInput} onChange={(e) => setTableIdInput(e.target.value.replace(/\D/g, ''))} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white font-mono font-bold" />
               </div>
               <div className="space-y-1">
                 <span className="text-zinc-500 block">客用條碼定位 URL QR (點餐自動扣桌號用連結)</span>

@@ -12,7 +12,7 @@ export const StaffLoginGate: React.FC<StaffLoginGateProps> = ({ onLoginSuccess, 
   const [loading, setLoading] = useState(false);
 
   const handleNumberClick = (num: string) => {
-    if (pin.length < 4) {
+    if (pin.length < 6) {
       setPin(prev => prev + num);
       setErrorCode(false);
     }
@@ -54,7 +54,7 @@ export const StaffLoginGate: React.FC<StaffLoginGateProps> = ({ onLoginSuccess, 
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 bg-[#161616] border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-6 text-center text-white" id="staff-login-gate-view">
+    <div className="max-w-md mx-auto my-12 bg-[#161616] border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-6 text-center text-white" id="secure-gate-container">
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={onCancel}
@@ -74,14 +74,14 @@ export const StaffLoginGate: React.FC<StaffLoginGateProps> = ({ onLoginSuccess, 
         </div>
         <h3 className="text-lg font-bold font-serif text-[#E5B453]">經營管理後台登入</h3>
         <p className="text-xs text-white/50 leading-relaxed max-w-xs mx-auto">
-          此區域為餐飲管理、廚房配單及數據庫存後端。請輸入 4 位數員工金鑰以完成安全驗證。
+          此區域為餐飲管理、廚房配單及數據庫存後端。請輸入 6 位數員工金鑰以完成安全驗證。
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Dots representing passcode */}
         <div className="flex justify-center space-x-4 py-3">
-          {[0, 1, 2, 3].map(i => (
+          {[0, 1, 2, 3, 4, 5].map(i => (
             <div
               key={i}
               className={`w-3.5 h-3.5 rounded-full border-2 transition-all duration-150 ${
@@ -96,7 +96,7 @@ export const StaffLoginGate: React.FC<StaffLoginGateProps> = ({ onLoginSuccess, 
         {errorCode && (
           <div className="bg-red-500/15 border border-red-500/20 text-red-400 text-xs py-2 px-3 rounded-xl flex items-center justify-center space-x-1.5 animate-bounce">
             <AlertCircle size={14} />
-            <span>解鎖金鑰錯誤！(預設為 8888 或輸入變更後的 4 位數金鑰)</span>
+            <span>解鎖金鑰錯誤！(預設為 888888 或輸入變更後的 6 位數金鑰)</span>
           </div>
         )}
 
@@ -141,10 +141,10 @@ export const StaffLoginGate: React.FC<StaffLoginGateProps> = ({ onLoginSuccess, 
 
         <button
           type="submit"
-          disabled={pin.length < 4}
+          disabled={pin.length < 6}
           id="pin-submit-button"
           className={`w-full font-bold py-3.5 px-6 rounded-2xl transition-all duration-150 flex items-center justify-center space-x-1.5 cursor-pointer text-xs ${
-            pin.length === 4
+            pin.length === 6
               ? 'bg-[#E5B453] text-[#0F0F0F] font-black'
               : 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
           }`}

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { MenuItem, OrderItem, FoodCustomization, Order, Language, Category, TableConfig } from '../types';
+import { MenuItem, OrderItem, FoodCustomization, Order, Language, Category, TableConfig, CustomAddOn } from '../types';
 import { TRANSLATIONS } from '../data';
 import { ShoppingCart, Clock, Check, AlertTriangle, ChevronRight, HelpCircle, X, Sparkles, BellRing, QrCode, Coins, Plus, Minus } from 'lucide-react';
-import { GeminiAiOrderingModal } from './GeminiAiOrderingModal';
 
 interface CustomerOrderViewProps {
   currentLang: Language;
@@ -64,7 +63,6 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   const [qrScannedInfo, setQrScannedInfo] = useState<string | null>(null);
   const [urlProcessed, setUrlProcessed] = useState(false);
   const [isTableFixed, setIsTableFixed] = useState(false);
-  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [loginCount, setLoginCount] = useState<number>(0);
   const [activeSegmentTab, setActiveSegmentTab] = useState<'bestsellers' | 'history'>('bestsellers');
 
@@ -134,11 +132,13 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   };
 
   // Customization selection state
+  const [isSimplifiedMode, setIsSimplifiedMode] = useState<boolean>(false);
   const [sweetness, setSweetness] = useState<number>(2); // regular
   const [spiciness, setSpiciness] = useState<number>(1); // mild/小辣
   const [noodleType, setNoodleType] = useState<'rice-noodle' | 'vermicelli' | 'none'>('rice-noodle');
   const [soupBase, setSoupBase] = useState<'plain' | 'coconut-milk'>('plain');
   const [customNotes, setCustomNotes] = useState<string>('');
+  const [selectedAddOns, setSelectedAddOns] = useState<CustomAddOn[]>([]);
   const [qty, setQty] = useState<number>(1);
 
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'credit' | 'member' | 'linepay'>('cash');
@@ -150,43 +150,84 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   const [userBalance, setUserBalance] = useState<number>(0);
   const [redeemMessage, setRedeemMessage] = useState<string | null>(null);
 
-  const REWARD_ITEMS = [
-    {
-      id: 'rew-01',
-      menuItemId: 'sk-02',
-      name: { zh: '爆汁金針菇豬肉串 / 串', en: 'Pork Skewer with Enoki Mushroom' },
-      cost: 400,
-      originalPrice: 120
-    },
-    {
-      id: 'rew-02',
-      menuItemId: 'vg-01',
-      name: { zh: '脆脆高麗菜 / 份', en: 'Charcoal Grilled Cabbage' },
-      cost: 550,
-      originalPrice: 100
-    },
-    {
-      id: 'rew-03',
-      menuItemId: 'dr-01',
-      name: { zh: '泰式奶茶 1L 桶裝', en: 'Thai Milk Tea (1L Bucket)' },
-      cost: 800,
-      originalPrice: 220
-    },
-    {
-      id: 'rew-04',
-      menuItemId: 'sw-01',
-      name: { zh: '泰小農芒果甜糯米飯', en: 'Sweet Mango Sticky Rice' },
-      cost: 1100,
-      originalPrice: 180
-    },
-    {
-      id: 'rew-05',
-      menuItemId: 'ty-01',
-      name: { zh: '曼谷冬蔭功海鮮湯', en: 'Bangkok Tom Yum Seafood Soup' },
-      cost: 1400,
-      originalPrice: 320
-    }
-  ];
+  const REWARD_ITEMS = useMemo(() => {
+    // Basic definition of rewards with their menuItemId and fallback configs
+    const defaultRewards = [
+      {
+        id: 'rew-01',
+        menuItemId: 'sk-02',
+        fallbackName: {
+          zh: '爆汁金針菇豬肉 / 串',
+          en: 'Enoki Mushroom & Pork Wrap',
+          ko: '팽이버섯 삼겹살 꼬치',
+          ja: '金針菇えのき豚肉巻き',
+          th: 'หมูสามชั้นพันเห็ดเข็มทองย่างสะเด็ด'
+        },
+        fallbackPrice: 90,
+      },
+      {
+        id: 'rew-02',
+        menuItemId: 'vg-01',
+        fallbackName: {
+          zh: '脆脆高麗菜 / 份',
+          en: 'Crispy Cabbage',
+          ko: '아삭 양배추 구い',
+          ja: 'あつあつキャベツ焼き',
+          th: 'กะหล่ำปลีย่างน้ำปลาหอม'
+        },
+        fallbackPrice: 80,
+      },
+      {
+        id: 'rew-03',
+        menuItemId: 'dr-01',
+        fallbackName: {
+          zh: '泰式奶茶 1L 桶裝 (限定)',
+          en: 'Signature Street Thai Milk Tea 1L (Bucket)',
+          ko: '길거리 타이 밀크티 1L 점보 通 (限定)',
+          ja: '極旨本場タイミルクティー1Lバケツ入り (テイクアウト・店内人気)',
+          th: 'ชาเย็นไทยสตรีท 1 ลิตรถังยักษ์'
+        },
+        fallbackPrice: 180,
+      },
+      {
+        id: 'rew-04',
+        menuItemId: 'sw-01',
+        fallbackName: {
+          zh: '南洋香蘭手作奶酪 / 份',
+          en: 'South Seas Pandan Handmade Pudding',
+          ko: '남양 판단 허브 수제 푸딩',
+          ja: '本格手摘みパンダンリーフ自家製ココナッツプリン',
+          th: 'พุดดิ้งพานาคอตต้าใบเตยนมสด'
+        },
+        fallbackPrice: 90,
+      },
+      {
+        id: 'rew-05',
+        menuItemId: 'ty-01',
+        fallbackName: {
+          zh: '曼谷冬蔭功海鮮湯',
+          en: 'Bangkok Tom Yum Seafood Soup',
+          ko: '방콕 똠얌꿍 해물탕',
+          ja: 'バンコトトムヤムクン海鮮スープ',
+          th: 'ต้มยำกุ้งทะเลบางกอก'
+        },
+        fallbackPrice: 260,
+      }
+    ];
+
+    return defaultRewards.map(reward => {
+      const match = menuItems.find(m => m.id === reward.menuItemId);
+      const originalPrice = match ? match.price : reward.fallbackPrice;
+      const name = match ? match.name : reward.fallbackName;
+      return {
+        id: reward.id,
+        menuItemId: reward.menuItemId,
+        name: name,
+        originalPrice: originalPrice,
+        cost: originalPrice * 10
+      };
+    });
+  }, [menuItems]);
 
   useEffect(() => {
     const updatePoints = () => {
@@ -392,15 +433,41 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   };
 
   const handleRedeemReward = (reward: any) => {
-    if (!lineProfile || !lineProfile.email) return;
-    if (userPoints < reward.cost) return;
-
-    const newPoints = userPoints - reward.cost;
+    if (!lineProfile) {
+      alert('抱歉，此功能僅限登入會員使用，請先登入帳號。');
+      return;
+    }
+    
+    const userEmail = lineProfile.email || 'bbq_lover@gmail.com';
+    
+    // Fetch latest points directly from local storage to avoid state delay or stale closure
+    let freshPoints = 0;
     const dbStr = localStorage.getItem('google-members-database');
     if (dbStr) {
       try {
         const db = JSON.parse(dbStr);
-        const userIndex = db.findIndex((m: any) => m.email === lineProfile.email);
+        const userIndex = db.findIndex((m: any) => m.email === userEmail);
+        if (userIndex >= 0) {
+          freshPoints = Number(db[userIndex].points || 0);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    if (freshPoints === 0 && userPoints > 0) {
+      freshPoints = Number(userPoints);
+    }
+
+    if (freshPoints < Number(reward.cost)) {
+      alert(`您的會員累積點數不足！(目前點數為 ${freshPoints} 點，兌換此餐點需要 ${reward.cost} 點)`);
+      return;
+    }
+
+    const newPoints = freshPoints - Number(reward.cost);
+    if (dbStr) {
+      try {
+        const db = JSON.parse(dbStr);
+        const userIndex = db.findIndex((m: any) => m.email === userEmail);
         if (userIndex >= 0) {
           db[userIndex].points = newPoints;
           localStorage.setItem('google-members-database', JSON.stringify(db));
@@ -410,7 +477,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       }
     }
     
-    localStorage.setItem(`google-points-${lineProfile.email}`, String(newPoints));
+    localStorage.setItem(`google-points-${userEmail}`, String(newPoints));
     setUserPoints(newPoints);
     window.dispatchEvent(new Event('local-points-updated'));
 
@@ -419,23 +486,34 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       id: cartId,
       menuItemId: reward.menuItemId,
       name: {
-        zh: `🎁 點數兌換：${reward.name.zh}`,
-        en: `🎁 Points Redeemed: ${reward.name.en}`,
-        ko: `🎁 포인트 교환: ${reward.name.en}`,
-        ja: `🎁 ポイント引き換え: ${reward.name.zh}`,
-        th: `🎁 แลกคะแนน: ${reward.name.en}`
+        zh: `🎁 點數兌換：${reward.name?.zh || '免費餐點'}`,
+        en: `🎁 Points Redeemed: ${reward.name?.en || 'Complimentary Item'}`,
+        ko: `🎁 포인트 교환: ${reward.name?.ko || reward.name?.en || '컴플리멘터리'}`,
+        ja: `🎁 ポイント引き換え: ${reward.name?.ja || reward.name?.zh || '無料メニュー'}`,
+        th: `🎁 แลกคะแนน: ${reward.name?.th || reward.name?.en || 'เมนูฟรี'}`
       },
       price: 0,
       qty: 1,
       customization: {
         sweetness: 2,
         spiciness: 0,
-        notes: '🎁 點數免費兌換禮遇 (Loyalty Reward)'
+        noodleType: undefined,
+        soupBase: undefined,
+        notes: '🎁 點數免費兌換禮遇 (Loyalty Reward)',
+        selectedAddOns: []
       }
     };
 
-    setCart(prev => [...prev, redeemedOrderItem]);
-    setRedeemMessage(`🎉 兌換成功！已扣除 ${reward.cost} 點，並將『${reward.name.zh}』作為點數賀禮存入購物車！`);
+    setCart(prev => {
+      const updated = [...prev, redeemedOrderItem];
+      console.log('Appended redeemed item to cart:', updated);
+      return updated;
+    });
+    
+    setIsCartOpen(true);
+    alert(`🎉 兌換成功！已扣除 ${reward.cost} 點，並將『${reward.name?.zh || '商品'}』作為點數賀禮存入購物車！`);
+    
+    setRedeemMessage(`🎉 兌換成功！已扣除 ${reward.cost} 點，並將『${reward.name?.zh || '商品'}』作為點數賀禮存入購物車！`);
     setTimeout(() => {
       setRedeemMessage(null);
     }, 6000);
@@ -458,6 +536,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
     setNoodleType('rice-noodle');
     setSoupBase('plain');
     setCustomNotes('');
+    setSelectedAddOns([]);
   };
 
   const handleAddToCart = () => {
@@ -486,6 +565,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
         noodleType: selectedDetailItem.hasNoodlesOption ? noodleType : undefined,
         soupBase: selectedDetailItem.hasCoconutsMilkOption ? soupBase : undefined,
         notes: customNotes,
+        selectedAddOns: [...selectedAddOns],
       },
     };
 
@@ -529,31 +609,12 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
     setOrderError(null);
   };
 
-  const handleAddToCartFromAi = (item: MenuItem, spiciness: number, sweetness: number) => {
-    if (!isOpen) return;
-    const newOrderItem: OrderItem = {
-      id: `cart-ai-${Math.floor(1000 + Math.random() * 9000)}-${Date.now()}`,
-      menuItemId: item.id,
-      name: item.name,
-      price: item.price,
-      qty: 1,
-      customization: {
-        sweetness,
-        spiciness,
-        noodleType: item.hasNoodlesOption ? 'rice-noodle' : undefined,
-        soupBase: item.hasCoconutsMilkOption ? 'plain' : undefined,
-        notes: 'AI 智慧特調比例 🌶️✨',
-      },
-    };
-    setCart([...cart, newOrderItem]);
-    setOrderError(null);
-  };
-
   const cartSubtotal = cart.reduce((sum, item) => {
     let finalPrice = item.price;
     if (item.customization.spiciness === 3) finalPrice += 10;
     if (item.customization.soupBase === 'coconut-milk') finalPrice += 50;
-    return sum + finalPrice * item.qty;
+    const addOnPrice = item.customization.selectedAddOns?.reduce((s, a) => s + a.price, 0) || 0;
+    return sum + (finalPrice + addOnPrice) * item.qty;
   }, 0);
 
   // Google member points program (no subtotal discount)
@@ -683,7 +744,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   };
 
   return (
-    <div className="space-y-6" id="customer-order-panel">
+    <div className={`space-y-6 transition-all duration-300 ${isSimplifiedMode ? 'bg-[#FFFFFF] text-[#000000] p-4 sm:p-6 min-h-screen border-4 border-[#FFA500]' : 'text-white'}`} id="customer-order-panel">
       {/* 📣 Customer Scrolling Notice */}
       {customerNotice && (
         <div className="w-full bg-thai-gold/10 border border-thai-gold/20 rounded-full overflow-hidden py-1.5 px-4 shadow-sm flex items-center space-x-2 text-thai-gold text-xs font-sans">
@@ -725,6 +786,46 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* ⚡ Simplified Mode Toggle Action Ribbon */}
+      <div 
+        className={`rounded-3xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-lg transition-all duration-300 ${
+          isSimplifiedMode 
+            ? 'bg-[#FFFFFF] border-4 border-[#FFA500] text-black' 
+            : 'bg-gradient-to-r from-thai-gold/20 via-[#E5B453]/10 to-transparent border border-thai-gold/30 text-white'
+        }`}
+      >
+        <div className="text-left space-y-1">
+          <h4 className={`font-extrabold flex items-center gap-2 ${isSimplifiedMode ? 'text-black text-lg' : 'text-sm sm:text-base'}`}>
+            <span>{isSimplifiedMode ? '👵👴 尊長大字/高對比點餐模式中' : '✨ 首選沙貝尊長大字點餐模式'}</span>
+            <span className="bg-amber-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full animate-pulse">
+              老年友善
+            </span>
+          </h4>
+          <p className={`${isSimplifiedMode ? 'text-black font-extrabold text-sm' : 'text-zinc-400 text-xs font-medium'}`}>
+            {isSimplifiedMode 
+              ? '已為您自動放大字體、啟用高對比高清晰底色，呈現超大型方塊，並移除冗餘介紹。' 
+              : '一鍵開啟最溫馨、高清晰大字體、極簡潔且不含廣告簡介的點餐介面。誠邀銀髮長輩品嚐。'}
+          </p>
+        </div>
+        
+        <button
+          type="button"
+          onClick={() => {
+            setIsSimplifiedMode(!isSimplifiedMode);
+            // Scroll to catalog top
+            const topPanel = document.getElementById('customer-order-panel');
+            if (topPanel) topPanel.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className={`px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm shadow-md active:scale-95 transition-all cursor-pointer whitespace-nowrap ${
+            isSimplifiedMode 
+              ? 'bg-black hover:bg-zinc-800 text-white border-2 border-black hover:scale-[1.02]' 
+              : 'bg-white hover:bg-slate-100 text-[#0F0F0F]'
+          }`}
+        >
+          {isSimplifiedMode ? '🔄 返回標準夜色模式' : '👵👴 切換簡單/尊長大字模式'}
+        </button>
+      </div>
 
       {/* Table QR Simulation indicator Bar */}
       <div className="bg-thai-charcoal border border-thai-gold/20 text-white rounded-3xl p-3 sm:p-4 flex flex-row items-center justify-between gap-2.5 sm:gap-4 shadow-xl select-none">
@@ -930,38 +1031,8 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
         </div>
       )}
 
-      {/* 🔮 Gemini AI Advisor Banner */}
-      <div 
-        onClick={() => setIsAiModalOpen(true)}
-        className="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-r from-thai-gold/15 via-[#E5B453]/5 to-transparent border border-[#E5B453]/25 hover:border-[#E5B453]/50 transition duration-300 cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl text-left hover:shadow-[#E5B453]/5 group"
-        id="ai-advisor-banner"
-      >
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-[#E5B453]/5 to-transparent pointer-events-none" />
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#E5B453] via-amber-400 to-amber-200 flex items-center justify-center shadow-lg shadow-[#E5B453]/15 group-hover:scale-105 transition duration-300">
-            <Sparkles className="w-6 h-6 text-slate-900 animate-spin-slow" />
-          </div>
-          <div className="space-y-1">
-            <h4 className="text-white font-extrabold text-sm sm:text-base tracking-wide flex items-center gap-2">
-              <span>不知道點什麼？交給 Gemini 智慧主廚 👨‍🍳</span>
-              <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest animation-pulse">NEW</span>
-            </h4>
-            <p className="text-slate-400 text-xs leading-relaxed max-w-lg">
-              選定飲食偏好或客製禁忌，Gemini 智慧 AI 為您自動配餐並調校黃金比例甜辣配比，一鍵爽快下單！
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          className="bg-transparent hover:bg-white/5 border border-[#E5B453]/40 hover:border-[#E5B453] px-4 py-2.5 rounded-xl text-xs font-black text-[#E5B453] tracking-wider transition shrink-0 cursor-pointer active:scale-95 flex items-center space-x-1"
-        >
-          <span>立即分析</span>
-          <ChevronRight size={13} />
-        </button>
-      </div>
-
       {/* 🎁 Google 會員累積點數與專屬好禮兌換專區 */}
-      {lineProfile ? (
+      {!isSimplifiedMode && (lineProfile ? (
         <div className="bg-gradient-to-br from-[#121824] to-[#0d0e14] border border-blue-500/25 rounded-3xl p-6 text-left shadow-2xl space-y-4 relative overflow-hidden" id="google-loyalty-panel">
           <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
           
@@ -1077,112 +1148,208 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
             立即登入累點
           </button>
         </div>
-      )}
+      ))}
 
       {/* Main Categories Menu Row (Horizontal Touch Carousel) */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold text-white/45 uppercase tracking-widest text-left font-display">
+        <label className={`block text-xs font-bold uppercase tracking-widest text-left font-display ${isSimplifiedMode ? 'text-black font-black text-sm' : 'text-white/45'}`}>
           {TRANSLATIONS.categories[currentLang]} Menu Category
         </label>
         <div className="flex overflow-x-auto py-2.5 gap-2 scrollbar-none scroll-smooth" id="categories-tabs-carousel">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              id={`cat-tab-${cat.id}`}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4.5 py-3 rounded-full text-sm font-bold flex items-center space-x-1.5 transition shrink-0 cursor-pointer active:scale-95 ${
-                selectedCategory === cat.id
-                  ? 'bg-[#E5B453] text-[#0F0F0F] shadow-lg shadow-[#E5B453]/20 font-extrabold'
-                  : 'bg-white/5 hover:bg-white/10 text-white/80 border border-white/10'
-              }`}
-            >
-              <span>{cat.name[currentLang] || cat.name['zh'] || cat.id}</span>
-            </button>
-          ))}
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                id={`cat-tab-${cat.id}`}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-4.5 py-3 rounded-full text-sm font-bold flex items-center space-x-1.5 transition shrink-0 cursor-pointer active:scale-95 ${
+                  isSelected
+                    ? isSimplifiedMode
+                      ? 'bg-[#FFA500] text-black border-2 border-black font-extrabold shadow-md text-base'
+                      : 'bg-[#E5B453] text-[#0F0F0F] shadow-lg shadow-[#E5B453]/20 font-extrabold'
+                    : isSimplifiedMode
+                      ? 'bg-black text-white border-2 border-black text-base font-black'
+                      : 'bg-white/5 hover:bg-white/10 text-white/80 border border-white/10'
+                }`}
+              >
+                <span>{cat.name[currentLang] || cat.name['zh'] || cat.id}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Catelog Menu Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="dish-catalog-grid">
-        {filteredItems.map((item) => (
-          <div
-            key={item.id}
-            id={`dish-card-${item.id}`}
-            onClick={() => handleOpenDetail(item)}
-            className={`bg-[#161616] rounded-xl overflow-hidden shadow-md hover:shadow-2xl border border-white/10 hover:border-[#E5B453]/30 transition-all duration-300 flex flex-col justify-between text-left relative ${
-              item.available ? 'cursor-pointer' : 'opacity-65 cursor-not-allowed'
-            }`}
-          >
-            {/* Out of Stock Ribbon */}
-            {!item.available && (
-              <div className="absolute top-3 right-3 bg-[#FF4D4D] text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full z-10 uppercase tracking-widest shadow-md">
-                賣完了 Sold Out
-              </div>
-            )}
-            
-            <div>
-              {/* Picture Frame */}
-              <div className="h-44 sm:h-48 overflow-hidden relative bg-black border-b border-white/5">
-                <img
-                  src={item.image}
-                  alt={item.name[currentLang]}
-                  className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 flex items-end justify-between">
-                  <div className="flex items-center space-x-1.5 flex-wrap gap-1">
-                    <span className="bg-[#E5B453] text-[#0F0F0F] text-xs font-black px-2.5 py-1 rounded-lg">
-                      NT$ {item.price}
-                    </span>
-                    {item.isNotSpicy ? (
-                      <span className="bg-emerald-500/95 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-wide flex items-center gap-0.5 shadow-sm">
-                        🍃 不辣
-                      </span>
-                    ) : (
-                      <span className="bg-rose-600/95 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-wide flex items-center gap-0.5 shadow-sm">
-                        🌶️ 辣
-                      </span>
-                    )}
+      <div 
+        className={isSimplifiedMode 
+          ? "grid grid-cols-1 md:grid-cols-2 gap-6" 
+          : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+        } 
+        id="dish-catalog-grid"
+      >
+        {filteredItems.map((item) => {
+          if (isSimplifiedMode) {
+            return (
+              <div
+                key={item.id}
+                id={`dish-card-${item.id}`}
+                onClick={() => { if (item.available) handleOpenDetail(item); }}
+                className={`bg-white text-black rounded-3xl overflow-hidden shadow-xl border-4 ${
+                  item.available 
+                    ? 'border-[#FFA500] hover:border-amber-500 cursor-pointer active:scale-[1.01] transition-all' 
+                    : 'border-zinc-300 opacity-60 cursor-not-allowed'
+                } flex flex-col justify-between text-left relative`}
+              >
+                {/* Out of Stock Ribbon */}
+                {!item.available && (
+                  <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-black px-4 py-2 rounded-full z-10 shadow-lg">
+                    ⚠️ 賣完了 SOLD OUT
                   </div>
-                  {item.isSetMeal && (
-                    <span className="bg-red-500 text-white text-[9px] uppercase tracking-wider font-sans font-bold px-1.5 py-0.5 rounded">
-                      Set Meal
-                    </span>
+                )}
+
+                <div>
+                  {/* Picture Frame */}
+                  <div className="h-60 overflow-hidden relative bg-zinc-100 border-b-2 border-zinc-200">
+                    <img
+                      src={item.image}
+                      alt={item.name.zh}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 left-4 bg-amber-500 text-black text-xs font-black px-3 py-1 rounded-lg border border-black uppercase">
+                      高對比配圖
+                    </div>
+                  </div>
+
+                  {/* Text Frame (No description, very large text) */}
+                  <div className="p-6 space-y-3">
+                    <h4 className="font-extrabold text-black text-2xl sm:text-3xl leading-snug tracking-wide font-sans">
+                      {item.name.zh || item.name[currentLang]}
+                    </h4>
+                    
+                    <div className="flex items-center space-x-2 flex-wrap gap-1.5 pt-1">
+                      <span className="bg-[#FFA500] text-black text-lg font-black px-4 py-1.5 rounded-xl border border-black shadow">
+                        現金價 NT$ {item.price} 元
+                      </span>
+                      {item.isNotSpicy ? (
+                        <span className="bg-emerald-600 text-white text-xs font-black px-3 py-1 rounded-lg border border-emerald-700">
+                          🍃 完全不辣 No Spicy
+                        </span>
+                      ) : (
+                        <span className="bg-red-600 text-white text-xs font-black px-3 py-1 rounded-lg border border-red-700">
+                          🌶️ 香中帶辣 Spicy
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Big Button action */}
+                <div className="p-6 border-t-2 border-zinc-100 bg-amber-50/50">
+                  {item.available ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenDetail(item);
+                      }}
+                      className="w-full py-4.5 bg-[#FFA500] hover:bg-amber-400 text-black font-black text-base sm:text-lg rounded-2xl border-2 border-black transition active:scale-95 cursor-pointer shadow-md flex items-center justify-center gap-2"
+                    >
+                      <span>🎯 點選：開始點餐加到購物車</span>
+                      <ChevronRight size={22} className="stroke-[3]" />
+                    </button>
+                  ) : (
+                    <div className="w-full py-4 bg-zinc-200 text-zinc-500 font-black text-center text-sm rounded-2xl border border-zinc-300">
+                      本日售罄 (Sold Out Today)
+                    </div>
                   )}
                 </div>
               </div>
+            );
+          }
 
-              {/* Text Frame */}
-              <div className="p-4.5 space-y-2">
-                <h5 className="font-bold text-white text-base leading-snug line-clamp-1 font-serif tracking-wide">
-                  {item.name[currentLang]}
-                </h5>
-                <p className="text-white/60 text-xs leading-relaxed line-clamp-2">
-                  {item.description[currentLang]}
-                </p>
+          // Standard Mode remains completely pristine and unmodified
+          return (
+            <div
+              key={item.id}
+              id={`dish-card-${item.id}`}
+              onClick={() => handleOpenDetail(item)}
+              className={`bg-[#161616] rounded-xl overflow-hidden shadow-md hover:shadow-2xl border border-white/10 hover:border-[#E5B453]/30 transition-all duration-300 flex flex-col justify-between text-left relative ${
+                item.available ? 'cursor-pointer' : 'opacity-65 cursor-not-allowed'
+              }`}
+            >
+              {/* Out of Stock Ribbon */}
+              {!item.available && (
+                <div className="absolute top-3 right-3 bg-[#FF4D4D] text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full z-10 uppercase tracking-widest shadow-md">
+                  賣完了 Sold Out
+                </div>
+              )}
+              
+              <div>
+                {/* Picture Frame */}
+                <div className="h-44 sm:h-48 overflow-hidden relative bg-black border-b border-white/5">
+                  <img
+                    src={item.image}
+                    alt={item.name[currentLang]}
+                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 flex items-end justify-between">
+                    <div className="flex items-center space-x-1.5 flex-wrap gap-1">
+                      <span className="bg-[#E5B453] text-[#0F0F0F] text-xs font-black px-2.5 py-1 rounded-lg">
+                        NT$ {item.price}
+                      </span>
+                      {item.isNotSpicy ? (
+                        <span className="bg-emerald-500/95 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-wide flex items-center gap-0.5 shadow-sm">
+                          🍃 不辣
+                        </span>
+                      ) : (
+                        <span className="bg-rose-600/95 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-wide flex items-center gap-0.5 shadow-sm">
+                          🌶️ 辣
+                        </span>
+                      )}
+                    </div>
+                    {item.isSetMeal && (
+                      <span className="bg-red-500 text-white text-[9px] uppercase tracking-wider font-sans font-bold px-1.5 py-0.5 rounded">
+                        Set Meal
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Text Frame */}
+                <div className="p-4.5 space-y-2">
+                  <h5 className="font-bold text-white text-base leading-snug line-clamp-1 font-serif tracking-wide">
+                    {item.name[currentLang]}
+                  </h5>
+                  <p className="text-white/60 text-xs leading-relaxed line-clamp-2">
+                    {item.description[currentLang]}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tap Action Bar */}
+              <div className="p-4 border-t border-white/5 bg-white/2 flex items-center justify-between">
+                <span className="text-white/40 text-[10px] font-semibold flex items-center space-x-1">
+                  <Clock size={11} className="text-white/40" />
+                  <span>烹調約 10-15 分鐘</span>
+                </span>
+                {item.available ? (
+                  <button
+                    id={`add-to-cart-btn-${item.id}`}
+                    className="bg-white/5 hover:bg-[#E5B453] hover:text-[#0F0F0F] text-white/80 text-xs font-bold px-3.5 py-2 rounded-xl border border-white/10 transition flex items-center space-x-1 active:scale-95 cursor-pointer"
+                  >
+                    <span>細修選項</span>
+                    <ChevronRight size={13} />
+                  </button>
+                ) : (
+                  <span className="text-white/40 text-xs font-bold font-sans">明日請早</span>
+                )}
               </div>
             </div>
-
-            {/* Tap Action Bar */}
-            <div className="p-4 border-t border-white/5 bg-white/2 flex items-center justify-between">
-              <span className="text-white/40 text-[10px] font-semibold flex items-center space-x-1">
-                <Clock size={11} className="text-white/40" />
-                <span>烹調約 10-15 分鐘</span>
-              </span>
-              {item.available ? (
-                <button
-                  id={`add-to-cart-btn-${item.id}`}
-                  className="bg-white/5 hover:bg-[#E5B453] hover:text-[#0F0F0F] text-white/80 text-xs font-bold px-3.5 py-2 rounded-xl border border-white/10 transition flex items-center space-x-1 active:scale-95 cursor-pointer"
-                >
-                  <span>細修選項</span>
-                  <ChevronRight size={13} />
-                </button>
-              ) : (
-                <span className="text-white/40 text-xs font-bold font-sans">明日請早</span>
-              )}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Floating View Shopping Cart Bar Trigger (if items present) */}
@@ -1217,8 +1384,8 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
 
       {/* Customize Options Side Sheet / Modal popup */}
       {selectedDetailItem && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" id="item-customizer-modal">
-          <div className="bg-[#161616] rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-white/10 flex flex-col max-h-[90vh] text-white">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" id="item-customizer-modal">
+          <div className={`rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh] border-4 transition-all duration-300 ${isSimplifiedMode ? 'bg-[#FFFFFF] text-black border-[#FFA500]' : 'bg-[#161616] border-white/10 text-white'}`}>
             {/* Pic & Name */}
             <div className="relative h-44 bg-black shrink-0">
               <img
@@ -1236,7 +1403,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
               </button>
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent p-5 text-left">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="text-lg font-bold text-white font-serif tracking-wide">
+                  <h4 className={`font-serif tracking-wide ${isSimplifiedMode ? 'text-white text-xl font-black' : 'text-white text-lg font-bold'}`}>
                     {selectedDetailItem.name[currentLang]}
                   </h4>
                   {selectedDetailItem.isNotSpicy ? (
@@ -1249,30 +1416,38 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-white/60 line-clamp-1 mt-1 font-sans">
-                  {selectedDetailItem.description[currentLang]}
-                </p>
+                {!isSimplifiedMode && (
+                  <p className="text-xs text-white/60 line-clamp-1 mt-1 font-sans">
+                    {selectedDetailItem.description[currentLang]}
+                  </p>
+                )}
               </div>
             </div>
 
             {/* Adjusters scroll area */}
-            <div className="p-5 overflow-y-auto space-y-4 text-left">
+            <div className={`p-5 overflow-y-auto space-y-4 text-left ${isSimplifiedMode ? 'bg-[#FFFFFF]' : ''}`}>
               {/* Portion Control */}
-              <div className="flex items-center justify-between bg-white/5 border border-white/10 p-3.5 rounded-xl">
-                <span className="text-xs font-bold text-white/90">點餐份數 Quantity</span>
-                <div className="flex items-center space-x-3 bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">
+              <div className={`flex items-center justify-between p-3.5 rounded-xl ${
+                isSimplifiedMode 
+                  ? 'bg-amber-500/15 border-2 border-[#FFA500]' 
+                  : 'bg-white/5 border border-white/10'
+              }`}>
+                <span className={`font-black ${isSimplifiedMode ? 'text-black text-base' : 'text-xs text-white/90 font-bold'}`}>點餐份數 Quantity</span>
+                <div className={`flex items-center space-x-3 px-3 py-1.5 rounded-lg ${
+                  isSimplifiedMode ? 'bg-[#FFA500] border-2 border-black' : 'bg-black/40 border border-white/10'
+                }`}>
                   <button
                     id="qty-decrement"
                     onClick={() => setQty(Math.max(1, qty - 1))}
-                    className="w-6 h-6 text-white/75 font-bold hover:bg-white/10 rounded flex items-center justify-center cursor-pointer transition"
+                    className={`w-8 h-8 font-extrabold rounded flex items-center justify-center cursor-pointer transition ${isSimplifiedMode ? 'text-black bg-white hover:bg-zinc-200 border border-black' : 'text-white/75 hover:bg-white/10'}`}
                   >
                     -
                   </button>
-                  <span className="font-mono font-black text-[#E5B453]">{qty}</span>
+                  <span className={`font-mono font-black ${isSimplifiedMode ? 'text-black text-xl' : 'text-[#E5B453]'}`}>{qty}</span>
                   <button
                     id="qty-increment"
                     onClick={() => setQty(qty + 1)}
-                    className="w-6 h-6 text-white/75 font-bold hover:bg-white/10 rounded flex items-center justify-center cursor-pointer transition"
+                    className={`w-8 h-8 font-extrabold rounded flex items-center justify-center cursor-pointer transition ${isSimplifiedMode ? 'text-black bg-white hover:bg-zinc-200 border border-black' : 'text-white/75 hover:bg-white/10'}`}
                   >
                     +
                   </button>
@@ -1284,7 +1459,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
               {/* Noodle options - e.g. for Mama items */}
               {selectedDetailItem.hasNoodlesOption && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">
+                  <label className={`block text-xs font-bold uppercase tracking-widest ${isSimplifiedMode ? 'text-zinc-800 text-sm font-black' : 'text-white/40'}`}>
                     {TRANSLATIONS.noodleOption[currentLang]} Select noodle types
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -1298,14 +1473,14 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                         id={`noodle-opt-${nd.code}`}
                         type="button"
                         onClick={() => setNoodleType(nd.code as any)}
-                        className={`p-2 rounded-xl text-center border transition cursor-pointer flex flex-col items-center justify-center ${
+                        className={`p-2 rounded-xl text-center border-2 transition cursor-pointer flex flex-col items-center justify-center ${
                           noodleType === nd.code
-                            ? 'border-[#E5B453] bg-[#E5B453]/15 text-[#E5B453] font-bold'
-                            : 'border-white/10 hover:border-white/25 text-white/70 hover:bg-[#1C1C1C]'
+                            ? (isSimplifiedMode ? 'border-amber-500 bg-amber-100 text-black font-extrabold' : 'border-[#E5B453] bg-[#E5B453]/15 text-[#E5B453] font-bold')
+                            : (isSimplifiedMode ? 'border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-100' : 'border-white/10 text-white/80 hover:bg-[#1C1C1C]')
                         }`}
                       >
-                        <span className="text-sm">{nd.label}</span>
-                        <span className="text-[9px] uppercase mt-0.5 text-white/40">{nd.spec}</span>
+                        <span className={`text-sm ${isSimplifiedMode ? 'text-base font-black' : ''}`}>{nd.label}</span>
+                        <span className={`text-[9px] uppercase mt-0.5 ${isSimplifiedMode ? 'text-zinc-500 font-extrabold' : 'text-white/40'}`}>{nd.spec}</span>
                       </button>
                     ))}
                   </div>
@@ -1314,18 +1489,64 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
 
               {/* Soup Base coconut milk modifier */}
               {selectedDetailItem.hasCoconutsMilkOption && (
-                <div className="bg-[#E5B453]/10 border border-[#E5B453]/25 p-3.5 rounded-xl flex items-center justify-between text-white">
+                <div className={`p-3.5 rounded-xl flex items-center justify-between border ${
+                  isSimplifiedMode 
+                    ? 'bg-amber-100 border-2 border-[#FFA500] text-black' 
+                    : 'bg-[#E5B453]/10 border-[#E5B453]/25 p-3.5 text-white'
+                }`}>
                   <div className="text-left">
-                    <span className="text-xs font-bold block text-[#E5B453]">升級奶香冬蔭功 (+NT$50)</span>
-                    <span className="text-[10px] text-white/60 leading-none">加入大罐頂級泰國椰奶，香濃誘人</span>
+                    <span className={`font-bold block ${isSimplifiedMode ? 'text-black text-base font-black' : 'text-[#E5B453] text-xs'}`}>升級奶香冬蔭功 (+NT$50)</span>
+                    <span className={`text-[10px] ${isSimplifiedMode ? 'text-zinc-600 font-extrabold' : 'text-white/60'} leading-none`}>加入大罐頂級泰國椰奶，香濃誘人</span>
                   </div>
                   <input
                     type="checkbox"
                     id="coconut-soup-base-checkbox"
                     checked={soupBase === 'coconut-milk'}
                     onChange={(e) => setSoupBase(e.target.checked ? 'coconut-milk' : 'plain')}
-                    className="w-5 h-5 rounded border-white/25 text-[#E5B453] focus:ring-[#E5B453] bg-black/40 cursor-pointer"
+                    className="w-6 h-6 rounded border-zinc-350 text-[#E5B453] focus:ring-[#E5B453] bg-black/40 cursor-pointer"
                   />
+                </div>
+              )}
+
+              {/* Custom Add-Ons list selection */}
+              {selectedDetailItem.customAddOns && selectedDetailItem.customAddOns.length > 0 && (
+                <div className={`space-y-2 border-t pt-3.5 mt-3.5 ${isSimplifiedMode ? 'border-zinc-200' : 'border-white/10'}`}>
+                  <label className={`block text-xs font-bold uppercase tracking-widest ${isSimplifiedMode ? 'text-black text-sm font-black' : 'text-[#E5B453]'}`}>
+                    加選附加選項 Custom Options & Add-Ons
+                  </label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {selectedDetailItem.customAddOns.map((addOn) => {
+                      const isSelected = selectedAddOns.some(a => a.id === addOn.id);
+                      return (
+                        <button
+                          key={addOn.id}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedAddOns(selectedAddOns.filter(a => a.id !== addOn.id));
+                            } else {
+                              setSelectedAddOns([...selectedAddOns, addOn]);
+                            }
+                          }}
+                          className={`p-3 rounded-xl border-2 flex items-center justify-between text-left transition cursor-pointer ${
+                            isSelected
+                              ? (isSimplifiedMode ? 'border-amber-500 bg-amber-100 text-black font-black' : 'border-[#E5B453] bg-[#E5B453]/15 text-[#E5B453] font-bold shadow-md')
+                              : (isSimplifiedMode ? 'border-zinc-300 text-zinc-800 bg-white hover:bg-zinc-150' : 'border-white/10 text-white/80 hover:bg-[#1C1C1C]')
+                          }`}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 ${
+                              isSelected ? 'bg-amber-500 border-transparent' : 'border-zinc-305'
+                            }`}>
+                              {isSelected && <Check size={11} className="text-black stroke-[4]" />}
+                            </div>
+                            <span className={`text-xs leading-tight ${isSimplifiedMode ? 'font-black' : ''}`}>{addOn.name}</span>
+                          </div>
+                          <span className={`font-mono text-[11px] font-bold shrink-0 ml-1 ${isSimplifiedMode ? 'text-amber-800 font-black' : 'text-amber-400'}`}>+${addOn.price}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
@@ -1339,11 +1560,15 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
             </div>
 
             {/* Bottom confirmation Bar */}
-            <div className="p-4 bg-black/30 border-t border-white/10 flex items-center justify-between shrink-0">
+            <div className={`p-4 border-t flex items-center justify-between shrink-0 ${
+              isSimplifiedMode 
+                ? 'bg-amber-50 border-t-2 border-zinc-200' 
+                : 'bg-black/30 border-t border-white/10'
+            }`}>
               <div className="text-left leading-none">
-                <span className="text-[10px] text-white/40 font-bold uppercase">總計算額金額</span>
-                <p className="text-lg font-bold text-[#E5B453] mt-1 font-serif">
-                  NT$ {(selectedDetailItem.price + (spiciness === 3 ? 10 : 0) + (soupBase === 'coconut-milk' ? 50 : 0)) * qty}
+                <span className={`text-[10px] uppercase font-bold ${isSimplifiedMode ? 'text-black font-black' : 'text-white/40'}`}>總計算額金額</span>
+                <p className={`text-lg font-bold mt-1 font-serif ${isSimplifiedMode ? 'text-amber-800 text-xl font-black' : 'text-[#E5B453]'}`}>
+                  NT$ {(selectedDetailItem.price + (spiciness === 3 ? 10 : 0) + (soupBase === 'coconut-milk' ? 50 : 0) + selectedAddOns.reduce((sum, a) => sum + a.price, 0)) * qty}
                 </p>
               </div>
 
@@ -1351,10 +1576,14 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                 <button
                   id="add-to-cart-confirm"
                   onClick={handleAddToCart}
-                  className="bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black px-3 min-[360px]:px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition flex items-center space-x-1.5 sm:space-x-2 active:scale-95 cursor-pointer text-[10px] min-[360px]:text-xs sm:text-sm whitespace-nowrap"
+                  className={`font-black px-4 sm:px-8 py-3.5 sm:py-4 rounded-2xl transition flex items-center space-x-2 active:scale-95 cursor-pointer text-xs min-[360px]:text-sm sm:text-base whitespace-nowrap ${
+                    isSimplifiedMode 
+                      ? 'bg-[#FFA500] hover:bg-amber-400 text-black border-2 border-black font-extrabold shadow-lg' 
+                      : 'bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F]'
+                  }`}
                 >
-                  <ShoppingCart size={12} className="sm:size-[14px]" />
-                  <span>加入購物車並備餐</span>
+                  <ShoppingCart size={15} className="shrink-0" />
+                  <span>確定加入點餐單</span>
                 </button>
               ) : (
                 <button
@@ -1373,17 +1602,27 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       {/* Shopping Cart Drawer Modal Sheet */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-4" id="cart-drawer-overlay">
-          <div className="bg-[#161616] rounded-t-2xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-white/10 flex flex-col max-h-[85vh] text-white animate-slide-up">
+          <div className={`rounded-t-2xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border flex flex-col max-h-[85vh] animate-slide-up transition-all ${
+            isSimplifiedMode 
+              ? 'bg-[#FFFFFF] text-black border-[#FFA500] border-4' 
+              : 'bg-[#161616] border-white/10 text-white'
+          }`}>
             {/* Header */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/30 shrink-0">
-              <h4 className="font-bold text-white flex items-center space-x-1.5 font-serif tracking-wide">
-                <ShoppingCart size={18} className="text-[#E5B453]" />
+            <div className={`p-4 border-b flex items-center justify-between shrink-0 ${
+              isSimplifiedMode ? 'bg-amber-100/40 border-zinc-200' : 'bg-black/30 border-white/10'
+            }`}>
+              <h4 className={`font-bold flex items-center space-x-1.5 font-serif tracking-wide ${
+                isSimplifiedMode ? 'text-black' : 'text-white'
+              }`}>
+                <ShoppingCart size={18} className={isSimplifiedMode ? 'text-black' : 'text-[#E5B453]'} />
                 <span>購物車結帳大廳</span>
               </h4>
               <button
                 id="close-cart-btn"
                 onClick={() => setIsCartOpen(false)}
-                className="text-white/40 hover:text-[#E5B453] p-1.5 rounded-full transition"
+                className={`p-1.5 rounded-full transition ${
+                  isSimplifiedMode ? 'text-black hover:bg-zinc-200' : 'text-white/40 hover:text-[#E5B453]'
+                }`}
               >
                 <X size={18} />
               </button>
@@ -1392,53 +1631,78 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
             {/* Cart Line Items */}
             <div className="p-5 overflow-y-auto space-y-4 flex-1 text-left">
               {cart.length === 0 ? (
-                <div className="py-12 text-center text-white/40 space-y-2">
-                  <ShoppingCart size={36} className="mx-auto text-white/20" />
+                <div className={`py-12 text-center space-y-2 ${isSimplifiedMode ? 'text-black/50' : 'text-white/40'}`}>
+                  <ShoppingCart size={36} className={`mx-auto ${isSimplifiedMode ? 'text-black/30' : 'text-white/20'}`} />
                   <p className="text-sm font-semibold">購物車空空如也，馬上點餐吧！</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {cart.map((item) => (
-                    <div key={item.id} id={`cart-item-${item.id}`} className="flex items-start justify-between bg-white/5 p-3.5 rounded-xl border border-white/5 shadow-inner">
+                    <div key={item.id} id={`cart-item-${item.id}`} className={`flex items-start justify-between p-3.5 rounded-xl border shadow-inner ${
+                      isSimplifiedMode ? 'bg-[#FFF9EE] border-zinc-300 text-black' : 'bg-white/5 border-white/5'
+                    }`}>
                       <div className="text-left space-y-1">
-                        <h6 className="font-bold text-sm text-white leading-snug">{item.name[currentLang]}</h6>
+                        <h6 className={`font-bold text-sm leading-snug ${isSimplifiedMode ? 'text-black text-base font-black' : 'text-white'}`}>{item.name[currentLang]}</h6>
                         <div className="flex flex-wrap gap-1">
                           {item.customization.noodleType && (
-                            <span className="bg-[#E5B453]/15 text-[#E5B453] text-[10px] px-1.5 py-0.5 rounded font-mono border border-[#E5B453]/15">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                              isSimplifiedMode ? 'bg-[#FFA500] text-black border-black font-extrabold' : 'bg-[#E5B453]/15 text-[#E5B453] border-[#E5B453]/15'
+                            }`}>
                               {item.customization.noodleType === 'rice-noodle' ? '河粉' : '米線'}
                             </span>
                           )}
                           {item.customization.soupBase === 'coconut-milk' && (
-                            <span className="bg-amber-500/10 text-amber-500 text-[10px] px-1.5 py-0.5 rounded font-mono border border-amber-500/15">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                              isSimplifiedMode ? 'bg-amber-200 text-amber-950 border-amber-400 font-extrabold' : 'bg-amber-500/10 text-amber-500 border-amber-500/15'
+                            }`}>
                               加椰奶(+50)
                             </span>
                           )}
                           {item.customization.spiciness > 1 && (
-                            <span className="bg-red-500/10 text-red-400 text-[10px] px-1.5 py-0.5 rounded font-mono border border-red-500/15">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                              isSimplifiedMode ? 'bg-red-200 text-red-950 border-red-300 font-extrabold' : 'bg-red-500/10 text-red-400 border-red-500/15'
+                            }`}>
                               {item.customization.spiciness === 2 ? '小辣' : '大辣(+10)'}
                             </span>
                           )}
+                          {item.customization.selectedAddOns?.map((addOn) => (
+                            <span key={addOn.id} className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${
+                              isSimplifiedMode ? 'bg-[#FFA500]/15 text-black border-[#FFA500] font-extrabold' : 'bg-[#E5B453]/15 text-[#E5B453] border-[#E5B453]/15'
+                            }`}>
+                              +{addOn.name}(+${addOn.price})
+                            </span>
+                          ))}
                         </div>
                         {item.customization.notes && (
-                          <p className="text-xs text-[#E5B453] font-sans italic">“{item.customization.notes}”</p>
+                          <p className={`text-xs font-sans italic ${isSimplifiedMode ? 'text-zinc-700 font-black' : 'text-[#E5B453]'}`}>“{item.customization.notes}”</p>
                         )}
                         <div className="flex items-center space-x-1.5 pt-1.5">
                           <button
                             type="button"
                             id={`dec-qty-${item.id}`}
                             onClick={() => handleUpdateCartQty(item.id, item.qty - 1)}
-                            className="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/15 hover:text-white flex items-center justify-center text-white/60 transition active:scale-90 cursor-pointer border border-white/10"
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition active:scale-90 cursor-pointer border ${
+                              isSimplifiedMode 
+                                ? 'text-black bg-zinc-100 hover:bg-zinc-200 border-zinc-400' 
+                                : 'bg-white/5 hover:bg-white/15 hover:text-white text-white/60 border-white/10'
+                            }`}
                           >
                             <span className="text-sm font-bold leading-none">-</span>
                           </button>
-                          <span className="font-mono text-xs font-black min-w-[22px] text-center text-white bg-black/20 py-0.5 rounded border border-white/5">
+                          <span className={`font-mono text-xs font-black min-w-[22px] text-center rounded border ${
+                            isSimplifiedMode ? 'text-black bg-white border-zinc-400' : 'text-white bg-black/20 border-white/5'
+                          }`}>
                             {item.qty}
                           </span>
                           <button
                             type="button"
                             id={`inc-qty-${item.id}`}
                             onClick={() => handleUpdateCartQty(item.id, item.qty + 1)}
-                            className="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/15 hover:text-white flex items-center justify-center text-[#E5B453]/90 transition active:scale-90 cursor-pointer border border-white/10"
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition active:scale-90 cursor-pointer border ${
+                              isSimplifiedMode 
+                                ? 'text-black bg-[#FFA500] hover:bg-[#E5B453] border-black font-extrabold' 
+                                : 'bg-white/5 hover:bg-white/15 hover:text-white text-[#E5B453]/90 border-[#E5B453]/20'
+                            }`}
                           >
                             <span className="text-sm font-bold leading-none">+</span>
                           </button>
@@ -1446,8 +1710,8 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                       </div>
 
                       <div className="text-right space-y-2 shrink-0 ml-4 font-sans">
-                        <span className="font-mono text-sm font-bold block text-white/95">
-                          NT$ {(item.price + (item.customization.spiciness === 3 ? 10 : 0) + (item.customization.soupBase === 'coconut-milk' ? 50 : 0)) * item.qty}
+                        <span className={`font-mono text-sm font-bold block ${isSimplifiedMode ? 'text-black text-base font-black' : 'text-white/95'}`}>
+                          NT$ {(item.price + (item.customization.spiciness === 3 ? 10 : 0) + (item.customization.soupBase === 'coconut-milk' ? 50 : 0) + (item.customization.selectedAddOns?.reduce((sum, a) => sum + a.price, 0) || 0)) * item.qty}
                         </span>
                         <button
                           id={`delete-cart-item-${item.id}`}
@@ -1461,8 +1725,8 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                   ))}
 
                   {/* Payment Method selector */}
-                  <div className="space-y-2 pt-4 border-t border-white/10">
-                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest">
+                  <div className={`space-y-2 pt-4 border-t ${isSimplifiedMode ? 'border-zinc-200' : 'border-white/10'}`}>
+                    <label className={`block text-xs font-bold uppercase tracking-widest ${isSimplifiedMode ? 'text-black font-black' : 'text-white/40'}`}>
                       支付方式 Payment Method
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -1471,28 +1735,39 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                         { code: 'credit', label: '信用卡支付', spec: '均含服務加收10%' },
                         { code: 'linepay', label: 'TWQR支付', spec: '預設服務費10%' },
                         { code: 'member', label: '會員儲值支付', spec: '扣抵會員帳戶餘額' }
-                      ].map((pm) => (
-                        <button
-                          key={pm.code}
-                          id={`pay-method-${pm.code}`}
-                          type="button"
-                          onClick={() => setPaymentMethod(pm.code as any)}
-                          className={`p-2 rounded-xl text-center border transition cursor-pointer flex flex-col items-center justify-center ${
-                            paymentMethod === pm.code
-                              ? 'border-[#E5B453] bg-[#E5B453]/15 text-[#E5B453] font-extrabold shadow-md shadow-[#E5B453]/5 scale-[1.02]'
-                              : 'border-white/10 hover:border-white/25 text-white/70 hover:bg-[#1C1C1C]'
-                          }`}
-                        >
-                          <span className="text-[11px] font-bold">{pm.label}</span>
-                          <span className="text-[9px] opacity-50 mt-0.5 leading-tight">{pm.spec}</span>
-                        </button>
-                      ))}
+                      ].map((pm) => {
+                        const isSelected = paymentMethod === pm.code;
+                        return (
+                          <button
+                            key={pm.code}
+                            id={`pay-method-${pm.code}`}
+                            type="button"
+                            onClick={() => setPaymentMethod(pm.code as any)}
+                            className={`p-2 rounded-xl text-center border-2 transition cursor-pointer flex flex-col items-center justify-center ${
+                              isSimplifiedMode
+                                ? isSelected
+                                  ? 'border-black bg-black text-white font-black scale-[1.02] shadow-md'
+                                  : 'border-zinc-300 text-black bg-white hover:bg-zinc-100'
+                                : isSelected
+                                  ? 'border-[#E5B453] bg-[#E5B453]/15 text-[#E5B453] font-extrabold shadow-md shadow-[#E5B453]/5 scale-[1.02]'
+                                  : 'border-white/10 hover:border-white/25 text-white/70 hover:bg-[#1C1C1C]'
+                            }`}
+                          >
+                            <span className={`text-[11px] font-bold ${isSimplifiedMode ? 'text-sm font-black' : ''}`}>{pm.label}</span>
+                            <span className={`text-[9px] mt-0.5 leading-tight ${isSimplifiedMode ? 'text-zinc-650 font-bold' : 'opacity-50'}`}>{pm.spec}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
                   {/* Price calculation list */}
-                  <div className="space-y-1.5 bg-black/20 p-4 rounded-xl text-xs font-medium border border-white/5">
-                    <div className="flex justify-between text-white/60">
+                  <div className={`p-4 rounded-xl text-xs font-medium border ${
+                    isSimplifiedMode 
+                      ? 'bg-amber-50/50 border-zinc-250 text-black border-2' 
+                      : 'bg-black/20 border-white/5 text-white/60'
+                  }`}>
+                    <div className={`flex justify-between ${isSimplifiedMode ? 'text-black font-extrabold' : 'text-white/60'}`}>
                       <span>餐點小計</span>
                       <span className="font-mono">NT$ {cartSubtotal}</span>
                     </div>
@@ -1505,27 +1780,37 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                     )}
 
                     {(paymentMethod === 'credit' || paymentMethod === 'linepay') && (
-                      <div className="flex justify-between text-white/60">
+                      <div className={`flex justify-between ${isSimplifiedMode ? 'text-black font-extrabold' : 'text-white/60'}`}>
                         <span>{paymentMethod === 'linepay' ? 'TWQR支付預設服務費 (10%)' : '信用卡服務加成 (10%)'}</span>
                         <span className="font-mono">+ NT$ {expressFee}</span>
                       </div>
                     )}
 
                     {paymentMethod === 'member' && (
-                      <div className="flex justify-between items-center bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2.5 my-1 text-emerald-400 font-sans">
+                      <div className={`flex justify-between items-center rounded-lg p-2.5 my-1 font-sans border-2 ${
+                        isSimplifiedMode 
+                          ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-black'
+                          : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                      }`}>
                         <span>👤 當前會員餘額 Account Wallet</span>
                         <span className="font-mono font-bold text-sm">NT$ {userBalance.toLocaleString()}</span>
                       </div>
                     )}
 
-                    <div className="flex justify-between text-sm font-extrabold text-white pt-1.5 border-t border-white/10">
+                    <div className={`flex justify-between pt-1.5 border-t ${
+                      isSimplifiedMode 
+                        ? 'text-base font-black text-black border-t-2 border-black' 
+                        : 'text-sm font-extrabold text-white border-white/10'
+                    }`}>
                       <span>本日總應付額</span>
-                      <span className="text-base text-[#E5B453] font-mono font-bold">NT$ {cartTotal}</span>
+                      <span className={`font-mono font-bold ${isSimplifiedMode ? 'text-xl text-amber-800 font-serif' : 'text-base text-[#E5B453]'}`}>NT$ {cartTotal}</span>
                     </div>
 
                     {/* Google Member Promo Banner */}
                     {!lineProfile && (
-                      <div className="text-[10px] text-white/50 bg-white/5 border border-white/10 rounded-lg p-2.5 mt-2 flex items-center justify-between">
+                      <div className={`text-[10px] border rounded-lg p-2.5 mt-2 flex items-center justify-between ${
+                        isSimplifiedMode ? 'bg-zinc-100 border-zinc-250 text-black' : 'bg-white/5 border-white/10 text-white/50'
+                      }`}>
                         <span>💡 綁定 Google 帳戶可累積點數！</span>
                         <span className="text-[#4285F4] font-black cursor-pointer">手刀登入</span>
                       </div>
@@ -1537,13 +1822,17 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
 
             {/* Action Bar */}
             {cart.length > 0 && (
-              <div className="p-3 sm:p-4 bg-black/30 border-t border-white/10 shrink-0">
+              <div className={`p-3 sm:p-4 border-t shrink-0 ${isSimplifiedMode ? 'bg-amber-50 border-t-2 border-zinc-200' : 'bg-black/30 border-white/10'}`}>
                 <button
                   id="checkout-confirm-btn"
                   onClick={handleCheckout}
-                  className="w-full bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] font-black px-2 min-[360px]:px-4 py-2.5 sm:py-3.5 rounded-xl transition text-center flex items-center justify-center space-x-1 sm:space-x-1.5 active:scale-95 cursor-pointer text-[10px] min-[360px]:text-[11px] min-[395px]:text-xs sm:text-sm whitespace-nowrap"
+                  className={`w-full font-black px-2 min-[360px]:px-4 rounded-xl transition text-center flex items-center justify-center space-x-1 sm:space-x-1.5 active:scale-95 cursor-pointer whitespace-nowrap ${
+                    isSimplifiedMode
+                      ? 'bg-[#FFA500] hover:bg-amber-400 text-black border-2 border-black font-extrabold text-base py-4 sm:py-4.5 shadow-lg'
+                      : 'bg-[#E5B453] hover:bg-[#F0C46B] text-[#0F0F0F] py-2.5 sm:py-3.5 text-[10px] min-[360px]:text-[11px] min-[395px]:text-xs sm:text-sm'
+                  }`}
                 >
-                  <ShoppingCart size={12} className="sm:size-[15px]" />
+                  <ShoppingCart size={isSimplifiedMode ? 18 : 12} className={isSimplifiedMode ? 'mr-1' : 'sm:size-[15px]'} />
                   <span>確認 {selectedTable.includes('外帶') ? selectedTable : `${selectedTable} 桌`} 並下單 (請至櫃台結帳)</span>
                 </button>
               </div>
@@ -1638,7 +1927,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       {activeOrders.filter(o => !o.isPaid).length === 0 && (
         <div className="pt-6 border-t border-white/10 text-left space-y-4 font-sans" id="best-sellers-segment">
           {/* Segment Header or Tabs */}
-          {loginCount >= 2 ? (
+          {loginCount >= 2 && !isSimplifiedMode ? (
             <div className="space-y-4">
               {/* Tabs Navigation */}
               <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
@@ -1933,16 +2222,6 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
           )}
         </div>
       )}
-
-      {/* 🔮 Gemini AI Ordering Modal */}
-      <GeminiAiOrderingModal
-        currentLang={currentLang}
-        isOpen={isAiModalOpen}
-        onClose={() => setIsAiModalOpen(false)}
-        menuItems={menuItems}
-        cart={cart}
-        onAddRecommendedToCart={handleAddToCartFromAi}
-      />
     </div>
   );
 };

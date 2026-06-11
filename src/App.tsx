@@ -28,13 +28,24 @@ export default function App() {
   const [lang, setLang] = useState<Language>('zh');
   const [activeTab, setActiveTab] = useState<'customer' | 'kitchen' | 'admin' | 'cashier'>('customer');
   const [lineProfile, setLineProfile] = useState<any>(null);
+  const [adminSubTab, setAdminSubTab] = useState<'stats' | 'orders' | 'inventory' | 'menu' | 'members' | 'cashier' | 'printer' | 'options' | 'eod' | undefined>(undefined);
 
   // Secure staff role gating
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [isVerifyingStaff, setIsVerifyingStaff] = useState<boolean>(false);
 
   // Path routing states
+  const [staffPin, setStaffPin] = useState<string>('');
   const [currentPath, setCurrentPath] = useState<string>(window.location.pathname);
+  const isSuperEntry = currentPath === '/FSY20260606';
+  const isAtStaffPath = (staffPin !== '' && currentPath === '/' + staffPin) || isSuperEntry;
+
+  useEffect(() => {
+    if (currentPath === '/FSY20260606') {
+      setIsStaff(true);
+      setStaffPin('FSY20260606');
+    }
+  }, [currentPath]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -194,6 +205,46 @@ export default function App() {
       setCategories(catData);
       setTables(tablesData);
 
+      // Secure Staff Path verification & check-path validation
+      if (window.location.pathname === '/FSY20260606') {
+        setStaffPin('FSY20260606');
+        setIsStaff(true);
+      } else {
+        const match = window.location.pathname.match(/^\/(\d{6})$/);
+        if (match) {
+          const potentialPin = match[1];
+          try {
+            const checkRes = await fetch('/api/staff/pin/check-path', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ pathPin: potentialPin })
+            });
+            if (checkRes.ok) {
+              const checkData = await checkRes.json();
+              if (checkData.valid) {
+                setStaffPin(potentialPin);
+              } else {
+                // Path PIN is invalid! Clear the route path to prevent scanning/probing
+                window.history.replaceState({}, '', '/');
+                setCurrentPath('/');
+                setStaffPin('');
+              }
+            } else {
+              window.history.replaceState({}, '', '/');
+              setCurrentPath('/');
+              setStaffPin('');
+            }
+          } catch (e) {
+            console.error('[Verify Path Error]', e);
+            window.history.replaceState({}, '', '/');
+            setCurrentPath('/');
+            setStaffPin('');
+          }
+        } else {
+          setStaffPin('');
+        }
+      }
+
     } catch (err: any) {
       const errMsg = err?.message || String(err);
       if (errMsg.includes('Failed to fetch') || errMsg.includes('Load failed')) {
@@ -290,6 +341,24 @@ export default function App() {
     } catch (err: any) {
       console.error('[Sabay Update table error]', err);
       return { success: false, error: err.message || '網路連線錯誤' };
+    }
+  };
+
+  // 2.4 Update Order Items list (add / remove qty inside order items)
+  const handleUpdateOrderItems = async (orderId: string, items: any[]) => {
+    try {
+      const res = await fetch(`/api/orders/${orderId}/items`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
+      if (res.ok) {
+        await fetchData();
+      } else {
+        console.error('Failed to update order items on the backend');
+      }
+    } catch (err) {
+      console.error('[Update order items error]', err);
     }
   };
 
@@ -483,7 +552,7 @@ export default function App() {
 
   const handleEditTable = async (id: string, qrCodeUrl: string) => {
     try {
-      const res = await fetch(`/api/tables/${id}`, {
+      const res = await fetch(`/api/tables/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ qrCodeUrl }),
@@ -503,7 +572,7 @@ export default function App() {
 
   const handleDeleteTable = async (id: string) => {
     try {
-      const res = await fetch(`/api/tables/${id}`, {
+      const res = await fetch(`/api/tables/${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
       if (res.ok) {
@@ -654,7 +723,7 @@ export default function App() {
               <div className="min-w-0">
                 <h1 className="text-[10px] min-[360px]:text-[11px] min-[395px]:text-xs sm:text-sm md:text-base font-bold sm:tracking-widest font-serif flex items-center text-[#E5B453]">
                   <span className="block whitespace-normal break-words leading-tight max-w-[120px] min-[360px]:max-w-[150px] min-[395px]:max-w-[180px] sm:max-w-none">
-                    {currentPath === '/staff-login' 
+                    {isAtStaffPath 
                       ? '沙貝泰式燒烤 經營管理中心' 
                       : (lang === 'zh' 
                           ? (lineProfile ? '沙貝燒烤' : '沙貝燒烤 泰式烤肉') 
@@ -662,7 +731,7 @@ export default function App() {
                   </span>
                 </h1>
                 <span className="text-[10px] text-white/50 hidden sm:block font-sans tracking-wide truncate">
-                  {currentPath === '/staff-login' 
+                  {isAtStaffPath 
                     ? '🛡️ 員工專屬隔離安全驗證終端 (Autonomous Admin Terminal)' 
                     : '桃園市大園區高鐵北路二段198號1樓 · 電話: 0966626408'}
                 </span>
@@ -671,12 +740,15 @@ export default function App() {
 
             {/* Viewport switch tabs */}
             <div className="hidden lg:flex items-center space-x-2">
-              {currentPath === '/staff-login' ? (
+              {isAtStaffPath ? (
                 isStaff ? (
                   <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 space-x-1" id="desktop-tab-selector">
                     <button
                       id="tab-btn-cashier-main"
-                      onClick={() => setActiveTab('cashier')}
+                      onClick={() => {
+                        setActiveTab('cashier');
+                        setAdminSubTab(undefined);
+                      }}
                       className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer ${
                         activeTab === 'cashier'
                           ? 'bg-[#E5B453] text-[#0F0F0F] shadow-md shadow-[#E5B453]/15'
@@ -689,7 +761,10 @@ export default function App() {
 
                     <button
                       id="tab-btn-kitchen"
-                      onClick={() => setActiveTab('kitchen')}
+                      onClick={() => {
+                        setActiveTab('kitchen');
+                        setAdminSubTab(undefined);
+                      }}
                       className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer ${
                         activeTab === 'kitchen'
                           ? 'bg-[#E5B453] text-[#0F0F0F] shadow-md shadow-[#E5B453]/15'
@@ -702,7 +777,10 @@ export default function App() {
 
                     <button
                       id="tab-btn-admin"
-                      onClick={() => setActiveTab('admin')}
+                      onClick={() => {
+                        setActiveTab('admin');
+                        setAdminSubTab(undefined);
+                      }}
                       className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer ${
                         activeTab === 'admin'
                           ? 'bg-[#E5B453] text-[#0F0F0F] shadow-md shadow-[#E5B453]/15'
@@ -720,6 +798,22 @@ export default function App() {
                     >
                       <Smartphone size={14} />
                       <span>📱 返回顧客點餐</span>
+                    </button>
+
+                    <button
+                      id="tab-btn-eod-main"
+                      onClick={() => {
+                        setActiveTab('admin');
+                        setAdminSubTab('eod');
+                      }}
+                      className={`flex items-center space-x-1 px-3.5 py-2 font-black text-xs rounded-xl cursor-pointer transition ml-1 shrink-0 ${
+                        activeTab === 'admin' && adminSubTab === 'eod'
+                          ? 'bg-[#E5B453] text-[#0F0F0F] shadow-md shadow-[#E5B453]/15'
+                          : 'text-amber-500 bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/25'
+                      }`}
+                    >
+                      <span className="text-sm select-none">🏁</span>
+                      <span>每日結帳關帳</span>
                     </button>
 
                     <button
@@ -745,7 +839,7 @@ export default function App() {
 
             {/* Loyalty LINE login & Multilingual flags selectors */}
             <div className="flex items-center space-x-3">
-              {currentPath !== '/staff-login' && (
+              {!isAtStaffPath && (
                 <GoogleLoginMock
                   currentLang={lang}
                   currentProfile={lineProfile}
@@ -761,7 +855,7 @@ export default function App() {
       </nav>
 
       {/* Interactive Collapsible Contact Banner (Middle Area between First Column/Navbar and Second Column/Workspace) */}
-      {currentPath !== '/staff-login' && (
+      {!isAtStaffPath && (
         <div className="bg-[#121212] border-b border-white/5 py-1.5 px-4" id="contact-info-reveal-bar">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
             <div className="flex items-center space-x-2 text-white/35 text-[11px] font-sans font-medium">
@@ -813,11 +907,14 @@ export default function App() {
       )}
 
       {/* Mobile Sticky Tab selectors, only shown to logged-in staff on staff login path */}
-      {currentPath === '/staff-login' && isStaff && (
+      {isAtStaffPath && isStaff && (
         <div className="lg:hidden bg-[#121212] border-b border-white/10 p-2 flex justify-around sticky top-18 z-30 shadow-md" id="mobile-tab-selector">
           <button
             id="m-tab-btn-cashier"
-            onClick={() => setActiveTab('cashier')}
+            onClick={() => {
+              setActiveTab('cashier');
+              setAdminSubTab(undefined);
+            }}
             className={`flex-1 py-1.5 text-center text-[10px] font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
               activeTab === 'cashier' ? 'text-[#E5B453]' : 'text-white/40'
             }`}
@@ -828,7 +925,10 @@ export default function App() {
 
           <button
             id="m-tab-btn-kitchen"
-            onClick={() => setActiveTab('kitchen')}
+            onClick={() => {
+              setActiveTab('kitchen');
+              setAdminSubTab(undefined);
+            }}
             className={`flex-1 py-1.5 text-center text-[10px] font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
               activeTab === 'kitchen' ? 'text-[#E5B453]' : 'text-white/40'
             }`}
@@ -839,7 +939,10 @@ export default function App() {
 
           <button
             id="m-tab-btn-admin"
-            onClick={() => setActiveTab('admin')}
+            onClick={() => {
+              setActiveTab('admin');
+              setAdminSubTab(undefined);
+            }}
             className={`flex-1 py-1.5 text-center text-[10px] font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
               activeTab === 'admin' ? 'text-[#E5B453]' : 'text-white/40'
             }`}
@@ -876,7 +979,7 @@ export default function App() {
             <div className="w-10 h-10 border-4 border-[#E5B453] border-t-transparent rounded-full animate-spin"></div>
             <p className="text-white/50 font-bold text-sm">沙貝燒烤 雲端主機連線中...</p>
           </div>
-        ) : currentPath === '/staff-login' ? (
+        ) : isAtStaffPath ? (
           !isStaff ? (
             <div className="py-8">
               <div className="max-w-md mx-auto text-center space-y-2 mb-6">
@@ -912,6 +1015,7 @@ export default function App() {
                   onUpdatePrinterIp={handleUpdatePrinterIp}
                   onPrintTestPage={handlePrintTestPage}
                   onUpdateTableNumber={handleUpdateTableNumber}
+                  tables={tables}
                 />
               ) : (
                 <ManagerDashboard
@@ -937,7 +1041,8 @@ export default function App() {
                   onDeleteTable={handleDeleteTable}
                   onPayOrder={handlePayOrder}
                   onUpdateTableNumber={handleUpdateTableNumber}
-                  defaultSubTab={activeTab === 'cashier' ? 'cashier' : undefined}
+                  onUpdateOrderItems={handleUpdateOrderItems}
+                  defaultSubTab={adminSubTab || (activeTab === 'cashier' ? 'cashier' : undefined)}
                   minSpend={minSpend}
                   onUpdateMinSpend={handleUpdateMinSpend}
                   operatingHours={operatingHours}
@@ -945,6 +1050,7 @@ export default function App() {
                   onUpdateOperatingHours={handleUpdateOperatingHours}
                   customerNotice={customerNotice}
                   onUpdateCustomerNotice={handleUpdateCustomerNotice}
+                  staffPin={staffPin}
                 />
               )}
             </div>
@@ -978,7 +1084,7 @@ export default function App() {
           <span>Designed by</span>
           <span className="font-extrabold text-white/95 tracking-widest drop-shadow-[0_0_8px_rgba(229,180,83,0.3)]">FlyShine A.S.R. System Technology.</span>
         </p>
-         {currentPath === '/staff-login' && (
+         {isAtStaffPath && (
            <div className="flex items-center justify-center space-x-4 pt-1">
              <button
                type="button"

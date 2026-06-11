@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Order, OrderStatus, Language } from '../types';
+import { Order, OrderStatus, Language, TableConfig } from '../types';
 import { ChefHat, Printer, Trash2, Check, Flame, Ban, RefreshCw, Volume2, Wifi, Edit, Save, Settings, X } from 'lucide-react';
 
 interface KitchenDisplaySystemProps {
@@ -12,6 +12,7 @@ interface KitchenDisplaySystemProps {
   onUpdatePrinterIp: (ip: string) => Promise<{ success: boolean; error?: string }>;
   onPrintTestPage: () => Promise<{ success: boolean; error?: string }>;
   onUpdateTableNumber?: (orderId: string, tableNumber: string) => Promise<{ success: boolean; error?: string }>;
+  tables?: TableConfig[];
 }
 
 export const KitchenDisplaySystem: React.FC<KitchenDisplaySystemProps> = ({
@@ -24,6 +25,7 @@ export const KitchenDisplaySystem: React.FC<KitchenDisplaySystemProps> = ({
   onUpdatePrinterIp,
   onPrintTestPage,
   onUpdateTableNumber,
+  tables = [],
 }) => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active'>('active');
   const [beepSim, setBeepSim] = useState(false);
@@ -138,13 +140,33 @@ export const KitchenDisplaySystem: React.FC<KitchenDisplaySystemProps> = ({
                         </span>
                         {editingOrderId === order.id ? (
                           <div className="flex items-center gap-1 bg-black/40 border border-[#E5B453]/30 px-1.5 py-0.5 rounded-lg">
-                            <input
-                              type="text"
+                            <select
                               value={editingTableValue}
                               onChange={(e) => setEditingTableValue(e.target.value)}
-                              className="bg-black text-white font-bold text-xs rounded px-1.5 py-0.5 w-20 focus:outline-none focus:ring-1 focus:ring-[#E5B453]"
-                              autoFocus
-                            />
+                              className="bg-black text-white font-bold text-xs rounded px-1.5 py-0.5 w-28 focus:outline-none focus:ring-1 focus:ring-[#E5B453]"
+                            >
+                              <optgroup label="客席就座桌號">
+                                {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((num) => (
+                                  <option key={num} value={num}>
+                                    🪑 第 {num} 桌
+                                  </option>
+                                ))}
+                                {tables && tables.map((t) => (
+                                  !Array.from({ length: 12 }, (_, i) => String(i + 1)).includes(t.id) && (
+                                    <option key={t.id} value={t.id}>
+                                      🪑 第 {t.id} 桌
+                                    </option>
+                                  )
+                                ))}
+                              </optgroup>
+                              <optgroup label="外帶自取佇列">
+                                {Array.from({ length: 15 }, (_, i) => `外帶 #${i + 1}`).map((takeoutId) => (
+                                  <option key={takeoutId} value={takeoutId}>
+                                    🛍️ {takeoutId}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            </select>
                             <button
                               type="button"
                               onClick={async () => {
@@ -231,6 +253,11 @@ export const KitchenDisplaySystem: React.FC<KitchenDisplaySystemProps> = ({
                                   椰奶(+50)
                                 </span>
                               )}
+                              {it.customization.selectedAddOns?.map((addOn) => (
+                                <span key={addOn.id} className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-semibold px-1.5 py-0.5 rounded font-sans">
+                                  +{addOn.name}
+                                </span>
+                              ))}
                             </div>
                             
                             {it.customization.notes && (

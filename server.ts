@@ -100,7 +100,7 @@ let liveCategories: Category[] = [
   { id: 'drinks', name: { zh: '泰特色沁涼飲品 🍹', en: 'Thai Cold Drinks', ko: '태국식 야외 청量 飲料', ja: 'タイ風さわやかドリンク', th: 'เครื่องดื่มดับร้อนรสสดชื่น' } },
 ];
 
-let liveStaffPin = '8888';
+let liveStaffPin = '888888';
 
 let livePrinterIp = '10.0.0.124';
 
@@ -126,7 +126,37 @@ let liveOperatingHours: OperatingHourSlot[] = [
 
 let liveRestDays: string[] = []; // Store public holidays as "YYYY-MM-DD"
 
-let liveCustomerNotice = '📣 歡迎來到沙貝泰式炭烤！我們提供正宗的泰南冬蔭功和頂級碳烤串燒。內用低消每人 200 元，用餐限時 60 分鐘。祝您用餐愉快！Sabay Thai BBQ wishes you a delicious meal!';
+let liveCustomerNotice = '📣 歡迎來到沙貝泰式炭烤！我們提供正宗的泰南冬蔭功 and 頂級碳烤串燒。內用低消每人 200 元，用餐限時 60 分鐘。祝您用餐愉快！Sabay Thai BBQ wishes you a delicious meal!';
+
+let liveOptionRules: any[] = [];
+let livePrinterSettings = {
+  kitchen: {
+    connectionType: 'IP',
+    ip: '192.168.1.101',
+    usbPort: 'USB001',
+    width: '80mm',
+    fontSizeFactor: 1.0,
+    restaurantName: '沙貝燒烤 泰式廚房',
+    printTelephone: '02-1234-5678',
+    printAddress: '台北市信義區泰式一番街8號',
+    printTimeEnabled: true,
+    headerPrefix: '★★★ 廚房工作備餐單 ★★★',
+    footerSuffix: '請主廚盡速配餐出餐！'
+  },
+  bill: {
+    connectionType: 'USB',
+    ip: '192.168.1.102',
+    usbPort: 'USB002',
+    width: '58mm',
+    fontSizeFactor: 0.8,
+    restaurantName: '沙貝燒烤 SABAY BBQ',
+    printTelephone: '02-1234-5678',
+    printAddress: '台北市信義區泰式一番街8號',
+    printTimeEnabled: true,
+    headerPrefix: '★★★ 顧客結帳明細單 ★★★',
+    footerSuffix: '謝謝光臨，歡迎再度光臨！'
+  }
+};
 
 function isStoreOpen(timestamp?: number): boolean {
   const date = timestamp ? new Date(timestamp) : new Date();
@@ -365,7 +395,9 @@ function saveStateToDisk() {
       liveOrders,
       inventoryLogs,
       printLogs,
-      promoNotifications
+      promoNotifications,
+      liveOptionRules,
+      livePrinterSettings
     };
     fs.writeFileSync(PERSISTENCE_FILE_PATH, JSON.stringify(dataToSave, null, 2), 'utf-8');
     console.log('✓ System State fully saved to codebase disk:', PERSISTENCE_FILE_PATH);
@@ -382,7 +414,13 @@ function loadStateFromDisk() {
       if (parsed.liveMenu) liveMenu = parsed.liveMenu;
       if (parsed.liveIngredients) liveIngredients = parsed.liveIngredients;
       if (parsed.liveCategories) liveCategories = parsed.liveCategories;
-      if (parsed.liveStaffPin) liveStaffPin = parsed.liveStaffPin;
+      if (parsed.liveStaffPin) {
+        liveStaffPin = parsed.liveStaffPin;
+        if (!/^\d{6}$/.test(liveStaffPin)) {
+          console.log(`⚠️ Legacy PIN detected (${liveStaffPin}), migrating to secure default '888888'`);
+          liveStaffPin = '888888';
+        }
+      }
       if (parsed.livePrinterIp) livePrinterIp = parsed.livePrinterIp;
       if (parsed.liveTables) liveTables = parsed.liveTables;
       if (parsed.liveTakeoutSeq !== undefined) liveTakeoutSeq = parsed.liveTakeoutSeq;
@@ -395,6 +433,8 @@ function loadStateFromDisk() {
       if (parsed.inventoryLogs) inventoryLogs = parsed.inventoryLogs;
       if (parsed.printLogs) printLogs = parsed.printLogs;
       if (parsed.promoNotifications) promoNotifications = parsed.promoNotifications;
+      if (parsed.liveOptionRules) liveOptionRules = parsed.liveOptionRules;
+      if (parsed.livePrinterSettings) livePrinterSettings = parsed.livePrinterSettings;
       console.log('✓ System State fully loaded from codebase disk:', PERSISTENCE_FILE_PATH);
     }
   } catch (error) {
@@ -494,10 +534,11 @@ app.post('/api/printer/pin', (req, res) => {
   if (currentPin !== liveStaffPin) {
     return res.status(400).json({ error: '目前解鎖金鑰輸入錯誤！ / Incorrect current PIN' });
   }
-  if (!/^\d{4}$/.test(newPin)) {
-    return res.status(400).json({ error: '新金鑰必須為 4 位半形數字！ / New PIN must be a 4-digit number' });
+  if (!/^\d{6}$/.test(newPin)) {
+    return res.status(400).json({ error: '新金鑰必須為 6 位半形數字！ / New PIN must be a 6-digit number' });
   }
   liveStaffPin = newPin;
+  saveStateToDisk();
   res.json({ success: true, message: '員工解鎖金鑰已成功變更！' });
 });
 
@@ -510,7 +551,7 @@ app.get('/api/menu', (req, res) => {
 
 // Create live menu item
 app.post('/api/menu', (req, res) => {
-  const { category, name, price, image, description, isSetMeal, requiredSaucesOption, hasNoodlesOption, hasCoconutsMilkOption, containsBeef, containsPork, containsSeafood, isNotSpicy } = req.body;
+  const { category, name, price, image, description, isSetMeal, requiredSaucesOption, hasNoodlesOption, hasCoconutsMilkOption, containsBeef, containsPork, containsSeafood, isNotSpicy, customAddOns } = req.body;
   
   if (!category || !name || !price) {
     return res.status(400).json({ error: 'Missing required fields (category, name, price)' });
@@ -531,7 +572,8 @@ app.post('/api/menu', (req, res) => {
     containsBeef: !!containsBeef,
     containsPork: !!containsPork,
     containsSeafood: !!containsSeafood,
-    isNotSpicy: !!isNotSpicy
+    isNotSpicy: !!isNotSpicy,
+    customAddOns: Array.isArray(customAddOns) ? customAddOns : []
   };
 
   liveMenu.push(newItem);
@@ -542,7 +584,7 @@ app.post('/api/menu', (req, res) => {
 // Update live menu item
 app.put('/api/menu/:id', (req, res) => {
   const { id } = req.params;
-  const { category, name, price, image, description, available, isSetMeal, requiredSaucesOption, hasNoodlesOption, hasCoconutsMilkOption, containsBeef, containsPork, containsSeafood, isNotSpicy } = req.body;
+  const { category, name, price, image, description, available, isSetMeal, requiredSaucesOption, hasNoodlesOption, hasCoconutsMilkOption, containsBeef, containsPork, containsSeafood, isNotSpicy, customAddOns } = req.body;
   
   const itemIndex = liveMenu.findIndex(m => m.id === id);
   if (itemIndex > -1) {
@@ -561,7 +603,8 @@ app.put('/api/menu/:id', (req, res) => {
       containsBeef: containsBeef !== undefined ? !!containsBeef : liveMenu[itemIndex].containsBeef,
       containsPork: containsPork !== undefined ? !!containsPork : liveMenu[itemIndex].containsPork,
       containsSeafood: containsSeafood !== undefined ? !!containsSeafood : liveMenu[itemIndex].containsSeafood,
-      isNotSpicy: isNotSpicy !== undefined ? !!isNotSpicy : liveMenu[itemIndex].isNotSpicy
+      isNotSpicy: isNotSpicy !== undefined ? !!isNotSpicy : liveMenu[itemIndex].isNotSpicy,
+      customAddOns: Array.isArray(customAddOns) ? customAddOns : (liveMenu[itemIndex].customAddOns || [])
     };
     liveMenu[itemIndex] = updated;
     saveStateToDisk();
@@ -697,6 +740,52 @@ app.post('/api/settings/customer-notice', (req, res) => {
   res.status(400).json({ error: 'Invalid customer notice / 顧客注意事項無效' });
 });
 
+// Option Rules Endpoints
+app.get('/api/option-rules', (req, res) => {
+  res.json(liveOptionRules);
+});
+
+app.post('/api/option-rules', (req, res) => {
+  const { name, category, price } = req.body;
+  const newRule = {
+    id: `rule-${Date.now()}`,
+    name: name || '新選項',
+    category: category || '加配料',
+    price: Number(price) || 0
+  };
+  liveOptionRules.push(newRule);
+  saveStateToDisk();
+  res.status(201).json(newRule);
+});
+
+app.delete('/api/option-rules/:id', (req, res) => {
+  const { id } = req.params;
+  const index = liveOptionRules.findIndex(r => r.id === id);
+  if (index > -1) {
+    const deleted = liveOptionRules.splice(index, 1);
+    saveStateToDisk();
+    return res.json({ success: true, deleted });
+  }
+  res.status(404).json({ error: 'Rule not found' });
+});
+
+// Printer Settings Endpoints
+app.get('/api/printer/settings', (req, res) => {
+  res.json(livePrinterSettings);
+});
+
+app.put('/api/printer/settings', (req, res) => {
+  const { kitchen, bill } = req.body;
+  if (kitchen) {
+    livePrinterSettings.kitchen = { ...livePrinterSettings.kitchen, ...kitchen };
+  }
+  if (bill) {
+    livePrinterSettings.bill = { ...livePrinterSettings.bill, ...bill };
+  }
+  saveStateToDisk();
+  res.json({ success: true, settings: livePrinterSettings });
+});
+
 
 // Tables Management Endpoints
 app.get('/api/tables', (req, res) => {
@@ -736,7 +825,8 @@ app.post('/api/tables', (req, res) => {
 app.put('/api/tables/:id', (req, res) => {
   const { id } = req.params;
   const { qrCodeUrl } = req.body;
-  const tableIndex = liveTables.findIndex(t => t.id === id);
+  const decodedId = decodeURIComponent(id).trim();
+  const tableIndex = liveTables.findIndex(t => t.id.toString().trim() === decodedId);
   if (tableIndex > -1) {
     if (qrCodeUrl !== undefined) {
       liveTables[tableIndex].qrCodeUrl = qrCodeUrl;
@@ -749,7 +839,8 @@ app.put('/api/tables/:id', (req, res) => {
 
 app.delete('/api/tables/:id', (req, res) => {
   const { id } = req.params;
-  const tableIndex = liveTables.findIndex(t => t.id === id);
+  const decodedId = decodeURIComponent(id).trim();
+  const tableIndex = liveTables.findIndex(t => t.id.toString().trim() === decodedId);
   if (tableIndex > -1) {
     const deleted = liveTables.splice(tableIndex, 1);
     saveStateToDisk();
@@ -781,6 +872,20 @@ app.get('/api/takeout/status', (req, res) => {
 });
 
 // Staff PIN Authentication & Update Endpoints
+app.get('/api/staff/pin/value', (req, res) => {
+  // Security Hardening: Never expose raw plaintext secret staff credentials to public clients!
+  res.json({ blocked: true });
+});
+
+// Securely check if a pathname PIN code matches the current live PIN without leaking the actual value
+app.post('/api/staff/pin/check-path', (req, res) => {
+  const { pathPin } = req.body;
+  if (!pathPin) {
+    return res.json({ valid: false });
+  }
+  return res.json({ valid: pathPin === liveStaffPin });
+});
+
 app.post('/api/staff/pin/verify', (req, res) => {
   const { pin } = req.body;
   if (pin === liveStaffPin) {
@@ -797,8 +902,8 @@ app.put('/api/staff/pin', (req, res) => {
   if (currentPin !== liveStaffPin) {
     return res.status(400).json({ error: '目前金鑰輸入錯誤！ / Incorrect current PIN' });
   }
-  if (!/^\d{4}$/.test(newPin)) {
-    return res.status(400).json({ error: '新金鑰必須為 4 位數字！ / New PIN must be a 4-digit number' });
+  if (!/^\d{6}$/.test(newPin)) {
+    return res.status(400).json({ error: '新金鑰必須為 6 位數字！ / New PIN must be a 6-digit number' });
   }
   liveStaffPin = newPin;
   saveStateToDisk();
