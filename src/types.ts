@@ -90,6 +90,7 @@ export interface Promotion {
 export interface Category {
   id: string;
   name: { [key in Language]: string };
+  showOnCustomerPage?: boolean;
 }
 
 export interface TableConfig {

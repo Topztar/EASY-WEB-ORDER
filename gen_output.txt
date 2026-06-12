@@ -1,0 +1,25 @@
+﻿import { MenuItem, Ingredient, Promotion, Language } from './types';
+
+export const TRANSLATIONS: { [key: string]: { [lang in Language]: string } } = {
+  sabayBBQ: {
+    zh: '瘝?? 瘜啣??方?',
+    en: 'Sabay BBQ Thai Barbecue',
+    ko: '?禺???諻????筏??諻???,
+    ja: '?萸??????乓 ?踴憸函??',
+    th: '鉊芹?鉊耜腺 鉊葡鉊??鉊葭鉊葩鉊?鉊徇腹鉊嫩?鉊?萼鉊萼鉆?鉊?,
+  },
+  slogan: {
+    zh: '甇??瘜啣?蝣喟??剖?蝟餃??挾憭???,
+    en: 'Authentic Thai BBQ, Tom Yum & Perfect Late Night Bites',
+    ko: '? ?筏??諻??? ?? 諻??科 篥科?',
+    ja: '?祆?踴憸函?怎????楛憭蝯嗅?銝脩??,
+    
+
+??Generated 135 menu items
+   Skewers: 51
+   Drinks:  45
+   Noodles: 20
+   Sides:   9
+   Combos:  10
+
+?? Saved to src/data_menu_only.ts for review

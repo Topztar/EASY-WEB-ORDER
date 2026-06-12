@@ -471,12 +471,12 @@ export default function App() {
   };
 
   // Category Mutation Handlers
-  const handleAddCategory = async (id: string, name: any) => {
+  const handleAddCategory = async (id: string, name: any, showOnCustomerPage?: boolean) => {
     try {
       const res = await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name }),
+        body: JSON.stringify({ id, name, showOnCustomerPage }),
       });
       if (res.ok) {
         await fetchData();
@@ -491,12 +491,12 @@ export default function App() {
     }
   };
 
-  const handleEditCategory = async (id: string, name: any) => {
+  const handleEditCategory = async (id: string, name: any, showOnCustomerPage?: boolean) => {
     try {
       const res = await fetch(`/api/categories/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, showOnCustomerPage }),
       });
       if (res.ok) {
         await fetchData();
@@ -747,7 +747,7 @@ export default function App() {
                       id="tab-btn-cashier-main"
                       onClick={() => {
                         setActiveTab('cashier');
-                        setAdminSubTab(undefined);
+                        setAdminSubTab('cashier');
                       }}
                       className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer ${
                         activeTab === 'cashier'
@@ -779,7 +779,7 @@ export default function App() {
                       id="tab-btn-admin"
                       onClick={() => {
                         setActiveTab('admin');
-                        setAdminSubTab(undefined);
+                        setAdminSubTab('stats');
                       }}
                       className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer ${
                         activeTab === 'admin'
@@ -813,7 +813,7 @@ export default function App() {
                       }`}
                     >
                       <span className="text-sm select-none">🏁</span>
-                      <span>每日結帳關帳</span>
+                      <span>每日關帳結算</span>
                     </button>
 
                     <button
@@ -913,7 +913,7 @@ export default function App() {
             id="m-tab-btn-cashier"
             onClick={() => {
               setActiveTab('cashier');
-              setAdminSubTab(undefined);
+              setAdminSubTab('cashier');
             }}
             className={`flex-1 py-1.5 text-center text-[10px] font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
               activeTab === 'cashier' ? 'text-[#E5B453]' : 'text-white/40'
@@ -941,7 +941,7 @@ export default function App() {
             id="m-tab-btn-admin"
             onClick={() => {
               setActiveTab('admin');
-              setAdminSubTab(undefined);
+              setAdminSubTab('stats');
             }}
             className={`flex-1 py-1.5 text-center text-[10px] font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
               activeTab === 'admin' ? 'text-[#E5B453]' : 'text-white/40'
@@ -1042,7 +1042,8 @@ export default function App() {
                   onPayOrder={handlePayOrder}
                   onUpdateTableNumber={handleUpdateTableNumber}
                   onUpdateOrderItems={handleUpdateOrderItems}
-                  defaultSubTab={adminSubTab || (activeTab === 'cashier' ? 'cashier' : undefined)}
+                  defaultSubTab={adminSubTab || (activeTab === 'cashier' ? 'cashier' : 'stats')}
+                  onSubTabChange={(subTab) => setAdminSubTab(subTab)}
                   minSpend={minSpend}
                   onUpdateMinSpend={handleUpdateMinSpend}
                   operatingHours={operatingHours}

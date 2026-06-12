@@ -31,10 +31,10 @@ let liveMenu: MenuItem[] = INITIAL_MENU.map(item => {
   const zh = (item.name && item.name.zh) ? item.name.zh : "";
   const category = item.category || "";
   
-  const containsBeef = id.includes('beef') || zh.includes('牛肉') || id === 'sk-01' || id === 'nd-02' || id === 'ty-02' || id === 'cb-02';
-  const containsPork = id.includes('pork') || zh.includes('豬五花') || zh.includes('豬肉') || id === 'sk-02' || id === 'sk-03' || id === 'sk-07' || id === 'sk-12' || id === 'cb-01';
-  const containsSeafood = id.includes('seafood') || zh.includes('海鮮') || zh.includes('蝦') || zh.includes('蛤') || id === 'ty-01' || id === 'nd-01' || id.startsWith('sf-');
-  const isNotSpicy = category === 'veggies' || category === 'sweets' || category === 'drinks' || zh.includes('不辣') || id.startsWith('vg-') || id.startsWith('sw-') || id.startsWith('dr-');
+  const containsBeef = item.containsBeef || id.includes('beef') || zh.includes('牛肉') || id === 'sk-01' || id === 'nd-02' || id === 'ty-02' || id === 'cb-02';
+  const containsPork = item.containsPork || id.includes('pork') || zh.includes('豬五花') || zh.includes('豬肉') || id === 'sk-02' || id === 'sk-03' || id === 'sk-07' || id === 'sk-12' || id === 'cb-01';
+  const containsSeafood = item.containsSeafood || id.includes('seafood') || zh.includes('海鮮') || zh.includes('蝦') || zh.includes('蛤') || id === 'ty-01' || id === 'nd-01' || id.startsWith('sf-');
+  const isNotSpicy = item.isNotSpicy || category === 'veggies' || category === 'sweets' || category === 'drinks' || category === 'sides' || zh.includes('不辣') || id.startsWith('vg-') || id.startsWith('sw-') || id.startsWith('dr-');
 
   return {
     ...item,
@@ -375,7 +375,7 @@ let promoNotifications: { id: string; timestamp: string; title: string; message:
 ];
 
 // File-System Local Codebase Persistence System for Preview Edits:
-const PERSISTENCE_FILE_PATH = path.join(process.cwd(), 'src', 'persisted_state.json');
+const PERSISTENCE_FILE_PATH = path.join(process.cwd(), 'persisted_state.json');
 
 function saveStateToDisk() {
   try {
@@ -634,7 +634,7 @@ app.get('/api/categories', (req, res) => {
 
 // Create category
 app.post('/api/categories', (req, res) => {
-  const { id, name } = req.body;
+  const { id, name, showOnCustomerPage } = req.body;
   if (!id || !name) {
     return res.status(400).json({ error: 'Missing required fields (id, name)' });
   }
@@ -647,7 +647,8 @@ app.post('/api/categories', (req, res) => {
   }
   const newCat: Category = {
     id: cleanId,
-    name: typeof name === 'object' ? name : { zh: name, en: name, ko: name, ja: name, th: name }
+    name: typeof name === 'object' ? name : { zh: name, en: name, ko: name, ja: name, th: name },
+    showOnCustomerPage: showOnCustomerPage !== false
   };
   liveCategories.push(newCat);
   saveStateToDisk();
@@ -657,10 +658,15 @@ app.post('/api/categories', (req, res) => {
 // Update category
 app.put('/api/categories/:id', (req, res) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, showOnCustomerPage } = req.body;
   const catIndex = liveCategories.findIndex(c => c.id === id);
   if (catIndex > -1) {
-    liveCategories[catIndex].name = typeof name === 'object' ? name : { zh: name, en: name, ko: name, ja: name, th: name };
+    if (name) {
+      liveCategories[catIndex].name = typeof name === 'object' ? name : { zh: name, en: name, ko: name, ja: name, th: name };
+    }
+    if (showOnCustomerPage !== undefined) {
+      liveCategories[catIndex].showOnCustomerPage = showOnCustomerPage;
+    }
     saveStateToDisk();
     return res.json({ success: true, category: liveCategories[catIndex] });
   }
@@ -1056,7 +1062,7 @@ app.post('/api/orders', (req, res) => {
   }
 
   const serviceCharge = (paymentMethod === 'credit' || paymentMethod === 'linepay') ? Math.round(subtotal * 0.1) : 0;
-  const total = subtotal + serviceCharge;
+  const total = Math.max(0, subtotal + serviceCharge);
 
   const newOrder: Order = {
     id: `SB-${1000 + liveOrders.length + 1}`,
@@ -1692,7 +1698,7 @@ app.get(['/auth/callback', '/auth/callback/'], async (req, res) => {
                 window.opener.postMessage({ 
                   type: 'GOOGLE_AUTH_SUCCESS', 
                   profile: ${JSON.stringify(profile)} 
-                }, '*');
+                }, window.location.origin);
                 setTimeout(() => {
                   window.close();
                 }, 800);
@@ -1784,7 +1790,7 @@ app.get(['/auth/callback', '/auth/callback/'], async (req, res) => {
                 window.opener.postMessage({ 
                   type: 'GOOGLE_AUTH_SUCCESS', 
                   profile: ${JSON.stringify(profile)} 
-                }, '*');
+                }, window.location.origin);
                 setTimeout(() => {
                   window.close();
                 }, 800);

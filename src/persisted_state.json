@@ -1,0 +1,4553 @@
+{
+  "liveMenu": [
+    {
+      "id": "dish-2696007842576",
+      "category": "drinks",
+      "name": {
+        "zh": "Vitamilk豆奶",
+        "en": "Vitamilk Soy Milk",
+        "ko": "비타밀크 두유",
+        "ja": "ビタミルク豆乳",
+        "th": "นมถั่วเหลืองไวตามิ้ลค์"
+      },
+      "price": 60,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的Vitamilk豆奶",
+        "en": "特製美味的Vitamilk豆奶",
+        "ko": "特製美味的Vitamilk豆奶",
+        "ja": "特製美味的Vitamilk豆奶",
+        "th": "特製美味的Vitamilk豆奶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2606012021064",
+      "category": "drinks",
+      "name": {
+        "zh": "麒麟啤酒",
+        "en": "Kirin Beer",
+        "ko": "기린 맥주",
+        "ja": "キリンビール",
+        "th": "เบียร์คิริน"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的麒麟啤酒",
+        "en": "特製美味的麒麟Beer",
+        "ko": "特製美味的麒麟맥주",
+        "ja": "特製美味的麒麟ビール",
+        "th": "特製美味的麒麟เบียร์"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2605122152569",
+      "category": "drinks",
+      "name": {
+        "zh": "SPY泰國雞尾酒",
+        "en": "SPY Thai Cocktail",
+        "ko": "SPY 태국 칵테일",
+        "ja": "SPY タイカクテル",
+        "th": "สปายค็อกเทลไทย"
+      },
+      "price": 110,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的SPY泰國雞尾酒",
+        "en": "特製美味的SPY泰國Chicken 尾酒",
+        "ko": "特製美味的SPY泰國닭尾酒",
+        "ja": "特製美味的SPY泰國鶏尾酒",
+        "th": "特製美味的SPY泰國ไก่尾酒"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2603132155426",
+      "category": "drinks",
+      "name": {
+        "zh": "D餐贈可哥冰奶",
+        "en": "Cocoa Ice Milk (Set D Gift)",
+        "ko": "코코아 아이스 밀크 (D세트 증정품)",
+        "ja": "ココアアイスミルク (Dセット贈答品)",
+        "th": "โกโก้นมสดเย็น (ของแถมเซต D)"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的D餐贈可哥冰奶",
+        "en": "特製美味的D餐贈可哥冰奶",
+        "ko": "特製美味的D餐贈可哥冰奶",
+        "ja": "特製美味的D餐贈可哥冰奶",
+        "th": "特製美味的D餐贈可哥冰奶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2603132154573",
+      "category": "drinks",
+      "name": {
+        "zh": "D餐贈美錄",
+        "en": "Milo (Set D Gift)",
+        "ko": "마일로 (D세트 증정품)",
+        "ja": "ミロ (Dセット贈答品)",
+        "th": "ไมโลเย็น (ของแถมเซต D)"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的D餐贈美錄",
+        "en": "特製美味的D餐贈美錄",
+        "ko": "特製美味的D餐贈美錄",
+        "ja": "特製美味的D餐贈美錄",
+        "th": "特製美味的D餐贈美錄"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2603071951301",
+      "category": "combos",
+      "name": {
+        "zh": "乳酪組合價",
+        "en": "Cheese Combo Special Price",
+        "ko": "치즈 콤보 특가",
+        "ja": "チーズコンボ特別価格",
+        "th": "ราคาพิเศษคอมโบชีส"
+      },
+      "price": -10,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的乳酪組合價",
+        "en": "特製美味的乳酪組合價",
+        "ko": "特製美味的乳酪組合價",
+        "ja": "特製美味的乳酪組合價",
+        "th": "特製美味的乳酪組合價"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2602121900078",
+      "category": "drinks",
+      "name": {
+        "zh": "桂花乳酪",
+        "en": "Sweet Osmanthus Cheese",
+        "ko": "계화 치즈",
+        "ja": "キンモクセイチーズ",
+        "th": "ชีสเก๊กฮวยหวาน"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的桂花乳酪",
+        "en": "特製美味的桂花乳酪",
+        "ko": "特製美味的桂花乳酪",
+        "ja": "特製美味的桂花乳酪",
+        "th": "特製美味的桂花乳酪"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2602121834434",
+      "category": "skewers",
+      "name": {
+        "zh": "78.板腱牛5oz",
+        "en": "78.板腱牛5oz",
+        "ko": "78.板腱牛5oz",
+        "ja": "78.板腱牛5oz",
+        "th": "78.板腱牛5oz"
+      },
+      "price": 390,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的78.板腱牛5oz",
+        "en": "特製美味的78.板腱牛5oz",
+        "ko": "特製美味的78.板腱牛5oz",
+        "ja": "特製美味的78.板腱牛5oz",
+        "th": "特製美味的78.板腱牛5oz"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2601312248029",
+      "category": "drinks",
+      "name": {
+        "zh": "香斕乳酪",
+        "en": "Pandan Cheese",
+        "ko": "판단 치즈",
+        "ja": "パンダンチーズ",
+        "th": "ชีสใบเตย"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的香斕乳酪",
+        "en": "特製美味的香斕乳酪",
+        "ko": "特製美味的香斕乳酪",
+        "ja": "特製美味的香斕乳酪",
+        "th": "特製美味的香斕乳酪"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2601312208252",
+      "category": "combos",
+      "name": {
+        "zh": "啤酒10送1",
+        "en": "Beer Buy 10 Get 1 Free",
+        "ko": "맥주 10+1 이벤트",
+        "ja": "ビール10本購入で1本サービス",
+        "th": "โปรโมชั่นเบียร์ 10 แถม 1"
+      },
+      "price": -10,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的啤酒10送1",
+        "en": "特製美味的Beer 10送1",
+        "ko": "特製美味的맥주10送1",
+        "ja": "特製美味的ビール10送1",
+        "th": "特製美味的เบียร์10送1"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2601310009011",
+      "category": "drinks",
+      "name": {
+        "zh": "鮮奶乳酪",
+        "en": "鮮奶乳酪",
+        "ko": "鮮奶乳酪",
+        "ja": "鮮奶乳酪",
+        "th": "鮮奶乳酪"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的鮮奶乳酪",
+        "en": "特製美味的鮮奶乳酪",
+        "ko": "特製美味的鮮奶乳酪",
+        "ja": "特製美味的鮮奶乳酪",
+        "th": "特製美味的鮮奶乳酪"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2601310007093",
+      "category": "drinks",
+      "name": {
+        "zh": "泰式奶茶乳酪",
+        "en": "Thai Style Milk Tea 乳酪",
+        "ko": "태국식밀크티乳酪",
+        "ja": "タイ風ミルクティー乳酪",
+        "th": "สไตล์ไทยชานม乳酪"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的泰式奶茶乳酪",
+        "en": "特製美味的Thai Style Milk Tea 乳酪",
+        "ko": "特製美味的태국식밀크티乳酪",
+        "ja": "特製美味的タイ風ミルクティー乳酪",
+        "th": "特製美味的สไตล์ไทยชานม乳酪"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2601221743349",
+      "category": "drinks",
+      "name": {
+        "zh": "3支-大摩12年",
+        "en": "3支-大摩12年",
+        "ko": "3支-大摩12年",
+        "ja": "3支-大摩12年",
+        "th": "3支-大摩12年"
+      },
+      "price": 9000,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的3支-大摩12年",
+        "en": "特製美味的3支-大摩12年",
+        "ko": "特製美味的3支-大摩12年",
+        "ja": "特製美味的3支-大摩12年",
+        "th": "特製美味的3支-大摩12年"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2601221741369",
+      "category": "drinks",
+      "name": {
+        "zh": "3支-蘇格登13年",
+        "en": "3支-蘇格登13年",
+        "ko": "3支-蘇格登13年",
+        "ja": "3支-蘇格登13年",
+        "th": "3支-蘇格登13年"
+      },
+      "price": 6900,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的3支-蘇格登13年",
+        "en": "特製美味的3支-蘇格登13年",
+        "ko": "特製美味的3支-蘇格登13年",
+        "ja": "特製美味的3支-蘇格登13年",
+        "th": "特製美味的3支-蘇格登13年"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2601221740072",
+      "category": "drinks",
+      "name": {
+        "zh": "3支-蘇格登12年",
+        "en": "3支-蘇格登12年",
+        "ko": "3支-蘇格登12年",
+        "ja": "3支-蘇格登12年",
+        "th": "3支-蘇格登12年"
+      },
+      "price": 5000,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的3支-蘇格登12年",
+        "en": "特製美味的3支-蘇格登12年",
+        "ko": "特製美味的3支-蘇格登12年",
+        "ja": "特製美味的3支-蘇格登12年",
+        "th": "特製美味的3支-蘇格登12年"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2601221737270",
+      "category": "drinks",
+      "name": {
+        "zh": "4支-金芬黛葡萄酒14.5%",
+        "en": "4支-金芬黛葡萄酒14.5%",
+        "ko": "4支-金芬黛葡萄酒14.5%",
+        "ja": "4支-金芬黛葡萄酒14.5%",
+        "th": "4支-金芬黛葡萄酒14.5%"
+      },
+      "price": 2400,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的4支-金芬黛葡萄酒14.5%",
+        "en": "特製美味的4支-金芬黛葡萄酒14.5%",
+        "ko": "特製美味的4支-金芬黛葡萄酒14.5%",
+        "ja": "特製美味的4支-金芬黛葡萄酒14.5%",
+        "th": "特製美味的4支-金芬黛葡萄酒14.5%"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2512111741522",
+      "category": "drinks",
+      "name": {
+        "zh": "分解茶",
+        "en": "分解茶",
+        "ko": "分解茶",
+        "ja": "分解茶",
+        "th": "分解茶"
+      },
+      "price": 100,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的分解茶",
+        "en": "特製美味的分解茶",
+        "ko": "特製美味的分解茶",
+        "ja": "特製美味的分解茶",
+        "th": "特製美味的分解茶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2511271537570",
+      "category": "drinks",
+      "name": {
+        "zh": "樂天氣泡酒",
+        "en": "樂天氣泡酒",
+        "ko": "樂天氣泡酒",
+        "ja": "樂天氣泡酒",
+        "th": "樂天氣泡酒"
+      },
+      "price": 280,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的樂天氣泡酒",
+        "en": "特製美味的樂天氣泡酒",
+        "ko": "特製美味的樂天氣泡酒",
+        "ja": "特製美味的樂天氣泡酒",
+        "th": "特製美味的樂天氣泡酒"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2511142143596",
+      "category": "sides",
+      "name": {
+        "zh": "小熊維C棒棒糖",
+        "en": "小熊維C棒棒糖",
+        "ko": "小熊維C棒棒糖",
+        "ja": "小熊維C棒棒糖",
+        "th": "小熊維C棒棒糖"
+      },
+      "price": 300,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的小熊維C棒棒糖",
+        "en": "特製美味的小熊維C棒棒糖",
+        "ko": "特製美味的小熊維C棒棒糖",
+        "ja": "特製美味的小熊維C棒棒糖",
+        "th": "特製美味的小熊維C棒棒糖"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2511071957264",
+      "category": "combos",
+      "name": {
+        "zh": "客家幣加碼",
+        "en": "客家幣加碼",
+        "ko": "客家幣加碼",
+        "ja": "客家幣加碼",
+        "th": "客家幣加碼"
+      },
+      "price": -100,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的客家幣加碼",
+        "en": "特製美味的客家幣加碼",
+        "ko": "特製美味的客家幣加碼",
+        "ja": "特製美味的客家幣加碼",
+        "th": "特製美味的客家幣加碼"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2510241901526",
+      "category": "noodles",
+      "name": {
+        "zh": "+mama麵",
+        "en": "+mamaNoodles",
+        "ko": "+mama국수",
+        "ja": "+mama麺",
+        "th": "+mamaบะหมี่"
+      },
+      "price": 30,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的+mama麵",
+        "en": "特製美味的+mamaNoodles",
+        "ko": "特製美味的+mama국수",
+        "ja": "特製美味的+mama麺",
+        "th": "特製美味的+mamaบะหมี่"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2510101943499",
+      "category": "combos",
+      "name": {
+        "zh": "集點兌換泰奶桶",
+        "en": "集點兌換泰奶桶",
+        "ko": "集點兌換泰奶桶",
+        "ja": "集點兌換泰奶桶",
+        "th": "集點兌換泰奶桶"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的集點兌換泰奶桶",
+        "en": "特製美味的集點兌換泰奶桶",
+        "ko": "特製美味的集點兌換泰奶桶",
+        "ja": "特製美味的集點兌換泰奶桶",
+        "th": "特製美味的集點兌換泰奶桶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2509281752083",
+      "category": "skewers",
+      "name": {
+        "zh": "41.泰鮮大魷魚",
+        "en": "41.泰鮮大魷魚",
+        "ko": "41.泰鮮大魷魚",
+        "ja": "41.泰鮮大魷魚",
+        "th": "41.泰鮮大魷魚"
+      },
+      "price": 280,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的41.泰鮮大魷魚",
+        "en": "特製美味的41.泰鮮大魷魚",
+        "ko": "特製美味的41.泰鮮大魷魚",
+        "ja": "特製美味的41.泰鮮大魷魚",
+        "th": "特製美味的41.泰鮮大魷魚"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2509271759269",
+      "category": "noodles",
+      "name": {
+        "zh": "0.大魷MAMA麵",
+        "en": "0.大魷MAMANoodles",
+        "ko": "0.大魷MAMA국수",
+        "ja": "0.大魷MAMA麺",
+        "th": "0.大魷MAMAบะหมี่"
+      },
+      "price": 390,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的0.大魷MAMA麵",
+        "en": "特製美味的0.大魷MAMANoodles",
+        "ko": "特製美味的0.大魷MAMA국수",
+        "ja": "特製美味的0.大魷MAMA麺",
+        "th": "特製美味的0.大魷MAMAบะหมี่"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2509191634172",
+      "category": "drinks",
+      "name": {
+        "zh": "西貢啤酒",
+        "en": "西貢Beer",
+        "ko": "西貢맥주",
+        "ja": "西貢ビール",
+        "th": "西貢เบียร์"
+      },
+      "price": 100,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的西貢啤酒",
+        "en": "特製美味的西貢Beer",
+        "ko": "特製美味的西貢맥주",
+        "ja": "特製美味的西貢ビール",
+        "th": "特製美味的西貢เบียร์"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2508252142113",
+      "category": "skewers",
+      "name": {
+        "zh": "45.雞皮10串",
+        "en": "45.Chicken 皮10串",
+        "ko": "45.닭皮10串",
+        "ja": "45.鶏皮10串",
+        "th": "45.ไก่皮10串"
+      },
+      "price": 550,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的45.雞皮10串",
+        "en": "特製美味的45.Chicken 皮10串",
+        "ko": "特製美味的45.닭皮10串",
+        "ja": "特製美味的45.鶏皮10串",
+        "th": "特製美味的45.ไก่皮10串"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508252141154",
+      "category": "skewers",
+      "name": {
+        "zh": "44.牛5羊5串",
+        "en": "44.牛5Lamb 5串",
+        "ko": "44.牛5양고기5串",
+        "ja": "44.牛5ラム5串",
+        "th": "44.牛5แกะ5串"
+      },
+      "price": 680,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的44.牛5羊5串",
+        "en": "特製美味的44.牛5Lamb 5串",
+        "ko": "特製美味的44.牛5양고기5串",
+        "ja": "特製美味的44.牛5ラム5串",
+        "th": "特製美味的44.牛5แกะ5串"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508252136150",
+      "category": "skewers",
+      "name": {
+        "zh": "43.羊肉10串",
+        "en": "43.Lamb 肉10串",
+        "ko": "43.양고기肉10串",
+        "ja": "43.ラム肉10串",
+        "th": "43.แกะ肉10串"
+      },
+      "price": 650,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的43.羊肉10串",
+        "en": "特製美味的43.Lamb 肉10串",
+        "ko": "特製美味的43.양고기肉10串",
+        "ja": "特製美味的43.ラム肉10串",
+        "th": "特製美味的43.แกะ肉10串"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508252133258",
+      "category": "skewers",
+      "name": {
+        "zh": "42.牛肉10串",
+        "en": "42.Beef 10串",
+        "ko": "42.소고기10串",
+        "ja": "42.牛肉10串",
+        "th": "42.เนื้อวัว10串"
+      },
+      "price": 650,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的42.牛肉10串",
+        "en": "特製美味的42.Beef 10串",
+        "ko": "特製美味的42.소고기10串",
+        "ja": "特製美味的42.牛肉10串",
+        "th": "特製美味的42.เนื้อวัว10串"
+      },
+      "available": true,
+      "containsBeef": true,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508252009102",
+      "category": "drinks",
+      "name": {
+        "zh": "57.恐龍美祿",
+        "en": "57.恐龍美祿",
+        "ko": "57.恐龍美祿",
+        "ja": "57.恐龍美祿",
+        "th": "57.恐龍美祿"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的57.恐龍美祿",
+        "en": "特製美味的57.恐龍美祿",
+        "ko": "特製美味的57.恐龍美祿",
+        "ja": "特製美味的57.恐龍美祿",
+        "th": "特製美味的57.恐龍美祿"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2508252008143",
+      "category": "drinks",
+      "name": {
+        "zh": "56.泰式可哥冰奶",
+        "en": "56.Thai Style 可哥冰奶",
+        "ko": "56.태국식可哥冰奶",
+        "ja": "56.タイ風可哥冰奶",
+        "th": "56.สไตล์ไทย可哥冰奶"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的56.泰式可哥冰奶",
+        "en": "特製美味的56.Thai Style 可哥冰奶",
+        "ko": "特製美味的56.태국식可哥冰奶",
+        "ja": "特製美味的56.タイ風可哥冰奶",
+        "th": "特製美味的56.สไตล์ไทย可哥冰奶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2508252003261",
+      "category": "skewers",
+      "name": {
+        "zh": "40.爆漿泰奶包",
+        "en": "40.爆漿泰奶包",
+        "ko": "40.爆漿泰奶包",
+        "ja": "40.爆漿泰奶包",
+        "th": "40.爆漿泰奶包"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的40.爆漿泰奶包",
+        "en": "特製美味的40.爆漿泰奶包",
+        "ko": "特製美味的40.爆漿泰奶包",
+        "ja": "特製美味的40.爆漿泰奶包",
+        "th": "特製美味的40.爆漿泰奶包"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508202144570",
+      "category": "drinks",
+      "name": {
+        "zh": "D餐贈可樂",
+        "en": "D餐贈可樂",
+        "ko": "D餐贈可樂",
+        "ja": "D餐贈可樂",
+        "th": "D餐贈可樂"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的D餐贈可樂",
+        "en": "特製美味的D餐贈可樂",
+        "ko": "特製美味的D餐贈可樂",
+        "ja": "特製美味的D餐贈可樂",
+        "th": "特製美味的D餐贈可樂"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2508202144235",
+      "category": "drinks",
+      "name": {
+        "zh": "D餐贈椰子水",
+        "en": "D餐贈椰子水",
+        "ko": "D餐贈椰子水",
+        "ja": "D餐贈椰子水",
+        "th": "D餐贈椰子水"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的D餐贈椰子水",
+        "en": "特製美味的D餐贈椰子水",
+        "ko": "特製美味的D餐贈椰子水",
+        "ja": "特製美味的D餐贈椰子水",
+        "th": "特製美味的D餐贈椰子水"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2508202142262",
+      "category": "drinks",
+      "name": {
+        "zh": "D餐贈泰奶",
+        "en": "D餐贈泰奶",
+        "ko": "D餐贈泰奶",
+        "ja": "D餐贈泰奶",
+        "th": "D餐贈泰奶"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的D餐贈泰奶",
+        "en": "特製美味的D餐贈泰奶",
+        "ko": "特製美味的D餐贈泰奶",
+        "ja": "特製美味的D餐贈泰奶",
+        "th": "特製美味的D餐贈泰奶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2508202000500",
+      "category": "skewers",
+      "name": {
+        "zh": "人氣D餐",
+        "en": "人氣D餐",
+        "ko": "人氣D餐",
+        "ja": "人氣D餐",
+        "th": "人氣D餐"
+      },
+      "price": 1550,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的人氣D餐",
+        "en": "特製美味的人氣D餐",
+        "ko": "特製美味的人氣D餐",
+        "ja": "特製美味的人氣D餐",
+        "th": "特製美味的人氣D餐"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508201955573",
+      "category": "skewers",
+      "name": {
+        "zh": "奢華C餐",
+        "en": "奢華C餐",
+        "ko": "奢華C餐",
+        "ja": "奢華C餐",
+        "th": "奢華C餐"
+      },
+      "price": 2160,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的奢華C餐",
+        "en": "特製美味的奢華C餐",
+        "ko": "特製美味的奢華C餐",
+        "ja": "特製美味的奢華C餐",
+        "th": "特製美味的奢華C餐"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508201952121",
+      "category": "noodles",
+      "name": {
+        "zh": "升級套餐",
+        "en": "升級Set Meal",
+        "ko": "升級세트",
+        "ja": "升級セット",
+        "th": "升級ชุดอาหาร"
+      },
+      "price": 140,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的升級套餐",
+        "en": "特製美味的升級Set Meal",
+        "ko": "特製美味的升級세트",
+        "ja": "特製美味的升級セット",
+        "th": "特製美味的升級ชุดอาหาร"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508201936503",
+      "category": "noodles",
+      "name": {
+        "zh": "加點A高麗菜",
+        "en": "加點ACabbage",
+        "ko": "加點A양배추",
+        "ja": "加點Aキャベツ",
+        "th": "加點Aกะหล่ำปลี"
+      },
+      "price": 30,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的加點A高麗菜",
+        "en": "特製美味的加點ACabbage",
+        "ko": "特製美味的加點A양배추",
+        "ja": "特製美味的加點Aキャベツ",
+        "th": "特製美味的加點Aกะหล่ำปลี"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508141908165",
+      "category": "combos",
+      "name": {
+        "zh": "51.泰奶空桶",
+        "en": "51.泰奶空桶",
+        "ko": "51.泰奶空桶",
+        "ja": "51.泰奶空桶",
+        "th": "51.泰奶空桶"
+      },
+      "price": -30,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的51.泰奶空桶",
+        "en": "特製美味的51.泰奶空桶",
+        "ko": "特製美味的51.泰奶空桶",
+        "ja": "特製美味的51.泰奶空桶",
+        "th": "特製美味的51.泰奶空桶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508122113366",
+      "category": "noodles",
+      "name": {
+        "zh": "69.湯加椰奶",
+        "en": "69.湯加椰奶",
+        "ko": "69.湯加椰奶",
+        "ja": "69.湯加椰奶",
+        "th": "69.湯加椰奶"
+      },
+      "price": 50,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的69.湯加椰奶",
+        "en": "特製美味的69.湯加椰奶",
+        "ko": "特製美味的69.湯加椰奶",
+        "ja": "特製美味的69.湯加椰奶",
+        "th": "特製美味的69.湯加椰奶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508112131059",
+      "category": "skewers",
+      "name": {
+        "zh": "8.娃娃菜2p",
+        "en": "8.娃娃菜2p",
+        "ko": "8.娃娃菜2p",
+        "ja": "8.娃娃菜2p",
+        "th": "8.娃娃菜2p"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的8.娃娃菜2p",
+        "en": "特製美味的8.娃娃菜2p",
+        "ko": "特製美味的8.娃娃菜2p",
+        "ja": "特製美味的8.娃娃菜2p",
+        "th": "特製美味的8.娃娃菜2p"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2508112130113",
+      "category": "skewers",
+      "name": {
+        "zh": "32.金針菇豬肉",
+        "en": "32.金針菇Pork",
+        "ko": "32.金針菇돼지고기",
+        "ja": "32.金針菇豚肉",
+        "th": "32.金針菇เนื้อหมู"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的32.金針菇豬肉",
+        "en": "特製美味的32.金針菇Pork",
+        "ko": "特製美味的32.金針菇돼지고기",
+        "ja": "特製美味的32.金針菇豚肉",
+        "th": "特製美味的32.金針菇เนื้อหมู"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": true,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2507182004409",
+      "category": "combos",
+      "name": {
+        "zh": "客家幣刷卡",
+        "en": "客家幣刷卡",
+        "ko": "客家幣刷卡",
+        "ja": "客家幣刷卡",
+        "th": "客家幣刷卡"
+      },
+      "price": -1000,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的客家幣刷卡",
+        "en": "特製美味的客家幣刷卡",
+        "ko": "特製美味的客家幣刷卡",
+        "ja": "特製美味的客家幣刷卡",
+        "th": "特製美味的客家幣刷卡"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2507072257199",
+      "category": "skewers",
+      "name": {
+        "zh": "招牌A餐",
+        "en": "招牌A餐",
+        "ko": "招牌A餐",
+        "ja": "招牌A餐",
+        "th": "招牌A餐"
+      },
+      "price": 660,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的招牌A餐",
+        "en": "特製美味的招牌A餐",
+        "ko": "特製美味的招牌A餐",
+        "ja": "特製美味的招牌A餐",
+        "th": "特製美味的招牌A餐"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2506292231385",
+      "category": "drinks",
+      "name": {
+        "zh": "雪山",
+        "en": "雪山",
+        "ko": "雪山",
+        "ja": "雪山",
+        "th": "雪山"
+      },
+      "price": 100,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的雪山",
+        "en": "特製美味的雪山",
+        "ko": "特製美味的雪山",
+        "ja": "特製美味的雪山",
+        "th": "特製美味的雪山"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2506182247281",
+      "category": "drinks",
+      "name": {
+        "zh": "金芬黛葡萄酒",
+        "en": "金芬黛葡萄酒",
+        "ko": "金芬黛葡萄酒",
+        "ja": "金芬黛葡萄酒",
+        "th": "金芬黛葡萄酒"
+      },
+      "price": 800,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的金芬黛葡萄酒",
+        "en": "特製美味的金芬黛葡萄酒",
+        "ko": "特製美味的金芬黛葡萄酒",
+        "ja": "特製美味的金芬黛葡萄酒",
+        "th": "特製美味的金芬黛葡萄酒"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2506132134210",
+      "category": "sides",
+      "name": {
+        "zh": "紅醬外帶瓶",
+        "en": "紅醬外帶瓶",
+        "ko": "紅醬外帶瓶",
+        "ja": "紅醬外帶瓶",
+        "th": "紅醬外帶瓶"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的紅醬外帶瓶",
+        "en": "特製美味的紅醬外帶瓶",
+        "ko": "特製美味的紅醬外帶瓶",
+        "ja": "特製美味的紅醬外帶瓶",
+        "th": "特製美味的紅醬外帶瓶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2506132131288",
+      "category": "sides",
+      "name": {
+        "zh": "綠醬外帶瓶",
+        "en": "綠醬外帶瓶",
+        "ko": "綠醬外帶瓶",
+        "ja": "綠醬外帶瓶",
+        "th": "綠醬外帶瓶"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的綠醬外帶瓶",
+        "en": "特製美味的綠醬外帶瓶",
+        "ko": "特製美味的綠醬外帶瓶",
+        "ja": "特製美味的綠醬外帶瓶",
+        "th": "特製美味的綠醬外帶瓶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2505242017116",
+      "category": "skewers",
+      "name": {
+        "zh": "9.爆汁櫛瓜",
+        "en": "9.爆汁Zucchini",
+        "ko": "9.爆汁호박",
+        "ja": "9.爆汁ズッキーニ",
+        "th": "9.爆汁ซูชินี่"
+      },
+      "price": 140,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的9.爆汁櫛瓜",
+        "en": "特製美味的9.爆汁Zucchini",
+        "ko": "特製美味的9.爆汁호박",
+        "ja": "特製美味的9.爆汁ズッキーニ",
+        "th": "特製美味的9.爆汁ซูชินี่"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2505041844456",
+      "category": "noodles",
+      "name": {
+        "zh": "74.泰式豬肉.米線",
+        "en": "74.Thai Style Pork .米線",
+        "ko": "74.태국식돼지고기.米線",
+        "ja": "74.タイ風豚肉.米線",
+        "th": "74.สไตล์ไทยเนื้อหมู.米線"
+      },
+      "price": 240,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的74.泰式豬肉.米線",
+        "en": "特製美味的74.Thai Style Pork .米線",
+        "ko": "特製美味的74.태국식돼지고기.米線",
+        "ja": "特製美味的74.タイ風豚肉.米線",
+        "th": "特製美味的74.สไตล์ไทยเนื้อหมู.米線"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": true,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2505041843176",
+      "category": "noodles",
+      "name": {
+        "zh": "73.泰式豬肉.河粉",
+        "en": "73.Thai Style Pork .河粉",
+        "ko": "73.태국식돼지고기.河粉",
+        "ja": "73.タイ風豚肉.河粉",
+        "th": "73.สไตล์ไทยเนื้อหมู.河粉"
+      },
+      "price": 240,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的73.泰式豬肉.河粉",
+        "en": "特製美味的73.Thai Style Pork .河粉",
+        "ko": "特製美味的73.태국식돼지고기.河粉",
+        "ja": "特製美味的73.タイ風豚肉.河粉",
+        "th": "特製美味的73.สไตล์ไทยเนื้อหมู.河粉"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": true,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2505041825592",
+      "category": "drinks",
+      "name": {
+        "zh": "50.街頭泰奶1L",
+        "en": "50.街頭泰奶1L",
+        "ko": "50.街頭泰奶1L",
+        "ja": "50.街頭泰奶1L",
+        "th": "50.街頭泰奶1L"
+      },
+      "price": 180,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的50.街頭泰奶1L",
+        "en": "特製美味的50.街頭泰奶1L",
+        "ko": "特製美味的50.街頭泰奶1L",
+        "ja": "特製美味的50.街頭泰奶1L",
+        "th": "特製美味的50.街頭泰奶1L"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2505041753253",
+      "category": "noodles",
+      "name": {
+        "zh": "67.海陸牛冬蔭功湯",
+        "en": "67.海陸牛Tom Yum Goong 湯",
+        "ko": "67.海陸牛똠얌꿍湯",
+        "ja": "67.海陸牛トムヤムクン湯",
+        "th": "67.海陸牛ต้มยำกุ้ง湯"
+      },
+      "price": 390,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的67.海陸牛冬蔭功湯",
+        "en": "特製美味的67.海陸牛Tom Yum Goong 湯",
+        "ko": "特製美味的67.海陸牛똠얌꿍湯",
+        "ja": "特製美味的67.海陸牛トムヤムクン湯",
+        "th": "特製美味的67.海陸牛ต้มยำกุ้ง湯"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2505041751044",
+      "category": "noodles",
+      "name": {
+        "zh": "66.海陸豬冬蔭功湯",
+        "en": "66.海陸豬Tom Yum Goong 湯",
+        "ko": "66.海陸豬똠얌꿍湯",
+        "ja": "66.海陸豬トムヤムクン湯",
+        "th": "66.海陸豬ต้มยำกุ้ง湯"
+      },
+      "price": 360,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的66.海陸豬冬蔭功湯",
+        "en": "特製美味的66.海陸豬Tom Yum Goong 湯",
+        "ko": "特製美味的66.海陸豬똠얌꿍湯",
+        "ja": "特製美味的66.海陸豬トムヤムクン湯",
+        "th": "特製美味的66.海陸豬ต้มยำกุ้ง湯"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": true,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2504161837515",
+      "category": "skewers",
+      "name": {
+        "zh": "10.蔬菜拼盤",
+        "en": "10.蔬菜拼盤",
+        "ko": "10.蔬菜拼盤",
+        "ja": "10.蔬菜拼盤",
+        "th": "10.蔬菜拼盤"
+      },
+      "price": 260,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的10.蔬菜拼盤",
+        "en": "特製美味的10.蔬菜拼盤",
+        "ko": "特製美味的10.蔬菜拼盤",
+        "ja": "特製美味的10.蔬菜拼盤",
+        "th": "特製美味的10.蔬菜拼盤"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2503181902333",
+      "category": "skewers",
+      "name": {
+        "zh": "29.小羊肩排",
+        "en": "29.小Lamb 肩排",
+        "ko": "29.小양고기肩排",
+        "ja": "29.小ラム肩排",
+        "th": "29.小แกะ肩排"
+      },
+      "price": 680,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的29.小羊肩排",
+        "en": "特製美味的29.小Lamb 肩排",
+        "ko": "特製美味的29.小양고기肩排",
+        "ja": "特製美味的29.小ラム肩排",
+        "th": "特製美味的29.小แกะ肩排"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2503171838086",
+      "category": "skewers",
+      "name": {
+        "zh": "泰式生蠔11p",
+        "en": "Thai Style 生蠔11p",
+        "ko": "태국식生蠔11p",
+        "ja": "タイ風生蠔11p",
+        "th": "สไตล์ไทย生蠔11p"
+      },
+      "price": 2200,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的泰式生蠔11p",
+        "en": "特製美味的Thai Style 生蠔11p",
+        "ko": "特製美味的태국식生蠔11p",
+        "ja": "特製美味的タイ風生蠔11p",
+        "th": "特製美味的สไตล์ไทย生蠔11p"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2503171727144",
+      "category": "drinks",
+      "name": {
+        "zh": "柳橙氣泡飲",
+        "en": "柳橙氣泡飲",
+        "ko": "柳橙氣泡飲",
+        "ja": "柳橙氣泡飲",
+        "th": "柳橙氣泡飲"
+      },
+      "price": 50,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的柳橙氣泡飲",
+        "en": "特製美味的柳橙氣泡飲",
+        "ko": "特製美味的柳橙氣泡飲",
+        "ja": "特製美味的柳橙氣泡飲",
+        "th": "特製美味的柳橙氣泡飲"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2503012218077",
+      "category": "combos",
+      "name": {
+        "zh": "客家幣",
+        "en": "客家幣",
+        "ko": "客家幣",
+        "ja": "客家幣",
+        "th": "客家幣"
+      },
+      "price": -1,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的客家幣",
+        "en": "特製美味的客家幣",
+        "ko": "特製美味的客家幣",
+        "ja": "特製美味的客家幣",
+        "th": "特製美味的客家幣"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2502252357010",
+      "category": "skewers",
+      "name": {
+        "zh": "多肉B餐",
+        "en": "多肉B餐",
+        "ko": "多肉B餐",
+        "ja": "多肉B餐",
+        "th": "多肉B餐"
+      },
+      "price": 460,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的多肉B餐",
+        "en": "特製美味的多肉B餐",
+        "ko": "特製美味的多肉B餐",
+        "ja": "特製美味的多肉B餐",
+        "th": "特製美味的多肉B餐"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2502031821565",
+      "category": "drinks",
+      "name": {
+        "zh": "大摩12年",
+        "en": "大摩12年",
+        "ko": "大摩12年",
+        "ja": "大摩12年",
+        "th": "大摩12年"
+      },
+      "price": 3200,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的大摩12年",
+        "en": "特製美味的大摩12年",
+        "ko": "特製美味的大摩12年",
+        "ja": "特製美味的大摩12年",
+        "th": "特製美味的大摩12年"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2502031820148",
+      "category": "drinks",
+      "name": {
+        "zh": "蘇格登13年",
+        "en": "蘇格登13年",
+        "ko": "蘇格登13年",
+        "ja": "蘇格登13年",
+        "th": "蘇格登13年"
+      },
+      "price": 2400,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的蘇格登13年",
+        "en": "特製美味的蘇格登13年",
+        "ko": "特製美味的蘇格登13年",
+        "ja": "特製美味的蘇格登13年",
+        "th": "特製美味的蘇格登13年"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2502031818015",
+      "category": "drinks",
+      "name": {
+        "zh": "蘇格登12年",
+        "en": "蘇格登12年",
+        "ko": "蘇格登12年",
+        "ja": "蘇格登12年",
+        "th": "蘇格登12年"
+      },
+      "price": 1800,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的蘇格登12年",
+        "en": "特製美味的蘇格登12年",
+        "ko": "特製美味的蘇格登12年",
+        "ja": "特製美味的蘇格登12年",
+        "th": "特製美味的蘇格登12年"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2502012109279",
+      "category": "skewers",
+      "name": {
+        "zh": "6.有機玉米筍",
+        "en": "6.有機玉米筍",
+        "ko": "6.有機玉米筍",
+        "ja": "6.有機玉米筍",
+        "th": "6.有機玉米筍"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的6.有機玉米筍",
+        "en": "特製美味的6.有機玉米筍",
+        "ko": "特製美味的6.有機玉米筍",
+        "ja": "特製美味的6.有機玉米筍",
+        "th": "特製美味的6.有機玉米筍"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2502012029386",
+      "category": "skewers",
+      "name": {
+        "zh": "11.澎湖花枝丸",
+        "en": "11.澎湖花枝丸",
+        "ko": "11.澎湖花枝丸",
+        "ja": "11.澎湖花枝丸",
+        "th": "11.澎湖花枝丸"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的11.澎湖花枝丸",
+        "en": "特製美味的11.澎湖花枝丸",
+        "ko": "特製美味的11.澎湖花枝丸",
+        "ja": "特製美味的11.澎湖花枝丸",
+        "th": "特製美味的11.澎湖花枝丸"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2501261510560",
+      "category": "sides",
+      "name": {
+        "zh": "百香果青木瓜",
+        "en": "百香果青木瓜",
+        "ko": "百香果青木瓜",
+        "ja": "百香果青木瓜",
+        "th": "百香果青木瓜"
+      },
+      "price": 60,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的百香果青木瓜",
+        "en": "特製美味的百香果青木瓜",
+        "ko": "特製美味的百香果青木瓜",
+        "ja": "特製美味的百香果青木瓜",
+        "th": "特製美味的百香果青木瓜"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2501142131426",
+      "category": "skewers",
+      "name": {
+        "zh": "1.爽脆高麗菜",
+        "en": "1.爽脆Cabbage",
+        "ko": "1.爽脆양배추",
+        "ja": "1.爽脆キャベツ",
+        "th": "1.爽脆กะหล่ำปลี"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的1.爽脆高麗菜",
+        "en": "特製美味的1.爽脆Cabbage",
+        "ko": "特製美味的1.爽脆양배추",
+        "ja": "特製美味的1.爽脆キャベツ",
+        "th": "特製美味的1.爽脆กะหล่ำปลี"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2412022102224",
+      "category": "drinks",
+      "name": {
+        "zh": "58.炭燒奶茶(壺)",
+        "en": "58.炭燒Milk Tea (壺)",
+        "ko": "58.炭燒밀크티(壺)",
+        "ja": "58.炭燒ミルクティー(壺)",
+        "th": "58.炭燒ชานม(壺)"
+      },
+      "price": 180,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的58.炭燒奶茶(壺)",
+        "en": "特製美味的58.炭燒Milk Tea (壺)",
+        "ko": "特製美味的58.炭燒밀크티(壺)",
+        "ja": "特製美味的58.炭燒ミルクティー(壺)",
+        "th": "特製美味的58.炭燒ชานม(壺)"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2412021741257",
+      "category": "sides",
+      "name": {
+        "zh": "49.泰辣醬",
+        "en": "49.泰辣醬",
+        "ko": "49.泰辣醬",
+        "ja": "49.泰辣醬",
+        "th": "49.泰辣醬"
+      },
+      "price": 10,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的49.泰辣醬",
+        "en": "特製美味的49.泰辣醬",
+        "ko": "特製美味的49.泰辣醬",
+        "ja": "特製美味的49.泰辣醬",
+        "th": "特製美味的49.泰辣醬"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2412021734433",
+      "category": "skewers",
+      "name": {
+        "zh": "17.手撕魷魚幹",
+        "en": "17.手撕魷魚幹",
+        "ko": "17.手撕魷魚幹",
+        "ja": "17.手撕魷魚幹",
+        "th": "17.手撕魷魚幹"
+      },
+      "price": 390,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的17.手撕魷魚幹",
+        "en": "特製美味的17.手撕魷魚幹",
+        "ko": "特製美味的17.手撕魷魚幹",
+        "ja": "特製美味的17.手撕魷魚幹",
+        "th": "特製美味的17.手撕魷魚幹"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2412021733504",
+      "category": "skewers",
+      "name": {
+        "zh": "18.炙燒幹貝3P",
+        "en": "18.炙燒幹貝3P",
+        "ko": "18.炙燒幹貝3P",
+        "ja": "18.炙燒幹貝3P",
+        "th": "18.炙燒幹貝3P"
+      },
+      "price": 390,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的18.炙燒幹貝3P",
+        "en": "特製美味的18.炙燒幹貝3P",
+        "ko": "特製美味的18.炙燒幹貝3P",
+        "ja": "特製美味的18.炙燒幹貝3P",
+        "th": "特製美味的18.炙燒幹貝3P"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2412021732545",
+      "category": "skewers",
+      "name": {
+        "zh": "16.泰辣扇貝9P",
+        "en": "16.泰辣扇貝9P",
+        "ko": "16.泰辣扇貝9P",
+        "ja": "16.泰辣扇貝9P",
+        "th": "16.泰辣扇貝9P"
+      },
+      "price": 360,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的16.泰辣扇貝9P",
+        "en": "特製美味的16.泰辣扇貝9P",
+        "ko": "特製美味的16.泰辣扇貝9P",
+        "ja": "特製美味的16.泰辣扇貝9P",
+        "th": "特製美味的16.泰辣扇貝9P"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2412021732071",
+      "category": "skewers",
+      "name": {
+        "zh": "15.大草蝦6P",
+        "en": "15.大草Prawn 6P",
+        "ko": "15.大草새우6P",
+        "ja": "15.大草エビ6P",
+        "th": "15.大草กุ้ง6P"
+      },
+      "price": 360,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的15.大草蝦6P",
+        "en": "特製美味的15.大草Prawn 6P",
+        "ko": "特製美味的15.大草새우6P",
+        "ja": "特製美味的15.大草エビ6P",
+        "th": "特製美味的15.大草กุ้ง6P"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2411142306093",
+      "category": "drinks",
+      "name": {
+        "zh": "60.泰醇奶酒5.6%",
+        "en": "60.泰醇奶酒5.6%",
+        "ko": "60.泰醇奶酒5.6%",
+        "ja": "60.泰醇奶酒5.6%",
+        "th": "60.泰醇奶酒5.6%"
+      },
+      "price": 380,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的60.泰醇奶酒5.6%",
+        "en": "特製美味的60.泰醇奶酒5.6%",
+        "ko": "特製美味的60.泰醇奶酒5.6%",
+        "ja": "特製美味的60.泰醇奶酒5.6%",
+        "th": "特製美味的60.泰醇奶酒5.6%"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2411142303467",
+      "category": "drinks",
+      "name": {
+        "zh": "59.泰醇奶酒1.4%",
+        "en": "59.泰醇奶酒1.4%",
+        "ko": "59.泰醇奶酒1.4%",
+        "ja": "59.泰醇奶酒1.4%",
+        "th": "59.泰醇奶酒1.4%"
+      },
+      "price": 280,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的59.泰醇奶酒1.4%",
+        "en": "特製美味的59.泰醇奶酒1.4%",
+        "ko": "特製美味的59.泰醇奶酒1.4%",
+        "ja": "特製美味的59.泰醇奶酒1.4%",
+        "th": "特製美味的59.泰醇奶酒1.4%"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2411142030288",
+      "category": "drinks",
+      "name": {
+        "zh": "果汁氣泡水",
+        "en": "果汁氣泡水",
+        "ko": "果汁氣泡水",
+        "ja": "果汁氣泡水",
+        "th": "果汁氣泡水"
+      },
+      "price": 100,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的果汁氣泡水",
+        "en": "特製美味的果汁氣泡水",
+        "ko": "特製美味的果汁氣泡水",
+        "ja": "特製美味的果汁氣泡水",
+        "th": "特製美味的果汁氣泡水"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2411142028551",
+      "category": "drinks",
+      "name": {
+        "zh": "海尼根",
+        "en": "海尼根",
+        "ko": "海尼根",
+        "ja": "海尼根",
+        "th": "海尼根"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的海尼根",
+        "en": "特製美味的海尼根",
+        "ko": "特製美味的海尼根",
+        "ja": "特製美味的海尼根",
+        "th": "特製美味的海尼根"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2411112029373",
+      "category": "skewers",
+      "name": {
+        "zh": "34.熱狗豬血糕",
+        "en": "34.熱狗豬血糕",
+        "ko": "34.熱狗豬血糕",
+        "ja": "34.熱狗豬血糕",
+        "th": "34.熱狗豬血糕"
+      },
+      "price": 70,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的34.熱狗豬血糕",
+        "en": "特製美味的34.熱狗豬血糕",
+        "ko": "特製美味的34.熱狗豬血糕",
+        "ja": "特製美味的34.熱狗豬血糕",
+        "th": "特製美味的34.熱狗豬血糕"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": true,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2411091621575",
+      "category": "drinks",
+      "name": {
+        "zh": "可樂娜",
+        "en": "可樂娜",
+        "ko": "可樂娜",
+        "ja": "可樂娜",
+        "th": "可樂娜"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的可樂娜",
+        "en": "特製美味的可樂娜",
+        "ko": "特製美味的可樂娜",
+        "ja": "特製美味的可樂娜",
+        "th": "特製美味的可樂娜"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2411042135298",
+      "category": "combos",
+      "name": {
+        "zh": "tip",
+        "en": "tip",
+        "ko": "tip",
+        "ja": "tip",
+        "th": "tip"
+      },
+      "price": 10,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的tip",
+        "en": "特製美味的tip",
+        "ko": "特製美味的tip",
+        "ja": "特製美味的tip",
+        "th": "特製美味的tip"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2410270119261",
+      "category": "drinks",
+      "name": {
+        "zh": "白鶴清酒",
+        "en": "白鶴清酒",
+        "ko": "白鶴清酒",
+        "ja": "白鶴清酒",
+        "th": "白鶴清酒"
+      },
+      "price": 350,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的白鶴清酒",
+        "en": "特製美味的白鶴清酒",
+        "ko": "特製美味的白鶴清酒",
+        "ja": "特製美味的白鶴清酒",
+        "th": "特製美味的白鶴清酒"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2410132030420",
+      "category": "drinks",
+      "name": {
+        "zh": "愛之味麥茶",
+        "en": "愛之味麥茶",
+        "ko": "愛之味麥茶",
+        "ja": "愛之味麥茶",
+        "th": "愛之味麥茶"
+      },
+      "price": 100,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的愛之味麥茶",
+        "en": "特製美味的愛之味麥茶",
+        "ko": "特製美味的愛之味麥茶",
+        "ja": "特製美味的愛之味麥茶",
+        "th": "特製美味的愛之味麥茶"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2410022148358",
+      "category": "drinks",
+      "name": {
+        "zh": "百威",
+        "en": "百威",
+        "ko": "百威",
+        "ja": "百威",
+        "th": "百威"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的百威",
+        "en": "特製美味的百威",
+        "ko": "特製美味的百威",
+        "ja": "特製美味的百威",
+        "th": "特製美味的百威"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2409232044239",
+      "category": "noodles",
+      "name": {
+        "zh": "68.牛小排冬蔭功湯",
+        "en": "68.牛小排Tom Yum Goong 湯",
+        "ko": "68.牛小排똠얌꿍湯",
+        "ja": "68.牛小排トムヤムクン湯",
+        "th": "68.牛小排ต้มยำกุ้ง湯"
+      },
+      "price": 620,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的68.牛小排冬蔭功湯",
+        "en": "特製美味的68.牛小排Tom Yum Goong 湯",
+        "ko": "特製美味的68.牛小排똠얌꿍湯",
+        "ja": "特製美味的68.牛小排トムヤムクン湯",
+        "th": "特製美味的68.牛小排ต้มยำกุ้ง湯"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2409232043478",
+      "category": "noodles",
+      "name": {
+        "zh": "76.泰式牛小排.米線",
+        "en": "76.Thai Style 牛小排.米線",
+        "ko": "76.태국식牛小排.米線",
+        "ja": "76.タイ風牛小排.米線",
+        "th": "76.สไตล์ไทย牛小排.米線"
+      },
+      "price": 620,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的76.泰式牛小排.米線",
+        "en": "特製美味的76.Thai Style 牛小排.米線",
+        "ko": "特製美味的76.태국식牛小排.米線",
+        "ja": "特製美味的76.タイ風牛小排.米線",
+        "th": "特製美味的76.สไตล์ไทย牛小排.米線"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2409232042549",
+      "category": "noodles",
+      "name": {
+        "zh": "75.泰式牛小排.河粉",
+        "en": "75.Thai Style 牛小排.河粉",
+        "ko": "75.태국식牛小排.河粉",
+        "ja": "75.タイ風牛小排.河粉",
+        "th": "75.สไตล์ไทย牛小排.河粉"
+      },
+      "price": 620,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的75.泰式牛小排.河粉",
+        "en": "特製美味的75.Thai Style 牛小排.河粉",
+        "ko": "特製美味的75.태국식牛小排.河粉",
+        "ja": "特製美味的75.タイ風牛小排.河粉",
+        "th": "特製美味的75.สไตล์ไทย牛小排.河粉"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2409232024040",
+      "category": "skewers",
+      "name": {
+        "zh": "泰式生蠔3p",
+        "en": "Thai Style 生蠔3p",
+        "ko": "태국식生蠔3p",
+        "ja": "タイ風生蠔3p",
+        "th": "สไตล์ไทย生蠔3p"
+      },
+      "price": 660,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的泰式生蠔3p",
+        "en": "特製美味的Thai Style 生蠔3p",
+        "ko": "特製美味的태국식生蠔3p",
+        "ja": "特製美味的タイ風生蠔3p",
+        "th": "特製美味的สไตล์ไทย生蠔3p"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2409131907512",
+      "category": "drinks",
+      "name": {
+        "zh": "冰水(大)",
+        "en": "冰水(大)",
+        "ko": "冰水(大)",
+        "ja": "冰水(大)",
+        "th": "冰水(大)"
+      },
+      "price": 100,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的冰水(大)",
+        "en": "特製美味的冰水(大)",
+        "ko": "特製美味的冰水(大)",
+        "ja": "特製美味的冰水(大)",
+        "th": "特製美味的冰水(大)"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2408192006066",
+      "category": "combos",
+      "name": {
+        "zh": "開瓶費1支",
+        "en": "開瓶費1支",
+        "ko": "開瓶費1支",
+        "ja": "開瓶費1支",
+        "th": "開瓶費1支"
+      },
+      "price": 500,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的開瓶費1支",
+        "en": "特製美味的開瓶費1支",
+        "ko": "特製美味的開瓶費1支",
+        "ja": "特製美味的開瓶費1支",
+        "th": "特製美味的開瓶費1支"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2408191941429",
+      "category": "skewers",
+      "name": {
+        "zh": "33.酸肉冬粉腸",
+        "en": "33.酸肉冬粉腸",
+        "ko": "33.酸肉冬粉腸",
+        "ja": "33.酸肉冬粉腸",
+        "th": "33.酸肉冬粉腸"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的33.酸肉冬粉腸",
+        "en": "特製美味的33.酸肉冬粉腸",
+        "ko": "特製美味的33.酸肉冬粉腸",
+        "ja": "特製美味的33.酸肉冬粉腸",
+        "th": "特製美味的33.酸肉冬粉腸"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2407231815553",
+      "category": "combos",
+      "name": {
+        "zh": "好友折扣",
+        "en": "好友Discount",
+        "ko": "好友할인",
+        "ja": "好友割引",
+        "th": "好友ส่วนลด"
+      },
+      "price": -10,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的好友折扣",
+        "en": "特製美味的好友Discount",
+        "ko": "特製美味的好友할인",
+        "ja": "特製美味的好友割引",
+        "th": "特製美味的好友ส่วนลด"
+      },
+      "available": false,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2305152126508",
+      "category": "skewers",
+      "name": {
+        "zh": "30.小羔羊肋",
+        "en": "30.小羔Lamb 肋",
+        "ko": "30.小羔양고기肋",
+        "ja": "30.小羔ラム肋",
+        "th": "30.小羔แกะ肋"
+      },
+      "price": 70,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的30.小羔羊肋",
+        "en": "特製美味的30.小羔Lamb 肋",
+        "ko": "特製美味的30.小羔양고기肋",
+        "ja": "特製美味的30.小羔ラム肋",
+        "th": "特製美味的30.小羔แกะ肋"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2304041737306",
+      "category": "drinks",
+      "name": {
+        "zh": "54.果肉椰子水",
+        "en": "54.果肉椰子水",
+        "ko": "54.果肉椰子水",
+        "ja": "54.果肉椰子水",
+        "th": "54.果肉椰子水"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的54.果肉椰子水",
+        "en": "特製美味的54.果肉椰子水",
+        "ko": "特製美味的54.果肉椰子水",
+        "ja": "特製美味的54.果肉椰子水",
+        "th": "特製美味的54.果肉椰子水"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2303301719168",
+      "category": "skewers",
+      "name": {
+        "zh": "20.泰式生蠔1P",
+        "en": "20.Thai Style 生蠔1P",
+        "ko": "20.태국식生蠔1P",
+        "ja": "20.タイ風生蠔1P",
+        "th": "20.สไตล์ไทย生蠔1P"
+      },
+      "price": 250,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的20.泰式生蠔1P",
+        "en": "特製美味的20.Thai Style 生蠔1P",
+        "ko": "特製美味的20.태국식生蠔1P",
+        "ja": "特製美味的20.タイ風生蠔1P",
+        "th": "特製美味的20.สไตล์ไทย生蠔1P"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2302272107257",
+      "category": "drinks",
+      "name": {
+        "zh": "勝獅",
+        "en": "勝獅",
+        "ko": "勝獅",
+        "ja": "勝獅",
+        "th": "勝獅"
+      },
+      "price": 110,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的勝獅",
+        "en": "特製美味的勝獅",
+        "ko": "特製美味的勝獅",
+        "ja": "特製美味的勝獅",
+        "th": "特製美味的勝獅"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2302162152176",
+      "category": "drinks",
+      "name": {
+        "zh": "泰象",
+        "en": "泰象",
+        "ko": "泰象",
+        "ja": "泰象",
+        "th": "泰象"
+      },
+      "price": 110,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的泰象",
+        "en": "特製美味的泰象",
+        "ko": "特製美味的泰象",
+        "ja": "特製美味的泰象",
+        "th": "特製美味的泰象"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2211162026366",
+      "category": "skewers",
+      "name": {
+        "zh": "7.秋葵(季節)",
+        "en": "7.秋葵(季節)",
+        "ko": "7.秋葵(季節)",
+        "ja": "7.秋葵(季節)",
+        "th": "7.秋葵(季節)"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的7.秋葵(季節)",
+        "en": "特製美味的7.秋葵(季節)",
+        "ko": "特製美味的7.秋葵(季節)",
+        "ja": "特製美味的7.秋葵(季節)",
+        "th": "特製美味的7.秋葵(季節)"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2209081804158",
+      "category": "noodles",
+      "name": {
+        "zh": "72.泰式海鮮.米線",
+        "en": "72.Thai Style Seafood .米線",
+        "ko": "72.태국식해산물.米線",
+        "ja": "72.タイ風シーフード.米線",
+        "th": "72.สไตล์ไทยอาหารทะเล.米線"
+      },
+      "price": 240,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的72.泰式海鮮.米線",
+        "en": "特製美味的72.Thai Style Seafood .米線",
+        "ko": "特製美味的72.태국식해산물.米線",
+        "ja": "特製美味的72.タイ風シーフード.米線",
+        "th": "特製美味的72.สไตล์ไทยอาหารทะเล.米線"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2209081753180",
+      "category": "skewers",
+      "name": {
+        "zh": "26.牛小排-5oz",
+        "en": "26.牛小排-5oz",
+        "ko": "26.牛小排-5oz",
+        "ja": "26.牛小排-5oz",
+        "th": "26.牛小排-5oz"
+      },
+      "price": 590,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的26.牛小排-5oz",
+        "en": "特製美味的26.牛小排-5oz",
+        "ko": "特製美味的26.牛小排-5oz",
+        "ja": "特製美味的26.牛小排-5oz",
+        "th": "特製美味的26.牛小排-5oz"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2209081751117",
+      "category": "skewers",
+      "name": {
+        "zh": "21.特大七裏香",
+        "en": "21.特大七裏香",
+        "ko": "21.特大七裏香",
+        "ja": "21.特大七裏香",
+        "th": "21.特大七裏香"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的21.特大七裏香",
+        "en": "特製美味的21.特大七裏香",
+        "ko": "特製美味的21.特大七裏香",
+        "ja": "特製美味的21.特大七裏香",
+        "th": "特製美味的21.特大七裏香"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2208121916271",
+      "category": "sides",
+      "name": {
+        "zh": "46.辣椒粉",
+        "en": "46.辣椒粉",
+        "ko": "46.辣椒粉",
+        "ja": "46.辣椒粉",
+        "th": "46.辣椒粉"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的46.辣椒粉",
+        "en": "特製美味的46.辣椒粉",
+        "ko": "特製美味的46.辣椒粉",
+        "ja": "特製美味的46.辣椒粉",
+        "th": "特製美味的46.辣椒粉"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2208121912457",
+      "category": "noodles",
+      "name": {
+        "zh": "71.泰式海鮮.河粉",
+        "en": "71.Thai Style Seafood .河粉",
+        "ko": "71.태국식해산물.河粉",
+        "ja": "71.タイ風シーフード.河粉",
+        "th": "71.สไตล์ไทยอาหารทะเล.河粉"
+      },
+      "price": 240,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的71.泰式海鮮.河粉",
+        "en": "特製美味的71.Thai Style Seafood .河粉",
+        "ko": "特製美味的71.태국식해산물.河粉",
+        "ja": "特製美味的71.タイ風シーフード.河粉",
+        "th": "特製美味的71.สไตล์ไทยอาหารทะเล.河粉"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2208071821298",
+      "category": "skewers",
+      "name": {
+        "zh": "38.泰酥豆皮",
+        "en": "38.泰酥豆皮",
+        "ko": "38.泰酥豆皮",
+        "ja": "38.泰酥豆皮",
+        "th": "38.泰酥豆皮"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的38.泰酥豆皮",
+        "en": "特製美味的38.泰酥豆皮",
+        "ko": "特製美味的38.泰酥豆皮",
+        "ja": "特製美味的38.泰酥豆皮",
+        "th": "特製美味的38.泰酥豆皮"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2208071820475",
+      "category": "skewers",
+      "name": {
+        "zh": "13.月亮蝦餅",
+        "en": "13.月亮Prawn 餅",
+        "ko": "13.月亮새우餅",
+        "ja": "13.月亮エビ餅",
+        "th": "13.月亮กุ้ง餅"
+      },
+      "price": 320,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的13.月亮蝦餅",
+        "en": "特製美味的13.月亮Prawn 餅",
+        "ko": "特製美味的13.月亮새우餅",
+        "ja": "特製美味的13.月亮エビ餅",
+        "th": "特製美味的13.月亮กุ้ง餅"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2208071816553",
+      "category": "noodles",
+      "name": {
+        "zh": "64.玉米濃湯",
+        "en": "64.玉米濃湯",
+        "ko": "64.玉米濃湯",
+        "ja": "64.玉米濃湯",
+        "th": "64.玉米濃湯"
+      },
+      "price": 160,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的64.玉米濃湯",
+        "en": "特製美味的64.玉米濃湯",
+        "ko": "特製美味的64.玉米濃湯",
+        "ja": "特製美味的64.玉米濃湯",
+        "th": "特製美味的64.玉米濃湯"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122341556",
+      "category": "noodles",
+      "name": {
+        "zh": "65.海鮮冬蔭功湯",
+        "en": "65.Seafood Tom Yum Goong 湯",
+        "ko": "65.해산물똠얌꿍湯",
+        "ja": "65.シーフードトムヤムクン湯",
+        "th": "65.อาหารทะเลต้มยำกุ้ง湯"
+      },
+      "price": 260,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的65.海鮮冬蔭功湯",
+        "en": "特製美味的65.Seafood Tom Yum Goong 湯",
+        "ko": "特製美味的65.해산물똠얌꿍湯",
+        "ja": "特製美味的65.シーフードトムヤムクン湯",
+        "th": "特製美味的65.อาหารทะเลต้มยำกุ้ง湯"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122341013",
+      "category": "noodles",
+      "name": {
+        "zh": "77.越南鮮牛肉河粉",
+        "en": "77.越南鮮Beef 河粉",
+        "ko": "77.越南鮮소고기河粉",
+        "ja": "77.越南鮮牛肉河粉",
+        "th": "77.越南鮮เนื้อวัว河粉"
+      },
+      "price": 250,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的77.越南鮮牛肉河粉",
+        "en": "特製美味的77.越南鮮Beef 河粉",
+        "ko": "特製美味的77.越南鮮소고기河粉",
+        "ja": "特製美味的77.越南鮮牛肉河粉",
+        "th": "特製美味的77.越南鮮เนื้อวัว河粉"
+      },
+      "available": true,
+      "containsBeef": true,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122338495",
+      "category": "noodles",
+      "name": {
+        "zh": "62.紫菜蛋花湯",
+        "en": "62.紫菜蛋花湯",
+        "ko": "62.紫菜蛋花湯",
+        "ja": "62.紫菜蛋花湯",
+        "th": "62.紫菜蛋花湯"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的62.紫菜蛋花湯",
+        "en": "特製美味的62.紫菜蛋花湯",
+        "ko": "特製美味的62.紫菜蛋花湯",
+        "ja": "特製美味的62.紫菜蛋花湯",
+        "th": "特製美味的62.紫菜蛋花湯"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122336248",
+      "category": "noodles",
+      "name": {
+        "zh": "63.鮮味蛤蜊湯",
+        "en": "63.鮮味蛤蜊湯",
+        "ko": "63.鮮味蛤蜊湯",
+        "ja": "63.鮮味蛤蜊湯",
+        "th": "63.鮮味蛤蜊湯"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的63.鮮味蛤蜊湯",
+        "en": "特製美味的63.鮮味蛤蜊湯",
+        "ko": "特製美味的63.鮮味蛤蜊湯",
+        "ja": "特製美味的63.鮮味蛤蜊湯",
+        "th": "特製美味的63.鮮味蛤蜊湯"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122331502",
+      "category": "drinks",
+      "name": {
+        "zh": "金牌",
+        "en": "金牌",
+        "ko": "金牌",
+        "ja": "金牌",
+        "th": "金牌"
+      },
+      "price": 100,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的金牌",
+        "en": "特製美味的金牌",
+        "ko": "特製美味的金牌",
+        "ja": "特製美味的金牌",
+        "th": "特製美味的金牌"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122330338",
+      "category": "drinks",
+      "name": {
+        "zh": "金樽",
+        "en": "金樽",
+        "ko": "金樽",
+        "ja": "金樽",
+        "th": "金樽"
+      },
+      "price": 150,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的金樽",
+        "en": "特製美味的金樽",
+        "ko": "特製美味的金樽",
+        "ja": "特製美味的金樽",
+        "th": "特製美味的金樽"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122323590",
+      "category": "drinks",
+      "name": {
+        "zh": "55.可口可樂",
+        "en": "55.可口可樂",
+        "ko": "55.可口可樂",
+        "ja": "55.可口可樂",
+        "th": "55.可口可樂"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的55.可口可樂",
+        "en": "特製美味的55.可口可樂",
+        "ko": "特製美味的55.可口可樂",
+        "ja": "特製美味的55.可口可樂",
+        "th": "特製美味的55.可口可樂"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122322371",
+      "category": "drinks",
+      "name": {
+        "zh": "52.泰式奶茶400ml",
+        "en": "52.Thai Style Milk Tea 400ml",
+        "ko": "52.태국식밀크티400ml",
+        "ja": "52.タイ風ミルクティー400ml",
+        "th": "52.สไตล์ไทยชานม400ml"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的52.泰式奶茶400ml",
+        "en": "特製美味的52.Thai Style Milk Tea 400ml",
+        "ko": "特製美味的52.태국식밀크티400ml",
+        "ja": "特製美味的52.タイ風ミルクティー400ml",
+        "th": "特製美味的52.สไตล์ไทยชานม400ml"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122316233",
+      "category": "sides",
+      "name": {
+        "zh": "特製辣椒醬(外帶)",
+        "en": "特製辣椒醬(外帶)",
+        "ko": "特製辣椒醬(外帶)",
+        "ja": "特製辣椒醬(外帶)",
+        "th": "特製辣椒醬(外帶)"
+      },
+      "price": 160,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的特製辣椒醬(外帶)",
+        "en": "特製美味的特製辣椒醬(外帶)",
+        "ko": "特製美味的特製辣椒醬(外帶)",
+        "ja": "特製美味的特製辣椒醬(外帶)",
+        "th": "特製美味的特製辣椒醬(外帶)"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122312525",
+      "category": "sides",
+      "name": {
+        "zh": "47.泰式綠醬",
+        "en": "47.Thai Style 綠醬",
+        "ko": "47.태국식綠醬",
+        "ja": "47.タイ風綠醬",
+        "th": "47.สไตล์ไทย綠醬"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的47.泰式綠醬",
+        "en": "特製美味的47.Thai Style 綠醬",
+        "ko": "特製美味的47.태국식綠醬",
+        "ja": "特製美味的47.タイ風綠醬",
+        "th": "特製美味的47.สไตล์ไทย綠醬"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122311467",
+      "category": "sides",
+      "name": {
+        "zh": "48.泰式紅醬",
+        "en": "48.Thai Style 紅醬",
+        "ko": "48.태국식紅醬",
+        "ja": "48.タイ風紅醬",
+        "th": "48.สไตล์ไทย紅醬"
+      },
+      "price": 0,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的48.泰式紅醬",
+        "en": "特製美味的48.Thai Style 紅醬",
+        "ko": "特製美味的48.태국식紅醬",
+        "ja": "特製美味的48.タイ風紅醬",
+        "th": "特製美味的48.สไตล์ไทย紅醬"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122252395",
+      "category": "skewers",
+      "name": {
+        "zh": "2.四季豆",
+        "en": "2.四季豆",
+        "ko": "2.四季豆",
+        "ja": "2.四季豆",
+        "th": "2.四季豆"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的2.四季豆",
+        "en": "特製美味的2.四季豆",
+        "ko": "特製美味的2.四季豆",
+        "ja": "特製美味的2.四季豆",
+        "th": "特製美味的2.四季豆"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122141316",
+      "category": "skewers",
+      "name": {
+        "zh": "37.新竹貢丸",
+        "en": "37.新竹貢丸",
+        "ko": "37.新竹貢丸",
+        "ja": "37.新竹貢丸",
+        "th": "37.新竹貢丸"
+      },
+      "price": 60,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的37.新竹貢丸",
+        "en": "特製美味的37.新竹貢丸",
+        "ko": "特製美味的37.新竹貢丸",
+        "ja": "特製美味的37.新竹貢丸",
+        "th": "特製美味的37.新竹貢丸"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122140364",
+      "category": "skewers",
+      "name": {
+        "zh": "12.澎澎甜不辣",
+        "en": "12.澎澎甜不辣",
+        "ko": "12.澎澎甜不辣",
+        "ja": "12.澎澎甜不辣",
+        "th": "12.澎澎甜不辣"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的12.澎澎甜不辣",
+        "en": "特製美味的12.澎澎甜不辣",
+        "ko": "特製美味的12.澎澎甜不辣",
+        "ja": "特製美味的12.澎澎甜不辣",
+        "th": "特製美味的12.澎澎甜不辣"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": true
+    },
+    {
+      "id": "dish-2207122132048",
+      "category": "skewers",
+      "name": {
+        "zh": "19.鯖甘魚下巴",
+        "en": "19.鯖甘魚下巴",
+        "ko": "19.鯖甘魚下巴",
+        "ja": "19.鯖甘魚下巴",
+        "th": "19.鯖甘魚下巴"
+      },
+      "price": 390,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的19.鯖甘魚下巴",
+        "en": "特製美味的19.鯖甘魚下巴",
+        "ko": "特製美味的19.鯖甘魚下巴",
+        "ja": "特製美味的19.鯖甘魚下巴",
+        "th": "特製美味的19.鯖甘魚下巴"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122058577",
+      "category": "skewers",
+      "name": {
+        "zh": "22.烤雞翅-4p",
+        "en": "22.Grilled Chicken 翅-4p",
+        "ko": "22.구이닭翅-4p",
+        "ja": "22.焼き鶏翅-4p",
+        "th": "22.ย่างไก่翅-4p"
+      },
+      "price": 160,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的22.烤雞翅-4p",
+        "en": "特製美味的22.Grilled Chicken 翅-4p",
+        "ko": "特製美味的22.구이닭翅-4p",
+        "ja": "特製美味的22.焼き鶏翅-4p",
+        "th": "特製美味的22.ย่างไก่翅-4p"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122056269",
+      "category": "skewers",
+      "name": {
+        "zh": "27.泰式手工牛",
+        "en": "27.Thai Style 手工牛",
+        "ko": "27.태국식手工牛",
+        "ja": "27.タイ風手工牛",
+        "th": "27.สไตล์ไทย手工牛"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的27.泰式手工牛",
+        "en": "特製美味的27.Thai Style 手工牛",
+        "ko": "特製美味的27.태국식手工牛",
+        "ja": "特製美味的27.タイ風手工牛",
+        "th": "特製美味的27.สไตล์ไทย手工牛"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122053275",
+      "category": "skewers",
+      "name": {
+        "zh": "35.噴水香腸",
+        "en": "35.噴水香腸",
+        "ko": "35.噴水香腸",
+        "ja": "35.噴水香腸",
+        "th": "35.噴水香腸"
+      },
+      "price": 60,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的35.噴水香腸",
+        "en": "特製美味的35.噴水香腸",
+        "ko": "特製美味的35.噴水香腸",
+        "ja": "特製美味的35.噴水香腸",
+        "th": "特製美味的35.噴水香腸"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122051592",
+      "category": "skewers",
+      "name": {
+        "zh": "25.啃的雞皮",
+        "en": "25.啃的Chicken 皮",
+        "ko": "25.啃的닭皮",
+        "ja": "25.啃的鶏皮",
+        "th": "25.啃的ไก่皮"
+      },
+      "price": 60,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的25.啃的雞皮",
+        "en": "特製美味的25.啃的Chicken 皮",
+        "ko": "特製美味的25.啃的닭皮",
+        "ja": "特製美味的25.啃的鶏皮",
+        "th": "特製美味的25.啃的ไก่皮"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2207122037251",
+      "category": "skewers",
+      "name": {
+        "zh": "23.去骨雞腿8兩",
+        "en": "23.去骨Chicken 腿8兩",
+        "ko": "23.去骨닭腿8兩",
+        "ja": "23.去骨鶏腿8兩",
+        "th": "23.去骨ไก่腿8兩"
+      },
+      "price": 160,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的23.去骨雞腿8兩",
+        "en": "特製美味的23.去骨Chicken 腿8兩",
+        "ko": "特製美味的23.去骨닭腿8兩",
+        "ja": "特製美味的23.去骨鶏腿8兩",
+        "th": "特製美味的23.去骨ไก่腿8兩"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-2005282340194",
+      "category": "noodles",
+      "name": {
+        "zh": "70.海鮮mama麵",
+        "en": "70.Seafood mamaNoodles",
+        "ko": "70.해산물mama국수",
+        "ja": "70.シーフードmama麺",
+        "th": "70.อาหารทะเลmamaบะหมี่"
+      },
+      "price": 190,
+      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的70.海鮮mama麵",
+        "en": "特製美味的70.Seafood mamaNoodles",
+        "ko": "特製美味的70.해산물mama국수",
+        "ja": "特製美味的70.シーフードmama麺",
+        "th": "特製美味的70.อาหารทะเลmamaบะหมี่"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909192003211",
+      "category": "skewers",
+      "name": {
+        "zh": "5.杏鮑菇",
+        "en": "5.King Oyster Mushroom",
+        "ko": "5.새송이버섯",
+        "ja": "5.エリンギ",
+        "th": "5.เห็ดออรินจิ"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的5.杏鮑菇",
+        "en": "特製美味的5.King Oyster Mushroom",
+        "ko": "特製美味的5.새송이버섯",
+        "ja": "特製美味的5.エリンギ",
+        "th": "特製美味的5.เห็ดออรินจิ"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909191959076",
+      "category": "skewers",
+      "name": {
+        "zh": "14.秋刀魚2p",
+        "en": "14.Saury 2p",
+        "ko": "14.꽁치2p",
+        "ja": "14.サンマ2p",
+        "th": "14.ปลาซาบะ2p"
+      },
+      "price": 320,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的14.秋刀魚2p",
+        "en": "特製美味的14.Saury 2p",
+        "ko": "特製美味的14.꽁치2p",
+        "ja": "特製美味的14.サンマ2p",
+        "th": "特製美味的14.ปลาซาบะ2p"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": true,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909191946205",
+      "category": "skewers",
+      "name": {
+        "zh": "4.香菇",
+        "en": "4.Shiitake Mushroom",
+        "ko": "4.표고버섯",
+        "ja": "4.椎茸",
+        "th": "4.เห็ดหอม"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的4.香菇",
+        "en": "特製美味的4.Shiitake Mushroom",
+        "ko": "特製美味的4.표고버섯",
+        "ja": "特製美味的4.椎茸",
+        "th": "特製美味的4.เห็ดหอม"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909191945086",
+      "category": "skewers",
+      "name": {
+        "zh": "3.青椒",
+        "en": "3.Green Pepper",
+        "ko": "3.피망",
+        "ja": "3.ピーマン",
+        "th": "3.พริกหยวก"
+      },
+      "price": 80,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的3.青椒",
+        "en": "特製美味的3.Green Pepper",
+        "ko": "特製美味的3.피망",
+        "ja": "特製美味的3.ピーマン",
+        "th": "特製美味的3.พริกหยวก"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909191943297",
+      "category": "skewers",
+      "name": {
+        "zh": "36.精選肥腸",
+        "en": "36.精選Intestine",
+        "ko": "36.精選곱창",
+        "ja": "36.精選ホルモン",
+        "th": "36.精選ไส้หมู"
+      },
+      "price": 60,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的36.精選肥腸",
+        "en": "特製美味的36.精選Intestine",
+        "ko": "特製美味的36.精選곱창",
+        "ja": "特製美味的36.精選ホルモン",
+        "th": "特製美味的36.精選ไส้หมู"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": true,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909191940395",
+      "category": "skewers",
+      "name": {
+        "zh": "28.原塊牛肋",
+        "en": "28.原塊牛肋",
+        "ko": "28.原塊牛肋",
+        "ja": "28.原塊牛肋",
+        "th": "28.原塊牛肋"
+      },
+      "price": 70,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的28.原塊牛肋",
+        "en": "特製美味的28.原塊牛肋",
+        "ko": "特製美味的28.原塊牛肋",
+        "ja": "特製美味的28.原塊牛肋",
+        "th": "特製美味的28.原塊牛肋"
+      },
+      "available": true,
+      "containsBeef": true,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909191316572",
+      "category": "skewers",
+      "name": {
+        "zh": "24.肉雞七裏香",
+        "en": "24.肉Chicken 七裏香",
+        "ko": "24.肉닭七裏香",
+        "ja": "24.肉鶏七裏香",
+        "th": "24.肉ไก่七裏香"
+      },
+      "price": 70,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的24.肉雞七裏香",
+        "en": "特製美味的24.肉Chicken 七裏香",
+        "ko": "特製美味的24.肉닭七裏香",
+        "ja": "特製美味的24.肉鶏七裏香",
+        "th": "特製美味的24.肉ไก่七裏香"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": false,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    },
+    {
+      "id": "dish-1909191310334",
+      "category": "skewers",
+      "name": {
+        "zh": "31.香菜豬肉捲",
+        "en": "31.香菜Pork 捲",
+        "ko": "31.香菜돼지고기捲",
+        "ja": "31.香菜豚肉捲",
+        "th": "31.香菜เนื้อหมู捲"
+      },
+      "price": 90,
+      "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
+      "description": {
+        "zh": "特製美味的31.香菜豬肉捲",
+        "en": "特製美味的31.香菜Pork 捲",
+        "ko": "特製美味的31.香菜돼지고기捲",
+        "ja": "特製美味的31.香菜豚肉捲",
+        "th": "特製美味的31.香菜เนื้อหมู捲"
+      },
+      "available": true,
+      "containsBeef": false,
+      "containsPork": true,
+      "containsSeafood": false,
+      "isNotSpicy": false
+    }
+  ],
+  "liveIngredients": [
+    {
+      "id": "ig-01",
+      "name": {
+        "zh": "大鮮蝦",
+        "en": "Fresh Prawns",
+        "ko": "생새우",
+        "ja": "新鮮なえび",
+        "th": "กุ้งแชบ๊วย大"
+      },
+      "stock": 89,
+      "minThreshold": 15,
+      "unit": "pcs"
+    },
+    {
+      "id": "ig-02",
+      "name": {
+        "zh": "頂級牛肉串",
+        "en": "USDA Beef",
+        "ko": "수제 소고기",
+        "ja": "厳選牛肉串",
+        "th": "เนื้อวัวพรีเมียม"
+      },
+      "stock": 99,
+      "minThreshold": 20,
+      "unit": "skewers"
+    },
+    {
+      "id": "ig-03",
+      "name": {
+        "zh": "鮮甜高麗菜",
+        "en": "Organic Cabbage",
+        "ko": "유기농 양배추",
+        "ja": "キャベツ",
+        "th": "กะหล่ำปลีหวาน"
+      },
+      "stock": 100,
+      "minThreshold": 10,
+      "unit": "kg"
+    },
+    {
+      "id": "ig-04",
+      "name": {
+        "zh": "生食干貝/生蠔",
+        "en": "Oysters / Scallops",
+        "ko": "석화 굴 및 가리비",
+        "ja": "生牡蠣・干貝",
+        "th": "หอยนางรมยักษ์/หอยเชลล์"
+      },
+      "stock": 100,
+      "minThreshold": 8,
+      "unit": "pcs"
+    },
+    {
+      "id": "ig-05",
+      "name": {
+        "zh": "多隆功泡麵/米粉",
+        "en": "Mama / Rice Noodles",
+        "ko": "라면 사리",
+        "ja": "ラーメン・フォー",
+        "th": "บะหมี่มาม่า/ก๋วยเตี๋ยว"
+      },
+      "stock": 118,
+      "minThreshold": 25,
+      "unit": "packs"
+    },
+    {
+      "id": "ig-06",
+      "name": {
+        "zh": "頂級椰奶罐",
+        "en": "Rich Coconut Milk",
+        "ko": "코코넛 밀크",
+        "ja": "ココナッツミルク缶",
+        "th": "กะทิกระป๋องออร์แกนิก"
+      },
+      "stock": 99.9,
+      "minThreshold": 12,
+      "unit": "cans"
+    },
+    {
+      "id": "ig-07",
+      "name": {
+        "zh": "泰手標紅茶原料",
+        "en": "Thai Red Tea Brew",
+        "ko": "홍차 베이스",
+        "ja": "タイ茶葉",
+        "th": "ชาแดงตรามือเกรดส่งออก"
+      },
+      "stock": 99.65,
+      "minThreshold": 20,
+      "unit": "liters"
+    },
+    {
+      "id": "ig-08",
+      "name": {
+        "zh": "爆香豬五花 / 金針菇",
+        "en": "Pork Belly & Enoki",
+        "ko": "돼지 삼겹 및 팽이",
+        "ja": "豚バラ・えのき",
+        "th": "หมูสามชั้น/เห็ดเข็มทอง"
+      },
+      "stock": 99,
+      "minThreshold": 15,
+      "unit": "skewers"
+    }
+  ],
+  "liveCategories": [
+    {
+      "id": "noodles",
+      "name": {
+        "zh": "單人熱麵食 🥢",
+        "en": "Single Noodles",
+        "ko": "단품 매운 면 요리",
+        "ja": "お一人様用麺類",
+        "th": "บะหมี่และก๋วยเตี๋ยวจานเดี่ยว"
+      }
+    },
+    {
+      "id": "combos",
+      "name": {
+        "zh": "主廚精選套餐 🍱",
+        "en": "Signature Meals",
+        "ko": "시그니처 세트 요리",
+        "ja": "主理人お得セット",
+        "th": "เซตเมนูยอดนิยม Sabay"
+      }
+    },
+    {
+      "id": "skewers",
+      "name": {
+        "zh": "原味碳烤肉類 🍢",
+        "en": "Charcoal BBQ Skewers",
+        "ko": "오리지널 숯불 꼬치",
+        "ja": "タイ風肉串炭火焼き",
+        "th": "บาร์บีคิวเสียบไม้ย่าง"
+      }
+    },
+    {
+      "id": "drinks",
+      "name": {
+        "zh": "泰特色沁涼飲品 🍹",
+        "en": "Thai Cold Drinks",
+        "ko": "태국식 야외 청量 飲料",
+        "ja": "タイ風さわやかドリンク",
+        "th": "เครื่องดื่มดับร้อนรสสดชื่น"
+      }
+    }
+  ],
+  "liveStaffPin": "888888",
+  "livePrinterIp": "10.0.0.124",
+  "liveTables": [
+    {
+      "id": "1",
+      "qrCodeUrl": "/?table=1"
+    },
+    {
+      "id": "2",
+      "qrCodeUrl": "//?table=2"
+    },
+    {
+      "id": "3",
+      "qrCodeUrl": "/?table=3"
+    },
+    {
+      "id": "5",
+      "qrCodeUrl": "/?table=5"
+    },
+    {
+      "id": "6",
+      "qrCodeUrl": "/?table=6"
+    },
+    {
+      "id": "8",
+      "qrCodeUrl": "/?table=8"
+    },
+    {
+      "id": "10",
+      "qrCodeUrl": "/?table=10"
+    },
+    {
+      "id": "12",
+      "qrCodeUrl": "/?table=12"
+    }
+  ],
+  "liveTakeoutSeq": 0,
+  "lastTakeoutDate": "Sat Jun 13 2026",
+  "liveMinSpendPerPerson": 200,
+  "liveOperatingHours": [
+    {
+      "id": "oh-1",
+      "name": "午餐時段 Lunch Session",
+      "start": "01:00",
+      "end": "03:30",
+      "days": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "isActive": true
+    },
+    {
+      "id": "oh-2",
+      "name": "晚餐時段 Dinner Session",
+      "start": "17:00",
+      "end": "22:00",
+      "days": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "isActive": true
+    }
+  ],
+  "liveRestDays": [],
+  "liveCustomerNotice": "📣 歡迎來到沙貝泰式炭烤！我們提供正宗的泰南冬蔭功 and 頂級碳烤串燒。內用低消每人 200 元，用餐限時 60 分鐘。祝您用餐愉快！Sabay Thai BBQ wishes you a delicious meal!",
+  "liveOrders": [
+    {
+      "id": "SB-09910",
+      "tableNumber": "3",
+      "items": [
+        {
+          "id": "old-10-1",
+          "menuItemId": "sk-01",
+          "name": {
+            "zh": "泰式手工牛肉串 / 串",
+            "en": "Handmade Thai Beef Skewer",
+            "ko": "수제 소고기",
+            "ja": "特製スパイス牛肉串焼き",
+            "th": "เนื้อเสียบไม้ย่าง"
+          },
+          "price": 90,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 1080,
+      "serviceCharge": 78,
+      "total": 858,
+      "status": "completed",
+      "createdAt": "2026-06-09T07:47:00.000Z",
+      "customerName": "泰國遊客",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000050000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": true,
+      "discount": 300,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0999",
+      "tableNumber": "2",
+      "items": [
+        {
+          "id": "old-9-1",
+          "menuItemId": "vg-01",
+          "name": {
+            "zh": "脆脆高麗菜",
+            "en": "Crispy Cabbage",
+            "ko": "아삭 양배추",
+            "ja": "キャベツ",
+            "th": "กะหล่ำปลี"
+          },
+          "price": 80,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 990,
+      "serviceCharge": 99,
+      "total": 1089,
+      "status": "completed",
+      "createdAt": "2026-06-09T03:07:00.000Z",
+      "customerName": "小智",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000045000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0998",
+      "tableNumber": "1",
+      "items": [
+        {
+          "id": "old-8-1",
+          "menuItemId": "sk-01",
+          "name": {
+            "zh": "泰式手工牛肉串 / 串",
+            "en": "Handmade Thai Beef Skewer",
+            "ko": "수제 소고기",
+            "ja": "特製スパイス牛肉串焼き",
+            "th": "เนื้อเสียบไม้ย่าง"
+          },
+          "price": 90,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        },
+        {
+          "id": "oi-1781286402826-137b",
+          "menuItemId": "dish-2407231815553",
+          "name": {
+            "zh": "好友折扣",
+            "en": "好友Discount",
+            "ko": "好友할인",
+            "ja": "好友割引",
+            "th": "好友ส่วนลด"
+          },
+          "price": -10,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "櫃檯收銀加點"
+          }
+        },
+        {
+          "id": "oi-1781286416097-2i38",
+          "menuItemId": "dish-2603132155426",
+          "name": {
+            "zh": "D餐贈可哥冰奶",
+            "en": "Cocoa Ice Milk (Set D Gift)",
+            "ko": "코코아 아이스 밀크 (D세트 증정품)",
+            "ja": "ココアアイスミルク (Dセット贈答品)",
+            "th": "โกโก้นมสดเย็น (ของแถมเซต D)"
+          },
+          "price": 0,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "櫃檯收銀加點"
+          }
+        }
+      ],
+      "subtotal": 260,
+      "serviceCharge": 0,
+      "total": 260,
+      "status": "completed",
+      "createdAt": "2026-06-10T11:49:00.000Z",
+      "customerName": "林大為",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000040000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": true,
+      "discount": 0,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0997",
+      "tableNumber": "8",
+      "items": [
+        {
+          "id": "old-7-1",
+          "menuItemId": "vg-01",
+          "name": {
+            "zh": "脆脆高麗菜",
+            "en": "Crispy Cabbage",
+            "ko": "아삭 양배추",
+            "ja": "キャベツ",
+            "th": "กะหล่ำปลี"
+          },
+          "price": 80,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 810,
+      "serviceCharge": 81,
+      "total": 891,
+      "status": "completed",
+      "createdAt": "2026-06-10T07:07:00.000Z",
+      "customerName": "阿福",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000035000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0996",
+      "tableNumber": "7",
+      "items": [
+        {
+          "id": "old-6-1",
+          "menuItemId": "sk-01",
+          "name": {
+            "zh": "泰式手工牛肉串 / 串",
+            "en": "Handmade Thai Beef Skewer",
+            "ko": "수제 소고기",
+            "ja": "特製スパイス牛肉串焼き",
+            "th": "เนื้อเสียบไม้ย่าง"
+          },
+          "price": 90,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 720,
+      "serviceCharge": 72,
+      "total": 792,
+      "status": "completed",
+      "createdAt": "2026-06-10T03:44:00.000Z",
+      "customerName": "張文欣",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000030000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "linepay",
+      "isMember": true,
+      "discount": 0,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0995",
+      "tableNumber": "6",
+      "items": [
+        {
+          "id": "old-5-1",
+          "menuItemId": "vg-01",
+          "name": {
+            "zh": "脆脆高麗菜",
+            "en": "Crispy Cabbage",
+            "ko": "아삭 양배추",
+            "ja": "キャベツ",
+            "th": "กะหล่ำปลี"
+          },
+          "price": 80,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 630,
+      "serviceCharge": 63,
+      "total": 693,
+      "status": "completed",
+      "createdAt": "2026-06-11T11:19:00.000Z",
+      "customerName": "泰國遊客",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000025000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0994",
+      "tableNumber": "5",
+      "items": [
+        {
+          "id": "old-4-1",
+          "menuItemId": "sk-01",
+          "name": {
+            "zh": "泰式手工牛肉串 / 串",
+            "en": "Handmade Thai Beef Skewer",
+            "ko": "수제 소고기",
+            "ja": "特製スパイス牛肉串焼き",
+            "th": "เนื้อเสียบไม้ย่าง"
+          },
+          "price": 90,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 540,
+      "serviceCharge": 54,
+      "total": 594,
+      "status": "completed",
+      "createdAt": "2026-06-11T07:12:00.000Z",
+      "customerName": "小智",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000020000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": true,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0993",
+      "tableNumber": "4",
+      "items": [
+        {
+          "id": "old-3-1",
+          "menuItemId": "vg-01",
+          "name": {
+            "zh": "脆脆高麗菜",
+            "en": "Crispy Cabbage",
+            "ko": "아삭 양배추",
+            "ja": "キャベツ",
+            "th": "กะหล่ำปลี"
+          },
+          "price": 80,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 450,
+      "serviceCharge": 45,
+      "total": 495,
+      "status": "completed",
+      "createdAt": "2026-06-11T03:54:00.000Z",
+      "customerName": "林大為",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000015000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0992",
+      "tableNumber": "3",
+      "items": [
+        {
+          "id": "old-2-1",
+          "menuItemId": "sk-01",
+          "name": {
+            "zh": "泰式手工牛肉串 / 串",
+            "en": "Handmade Thai Beef Skewer",
+            "ko": "수제 소고기",
+            "ja": "特製スパイス牛肉串焼き",
+            "th": "เนื้อเสียบไม้ย่าง"
+          },
+          "price": 90,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 360,
+      "serviceCharge": 36,
+      "total": 396,
+      "status": "completed",
+      "createdAt": "2026-06-12T11:48:00.000Z",
+      "customerName": "阿福",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000010000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": true,
+      "isPaid": true
+    },
+    {
+      "id": "SB-0991",
+      "tableNumber": "2",
+      "items": [
+        {
+          "id": "old-1-1",
+          "menuItemId": "vg-01",
+          "name": {
+            "zh": "脆脆高麗菜",
+            "en": "Crispy Cabbage",
+            "ko": "아삭 양배추",
+            "ja": "キャベツ",
+            "th": "กะหล่ำปลี"
+          },
+          "price": 80,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 270,
+      "serviceCharge": 27,
+      "total": 297,
+      "status": "completed",
+      "createdAt": "2026-06-12T07:10:00.000Z",
+      "customerName": "張文欣",
+      "customerAvatar": "https://images.unsplash.com/photo-1500000005000?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true
+    },
+    {
+      "id": "SB-1001",
+      "tableNumber": "6",
+      "items": [
+        {
+          "id": "item-1",
+          "menuItemId": "ty-01",
+          "name": {
+            "zh": "曼谷冬蔭功海鮮湯",
+            "en": "Bangkok Tom Yum Seafood Soup",
+            "ko": "방콕 똠얌꿍 해물탕",
+            "ja": "バンコトトムヤムクン海鮮スープ",
+            "th": "ต้มยำกุ้งทะเลบางกอก"
+          },
+          "price": 260,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 2,
+            "notes": ""
+          }
+        },
+        {
+          "id": "item-2",
+          "menuItemId": "sk-01",
+          "name": {
+            "zh": "泰式手工牛肉串 / 串",
+            "en": "Handmade Thai Beef Skewer",
+            "ko": "수제 태국식 소고기 꼬치",
+            "ja": "特製スパイス牛肉串焼き",
+            "th": "เนื้อเสียบไม้ย่างสูตรลับชาววัง Sabay"
+          },
+          "price": 90,
+          "qty": 3,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 1,
+            "notes": "醬料分開"
+          }
+        }
+      ],
+      "subtotal": 530,
+      "serviceCharge": 53,
+      "total": 583,
+      "status": "completed",
+      "createdAt": "2026-06-12T03:57:46.120Z",
+      "customerName": "李美莉 (Emily)",
+      "customerAvatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": true,
+      "isPaid": true
+    },
+    {
+      "id": "SB-1002",
+      "tableNumber": "3",
+      "items": [
+        {
+          "id": "item-3",
+          "menuItemId": "nd-01",
+          "name": {
+            "zh": "豪華版海鮮乾拌MAMA麵",
+            "en": "Signature Spicy Seafood Mama Noodles",
+            "ko": "호화 해산물 비빔 마마 라면",
+            "ja": "豪華シーフード和えMAMA麺",
+            "th": "มาม่าแห้งทะเลรวมมิตรภูเขาไฟ"
+          },
+          "price": 390,
+          "qty": 2,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 3,
+            "notes": "多蔥花"
+          }
+        },
+        {
+          "id": "item-4",
+          "menuItemId": "dr-01",
+          "name": {
+            "zh": "泰式奶茶 1L 桶裝 (限定)",
+            "en": "Signature Street Thai Milk Tea 1L (Bucket)",
+            "ko": "길거리 타이 밀크티 1L 점보 통 (한정)",
+            "ja": "極旨本場タイミルクティー1Lバケツ入り (テイクアウト・店内人気)",
+            "th": "ชาเย็นไทยสตรีท 1 ลิตรถังยักษ์"
+          },
+          "price": 180,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 0,
+            "notes": "微冰"
+          }
+        }
+      ],
+      "subtotal": 960,
+      "serviceCharge": 96,
+      "total": 1056,
+      "status": "completed",
+      "createdAt": "2026-06-11T22:57:46.120Z",
+      "customerName": "陳健國",
+      "customerAvatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true
+    },
+    {
+      "id": "SB-1003",
+      "tableNumber": "12",
+      "items": [
+        {
+          "id": "item-5",
+          "menuItemId": "cb-01",
+          "name": {
+            "zh": "A套餐 $660 人氣招牌盤",
+            "en": "Sabay $660 Signature Set A",
+            "ko": "A세트 $660 인기 클래식 플레이트",
+            "ja": "Aセット $660 定番人気盛り合わせ",
+            "th": "ชุดอิ่มฟิน A $660 ยอดฮิตซิกเนเจอร์"
+          },
+          "price": 660,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": ""
+          }
+        }
+      ],
+      "subtotal": 660,
+      "serviceCharge": 0,
+      "total": 660,
+      "status": "completed",
+      "createdAt": "2026-06-12T06:42:46.120Z",
+      "customerName": "Somchai Jaidee",
+      "customerAvatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": true,
+      "isPaid": true
+    },
+    {
+      "id": "SB-1004",
+      "tableNumber": "5",
+      "items": [
+        {
+          "id": "item-6",
+          "menuItemId": "vg-01",
+          "name": {
+            "zh": "脆脆高麗菜 / 份",
+            "en": "Crispy Cabbage",
+            "ko": "아삭 양배추 구이",
+            "ja": "あつあつキャベツ焼き",
+            "th": "กะหล่ำปลีย่างน้ำปลาหอม"
+          },
+          "price": 80,
+          "qty": 2,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 2,
+            "notes": ""
+          }
+        },
+        {
+          "id": "item-7",
+          "menuItemId": "sk-02",
+          "name": {
+            "zh": "爆汁金針菇豬肉 / 串",
+            "en": "Enoki Mushroom & Pork Wrap",
+            "ko": "팽이버섯 삼겹살 꼬치",
+            "ja": "金針菇えのき豚肉巻き",
+            "th": "หมูสามชั้นพันเห็ดเข็มทองย่างสะเด็ด"
+          },
+          "price": 90,
+          "qty": 4,
+          "customization": {
+            "sweetness": 1,
+            "spiciness": 2,
+            "notes": "烤焦一點"
+          }
+        }
+      ],
+      "subtotal": 520,
+      "serviceCharge": 52,
+      "total": 572,
+      "status": "completed",
+      "createdAt": "2026-06-12T06:52:46.120Z",
+      "customerName": "佐藤 健 (Ken)",
+      "customerAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": true,
+      "isPaid": true
+    },
+    {
+      "id": "SB-1015",
+      "tableNumber": "5",
+      "items": [
+        {
+          "id": "oi-1781288663379-0",
+          "menuItemId": "dish-2509271759269",
+          "name": {
+            "zh": "0.大魷MAMA麵",
+            "en": "0.大魷MAMANoodles",
+            "ko": "0.大魷MAMA국수",
+            "ja": "0.大魷MAMA麺",
+            "th": "0.大魷MAMAบะหมี่"
+          },
+          "price": 390,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781288663380-1",
+          "menuItemId": "dish-2508141908165",
+          "name": {
+            "zh": "51.泰奶空桶",
+            "en": "51.泰奶空桶",
+            "ko": "51.泰奶空桶",
+            "ja": "51.泰奶空桶",
+            "th": "51.泰奶空桶"
+          },
+          "price": -30,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 0,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781288663380-2",
+          "menuItemId": "dish-2601312208252",
+          "name": {
+            "zh": "啤酒10送1",
+            "en": "Beer Buy 10 Get 1 Free",
+            "ko": "맥주 10+1 이벤트",
+            "ja": "ビール10本購入で1本サービス",
+            "th": "โปรโมชั่นเบียร์ 10 แถม 1"
+          },
+          "price": -10,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 0,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781288663380-3",
+          "menuItemId": "dish-2603071951301",
+          "name": {
+            "zh": "乳酪組合價",
+            "en": "Cheese Combo Special Price",
+            "ko": "치즈 콤보 특가",
+            "ja": "チーズコンボ特別価格",
+            "th": "ราคาพิเศษคอมโบชีส"
+          },
+          "price": -10,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 0,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781288663380-4",
+          "menuItemId": "dish-2508252133258",
+          "name": {
+            "zh": "42.牛肉10串",
+            "en": "42.Beef 10串",
+            "ko": "42.소고기10串",
+            "ja": "42.牛肉10串",
+            "th": "42.เนื้อวัว10串"
+          },
+          "price": 650,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781288663380-5",
+          "menuItemId": "dish-2603132155426",
+          "name": {
+            "zh": "D餐贈可哥冰奶",
+            "en": "Cocoa Ice Milk (Set D Gift)",
+            "ko": "코코아 아이스 밀크 (D세트 증정품)",
+            "ja": "ココアアイスミルク (Dセット贈答品)",
+            "th": "โกโก้นมสดเย็น (ของแถมเซต D)"
+          },
+          "price": 0,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 0,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781288792837-qt8v",
+          "menuItemId": "dish-2601221740072",
+          "name": {
+            "zh": "3支-蘇格登12年",
+            "en": "3支-蘇格登12年",
+            "ko": "3支-蘇格登12年",
+            "ja": "3支-蘇格登12年",
+            "th": "3支-蘇格登12年"
+          },
+          "price": 5000,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "櫃檯收銀加點"
+          }
+        }
+      ],
+      "subtotal": 5990,
+      "serviceCharge": 0,
+      "total": 5990,
+      "status": "completed",
+      "createdAt": "2026-06-12T18:24:23.380Z",
+      "customerName": "顧客",
+      "customerAvatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true,
+      "guestCount": 2,
+      "discount": 0
+    },
+    {
+      "id": "SB-1016",
+      "tableNumber": "5",
+      "items": [
+        {
+          "id": "oi-1781289074941-0",
+          "menuItemId": "dish-2409232042549",
+          "name": {
+            "zh": "75.泰式牛小排.河粉",
+            "en": "75.Thai Style 牛小排.河粉",
+            "ko": "75.태국식牛小排.河粉",
+            "ja": "75.タイ風牛小排.河粉",
+            "th": "75.สไตล์ไทย牛小排.河粉"
+          },
+          "price": 620,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781289074941-1",
+          "menuItemId": "dish-2505041751044",
+          "name": {
+            "zh": "66.海陸豬冬蔭功湯",
+            "en": "66.海陸豬Tom Yum Goong 湯",
+            "ko": "66.海陸豬똠얌꿍湯",
+            "ja": "66.海陸豬トムヤムクン湯",
+            "th": "66.海陸豬ต้มยำกุ้ง湯"
+          },
+          "price": 360,
+          "qty": 3,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        }
+      ],
+      "subtotal": 1700,
+      "serviceCharge": 170,
+      "total": 1870,
+      "status": "preparing",
+      "createdAt": "2026-06-12T18:31:14.941Z",
+      "customerName": "顧客",
+      "customerAvatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "linepay",
+      "isMember": false,
+      "isPaid": false,
+      "guestCount": 2
+    }
+  ],
+  "inventoryLogs": [
+    {
+      "id": "ir-seed-1",
+      "timestamp": "2026-06-09T06:57:46.119Z",
+      "ingredientId": "ig-01",
+      "ingredientName": "大鮮蝦",
+      "type": "incoming",
+      "quantityChanged": 50,
+      "remainingStock": 65,
+      "note": "精選泰南白明蝦例行採購進貨"
+    },
+    {
+      "id": "ir-seed-2",
+      "timestamp": "2026-06-10T06:57:46.120Z",
+      "ingredientId": "ig-02",
+      "ingredientName": "頂級牛肉串",
+      "type": "incoming",
+      "quantityChanged": 100,
+      "remainingStock": 80,
+      "note": "週五宵夜預備食材手工牛肉串採購進庫"
+    },
+    {
+      "id": "ir-seed-3",
+      "timestamp": "2026-06-11T06:57:46.120Z",
+      "ingredientId": "ig-03",
+      "ingredientName": "鮮甜高麗菜",
+      "type": "adjustment",
+      "quantityChanged": -2.5,
+      "remainingStock": 45,
+      "note": "盤點清查：扣除葉面受損與耗損"
+    },
+    {
+      "id": "ir-adj-1781288487731-xba8",
+      "timestamp": "2026-06-12T18:21:27.731Z",
+      "ingredientId": "ig-01",
+      "ingredientName": "大鮮蝦",
+      "type": "adjustment",
+      "quantityChanged": -11,
+      "remainingStock": 89,
+      "note": "EOD 每日關帳自動扣減：已售餐品配方消耗核銷"
+    },
+    {
+      "id": "ir-adj-1781288487762-hkvk",
+      "timestamp": "2026-06-12T18:21:27.762Z",
+      "ingredientId": "ig-02",
+      "ingredientName": "頂級牛肉串",
+      "type": "adjustment",
+      "quantityChanged": -1,
+      "remainingStock": 99,
+      "note": "EOD 每日關帳自動扣減：已售餐品配方消耗核銷"
+    },
+    {
+      "id": "ir-adj-1781288487785-t1sz",
+      "timestamp": "2026-06-12T18:21:27.785Z",
+      "ingredientId": "ig-05",
+      "ingredientName": "多隆功泡麵/米粉",
+      "type": "adjustment",
+      "quantityChanged": -2,
+      "remainingStock": 118,
+      "note": "EOD 每日關帳自動扣減：已售餐品配方消耗核銷"
+    },
+    {
+      "id": "ir-adj-1781288487795-k3cz",
+      "timestamp": "2026-06-12T18:21:27.795Z",
+      "ingredientId": "ig-06",
+      "ingredientName": "頂級椰奶罐",
+      "type": "adjustment",
+      "quantityChanged": -0.1,
+      "remainingStock": 99.9,
+      "note": "EOD 每日關帳自動扣減：已售餐品配方消耗核銷"
+    },
+    {
+      "id": "ir-adj-1781288487810-dvh5",
+      "timestamp": "2026-06-12T18:21:27.810Z",
+      "ingredientId": "ig-07",
+      "ingredientName": "泰手標紅茶原料",
+      "type": "adjustment",
+      "quantityChanged": -0.35,
+      "remainingStock": 99.65,
+      "note": "EOD 每日關帳自動扣減：已售餐品配方消耗核銷"
+    },
+    {
+      "id": "ir-adj-1781288487821-y1b8",
+      "timestamp": "2026-06-12T18:21:27.821Z",
+      "ingredientId": "ig-08",
+      "ingredientName": "爆香豬五花 / 金針菇",
+      "type": "adjustment",
+      "quantityChanged": -1,
+      "remainingStock": 99,
+      "note": "EOD 每日關帳自動扣減：已售餐品配方消耗核銷"
+    }
+  ],
+  "printLogs": [
+    {
+      "id": "pr-1781247907274-k",
+      "timestamp": "下午3:05:07",
+      "content": "========================================\n       沙貝燒烤 (廚房工作單)\n       桌號: 5 桌\n========================================\n單號: SB-1004\n出單位址: 10.0.0.124 (TCP/3000)\n時間: 下午2:52:46\n----------------------------------------\n餐點菜單項目:\n[ ] 脆脆高麗菜 / 份 x 2份\n    【 中辣/正常糖 】\n[ ] 爆汁金針菇豬肉 / 串 x 4份\n    【 中辣/微糖/備註: 烤焦一點 】\n----------------------------------------\n*請依序出餐後更新平板進度\n========================================",
+      "orderId": "SB-1004",
+      "type": "kitchen"
+    },
+    {
+      "id": "pr-1781247907274-c",
+      "timestamp": "下午3:05:07",
+      "content": "========================================\n       沙貝燒烤 (顧客點餐菜單明細單)\n       桌號: 5 桌\n========================================\n單號: SB-1004\n出單位址: 10.0.0.124 (TCP/3000)\n付費方式: MEMBER (Google會員: 是(累積點數))\n時間: 下午2:52:46\n----------------------------------------\n餐點明細:\n  脆脆高麗菜 / 份 x2  $160\n  爆汁金針菇豬肉 / 串 x4  $360\n----------------------------------------\n小計: $520\n服務費(10%): $52\n親享總計: $572\n========================================\n*感謝您的光臨，請至櫃檯完成買單。",
+      "orderId": "SB-1004",
+      "type": "customer"
+    },
+    {
+      "id": "pr-1781288688723-k",
+      "timestamp": "上午2:24:48",
+      "content": "========================================\n       沙貝燒烤 (廚房工作單)\n       桌號: 5 桌\n========================================\n單號: SB-1015\n出單位址: 10.0.0.124 (TCP/3000)\n時間: 上午2:24:23\n----------------------------------------\n餐點菜單項目:\n[ ] 0.大魷MAMA麵 x 1份\n    【 小辣/正常糖 】\n[ ] 51.泰奶空桶 x 1份\n    【 不辣/正常糖 】\n[ ] 啤酒10送1 x 1份\n    【 不辣/正常糖 】\n[ ] 乳酪組合價 x 1份\n    【 不辣/正常糖 】\n[ ] 42.牛肉10串 x 1份\n    【 小辣/正常糖 】\n[ ] D餐贈可哥冰奶 x 1份\n    【 不辣/正常糖 】\n----------------------------------------\n*請依序出餐後更新平板進度\n========================================",
+      "orderId": "SB-1015",
+      "type": "kitchen"
+    },
+    {
+      "id": "pr-1781288688723-c",
+      "timestamp": "上午2:24:48",
+      "content": "========================================\n       沙貝燒烤 (顧客點餐菜單明細單)\n       桌號: 5 桌\n========================================\n單號: SB-1015\n出單位址: 10.0.0.124 (TCP/3000)\n付費方式: CASH (Google會員: 否)\n時間: 上午2:24:23\n----------------------------------------\n餐點明細:\n  0.大魷MAMA麵 x1  $390\n  51.泰奶空桶 x1  $-30\n  啤酒10送1 x1  $-10\n  乳酪組合價 x1  $-10\n  42.牛肉10串 x1  $650\n  D餐贈可哥冰奶 x1  $0\n----------------------------------------\n小計: $990\n服務費(10%): $0\n親享總計: $990\n========================================\n*感謝您的光臨，請至櫃檯完成買單。",
+      "orderId": "SB-1015",
+      "type": "customer"
+    },
+    {
+      "id": "pr-1781289088276-k",
+      "timestamp": "上午2:31:28",
+      "content": "========================================\n       沙貝燒烤 (廚房工作單)\n       桌號: 5 桌\n========================================\n單號: SB-1016\n出單位址: 10.0.0.124 (TCP/3000)\n時間: 上午2:31:14\n----------------------------------------\n餐點菜單項目:\n[ ] 75.泰式牛小排.河粉 x 1份\n    【 小辣/正常糖 】\n[ ] 66.海陸豬冬蔭功湯 x 3份\n    【 小辣/正常糖 】\n----------------------------------------\n*請依序出餐後更新平板進度\n========================================",
+      "orderId": "SB-1016",
+      "type": "kitchen"
+    },
+    {
+      "id": "pr-1781289088276-c",
+      "timestamp": "上午2:31:28",
+      "content": "========================================\n       沙貝燒烤 (顧客點餐菜單明細單)\n       桌號: 5 桌\n========================================\n單號: SB-1016\n出單位址: 10.0.0.124 (TCP/3000)\n付費方式: LINEPAY (Google會員: 否)\n時間: 上午2:31:14\n----------------------------------------\n餐點明細:\n  75.泰式牛小排.河粉 x1  $620\n  66.海陸豬冬蔭功湯 x3  $1080\n----------------------------------------\n小計: $1700\n服務費(10%): $170\n親享總計: $1870\n========================================\n*感謝您的光臨，請至櫃檯完成買單。",
+      "orderId": "SB-1016",
+      "type": "customer"
+    }
+  ],
+  "promoNotifications": [
+    {
+      "id": "notif-seed-1",
+      "timestamp": "下午12:57:46",
+      "title": "沙貝招牌推薦 🌟",
+      "message": "熱門！特盛大鮮蝦拼盤與泰式手工牛肉串現正熱賣中，會員再享積點優惠！",
+      "badge": "PROMO",
+      "isRead": false
+    }
+  ],
+  "liveOptionRules": [],
+  "livePrinterSettings": {
+    "kitchen": {
+      "connectionType": "IP",
+      "ip": "192.168.1.101",
+      "usbPort": "USB001",
+      "width": "80mm",
+      "fontSizeFactor": 1,
+      "restaurantName": "沙貝燒烤 泰式廚房",
+      "printTelephone": "02-1234-5678",
+      "printAddress": "台北市信義區泰式一番街8號",
+      "printTimeEnabled": true,
+      "headerPrefix": "★★★ 廚房工作備餐單 ★★★",
+      "footerSuffix": "請主廚盡速配餐出餐！"
+    },
+    "bill": {
+      "connectionType": "USB",
+      "ip": "192.168.1.102",
+      "usbPort": "USB002",
+      "width": "58mm",
+      "fontSizeFactor": 0.8,
+      "restaurantName": "沙貝燒烤 SABAY BBQ",
+      "printTelephone": "02-1234-5678",
+      "printAddress": "台北市信義區泰式一番街8號",
+      "printTimeEnabled": true,
+      "headerPrefix": "★★★ 顧客結帳明細單 ★★★",
+      "footerSuffix": "謝謝光臨，歡迎再度光臨！"
+    }
+  }
+}

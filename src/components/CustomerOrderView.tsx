@@ -519,11 +519,15 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
     }, 6000);
   };
 
-  useEffect(() => {
-    if (categories && categories.length > 0 && !categories.some(c => c.id === selectedCategory)) {
-      setSelectedCategory(categories[0].id);
-    }
+  const visibleCategories = useMemo(() => {
+    return categories.filter(c => c.showOnCustomerPage !== false);
   }, [categories]);
+
+  useEffect(() => {
+    if (visibleCategories.length > 0 && !visibleCategories.some(c => c.id === selectedCategory)) {
+      setSelectedCategory(visibleCategories[0].id);
+    }
+  }, [visibleCategories, selectedCategory]);
 
   const filteredItems = menuItems.filter((item) => item.category === selectedCategory);
 
@@ -1156,7 +1160,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
           {TRANSLATIONS.categories[currentLang]} Menu Category
         </label>
         <div className="flex overflow-x-auto py-2.5 gap-2 scrollbar-none scroll-smooth" id="categories-tabs-carousel">
-          {categories.map((cat) => {
+          {categories.filter(cat => cat.showOnCustomerPage !== false).map((cat) => {
             const isSelected = selectedCategory === cat.id;
             return (
               <button
@@ -2036,9 +2040,13 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {(() => {
                     const popularItemIds = ['ty-01', 'nd-01', 'sk-02', 'sk-01'];
-                    let popularItems = menuItems.filter(item => popularItemIds.includes(item.id));
+                    const isVisibleItem = (item: MenuItem) => {
+                      const cat = categories.find(c => c.id === item.category);
+                      return !cat || cat.showOnCustomerPage !== false;
+                    };
+                    let popularItems = menuItems.filter(item => popularItemIds.includes(item.id) && isVisibleItem(item));
                     if (popularItems.length === 0) {
-                      popularItems = menuItems.slice(0, 4);
+                      popularItems = menuItems.filter(isVisibleItem).slice(0, 4);
                     }
                     
                     const badges: { [key: string]: string[] } = {
@@ -2138,9 +2146,13 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {(() => {
                   const popularItemIds = ['ty-01', 'nd-01', 'sk-02', 'sk-01'];
-                  let popularItems = menuItems.filter(item => popularItemIds.includes(item.id));
+                  const isVisibleItem = (item: MenuItem) => {
+                    const cat = categories.find(c => c.id === item.category);
+                    return !cat || cat.showOnCustomerPage !== false;
+                  };
+                  let popularItems = menuItems.filter(item => popularItemIds.includes(item.id) && isVisibleItem(item));
                   if (popularItems.length === 0) {
-                    popularItems = menuItems.slice(0, 4);
+                    popularItems = menuItems.filter(isVisibleItem).slice(0, 4);
                   }
                   
                   const badges: { [key: string]: string[] } = {

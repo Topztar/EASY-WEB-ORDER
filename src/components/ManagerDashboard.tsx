@@ -74,8 +74,8 @@ interface ManagerDashboardProps {
   onAddMenuItem?: (item: any) => Promise<void>;
   onEditMenuItem?: (id: string, item: any) => Promise<void>;
   categories: Category[];
-  onAddCategory?: (id: string, name: any) => Promise<{ success: boolean; error?: string }>;
-  onEditCategory?: (id: string, name: any) => Promise<{ success: boolean; error?: string }>;
+  onAddCategory?: (id: string, name: any, showOnCustomerPage?: boolean) => Promise<{ success: boolean; error?: string }>;
+  onEditCategory?: (id: string, name: any, showOnCustomerPage?: boolean) => Promise<{ success: boolean; error?: string }>;
   onDeleteCategory?: (id: string) => Promise<{ success: boolean; error?: string }>;
   tables: TableConfig[];
   onAddTable: (id: string, qrCodeUrl?: string) => Promise<{ success: boolean; error?: string }>;
@@ -94,6 +94,7 @@ interface ManagerDashboardProps {
     }
   ) => Promise<void>;
   defaultSubTab?: 'stats' | 'orders' | 'inventory' | 'menu' | 'members' | 'cashier' | 'printer' | 'options' | 'eod';
+  onSubTabChange?: (subTab: 'stats' | 'orders' | 'inventory' | 'menu' | 'members' | 'cashier' | 'printer' | 'options' | 'eod') => void;
   minSpend?: number;
   onUpdateMinSpend?: (newVal: number) => Promise<{ success: boolean; error?: string }>;
   operatingHours?: any[];
@@ -130,6 +131,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   onPayOrder,
   onUpdateTableNumber,
   defaultSubTab,
+  onSubTabChange,
   minSpend = 200,
   onUpdateMinSpend,
   operatingHours = [],
@@ -720,6 +722,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [catNameJa, setCatNameJa] = useState('');
   const [catNameKo, setCatNameKo] = useState('');
   const [catError, setCatError] = useState<string | null>(null);
+  const [catShowOnCustomer, setCatShowOnCustomer] = useState<boolean>(true);
 
   // Google Members state and points database
   const [membersList, setMembersList] = useState<any[]>([]);
@@ -1191,6 +1194,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     setCatNameJa('');
     setCatNameKo('');
     setCatError(null);
+    setCatShowOnCustomer(true);
     setIsCatFormOpen(true);
   };
 
@@ -1203,6 +1207,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     setCatNameJa(cat.name?.ja || '');
     setCatNameKo(cat.name?.ko || '');
     setCatError(null);
+    setCatShowOnCustomer(cat.showOnCustomerPage !== false);
     setIsCatFormOpen(true);
   };
 
@@ -1223,13 +1228,13 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     };
     if (editingCategory) {
       if (onEditCategory) {
-        const r = await onEditCategory(editingCategory.id, payloadName);
+        const r = await onEditCategory(editingCategory.id, payloadName, catShowOnCustomer);
         if (r.success) setIsCatFormOpen(false);
         else setCatError(r.error || '保存出錯');
       }
     } else {
       if (onAddCategory) {
-        const r = await onAddCategory(cleanId, payloadName);
+        const r = await onAddCategory(cleanId, payloadName, catShowOnCustomer);
         if (r.success) setIsCatFormOpen(false);
         else setCatError(r.error || '新增出錯');
       }
@@ -1358,7 +1363,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   return (
     <div className="space-y-6 text-white" id="manager-dashboard-container">
       {/* 1. Dynamic Tab Switcher */}
-      {defaultSubTab !== 'cashier' && (
+      {defaultSubTab !== 'cashier' && activeSubTab !== 'eod' && (
         <div className="flex flex-wrap gap-2 border-b border-white/10 pb-4" id="admin-subtabs-nav">
           {[
             { id: 'stats', label: '📊 營運數據分析', desc: '全店每日銷售分析、客流量時段與菜品排行' },
@@ -1367,13 +1372,17 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
             { id: 'menu', label: '🍜 菜品與類別編輯', desc: '菜單單品與可售狀態、客製選項、全店類別更新' },
             { id: 'members', label: '⚙️ 會員、桌席與系統', desc: 'Google 會員統計、桌席二維碼、員工PIN變更' },
             { id: 'printer', label: '🖨️ 印表機與硬體', desc: '分離雙機：廚房印表機、帳單印表機寬度與連線' },
-            { id: 'options', label: '🧩 客製選項管理器', desc: '設定全店客製選項規則 (例如：加河粉、熟度、辣度)' },
-            { id: 'eod', label: '🏁 每日關帳結算', desc: '連動「數據庫存」與今日營業核對，登錄銷帳、變更支付、列印預覽' }
+            { id: 'options', label: '🧩 客製選項管理器', desc: '設定全店客製選項規則 (例如：加河粉、熟度、辣度)' }
           ].map((tab) => (
             <button
               key={tab.id}
               id={`tab-btn-${tab.id}`}
-              onClick={() => setActiveSubTab(tab.id as any)}
+              onClick={() => {
+                setActiveSubTab(tab.id as any);
+                if (onSubTabChange) {
+                  onSubTabChange(tab.id as any);
+                }
+              }}
               className={`flex flex-col items-start px-5 py-3 rounded-lg border text-left transition-all outline-none ${
                 activeSubTab === tab.id
                   ? 'bg-[#E5B453] border-[#E5B453] text-black shadow-md font-black scale-[1.01]'
@@ -3798,7 +3807,12 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               {categories.map((cat) => (
                 <div key={cat.id} className="bg-black/35 border border-white/10 rounded-lg px-3 py-2 flex items-center space-x-2">
                   <div className="text-left font-sans text-xs">
-                    <p className="font-bold text-white leading-normal">{cat.name.zh}</p>
+                    <p className="font-bold text-white leading-normal flex items-center gap-1.5">
+                      <span>{cat.name.zh}</span>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded ${cat.showOnCustomerPage !== false ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                        {cat.showOnCustomerPage !== false ? '顧客可見' : '後台限定'}
+                      </span>
+                    </p>
                     <p className="text-[10px] text-zinc-500 font-mono">標記 ID: {cat.id}</p>
                   </div>
                   {onEditCategory && (
@@ -6149,6 +6163,18 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
               <div className="space-y-1">
                 <label className="text-zinc-400">中文正體類別名稱 Name Zh</label>
                 <input type="text" required value={catNameZh} onChange={(e) => setCatNameZh(e.target.value)} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white" />
+              </div>
+              <div className="flex items-center space-x-2 py-1">
+                <input
+                  type="checkbox"
+                  id="cat-show-on-customer"
+                  checked={catShowOnCustomer}
+                  onChange={(e) => setCatShowOnCustomer(e.target.checked)}
+                  className="rounded border-zinc-700 bg-[#1e1e1e] text-[#E5B453] focus:ring-0 w-4 h-4 cursor-pointer"
+                />
+                <label htmlFor="cat-show-on-customer" className="text-zinc-350 cursor-pointer font-bold select-none">
+                  顯示於顧客線上點餐頁面 (Show on Customer Page)
+                </label>
               </div>
               <div className="space-y-1">
                 <label className="text-zinc-400">英文對應 Name En</label>
