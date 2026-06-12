@@ -777,10 +777,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "57.恐龍美祿",
-      "en": "57.恐龍美祿",
-      "ko": "57.恐龍美祿",
-      "ja": "57.恐龍美祿",
-      "th": "57.恐龍美祿"
+      "en": "57. Dino Milo",
+      "ko": "57. 다이노 마일로",
+      "ja": "57. ダイノミロ",
+      "th": "57. ไดโนไมโล"
     },
     "price": 90.0,
     "image": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&q=80&w=400",
@@ -802,10 +802,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "56.泰式可哥冰奶",
-      "en": "56.泰式可哥冰奶",
-      "ko": "56.泰式可哥冰奶",
-      "ja": "56.泰式可哥冰奶",
-      "th": "56.泰式可哥冰奶"
+      "en": "56. Thai Cocoa Ice Milk",
+      "ko": "56. 태국 코코아 아이스 밀크",
+      "ja": "56. タイ風ココアアイスミルク",
+      "th": "56. นมโกโก้เย็นไทย"
     },
     "price": 90.0,
     "image": "https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&q=80&w=400",
@@ -1756,10 +1756,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "58.炭燒奶茶(壺)",
-      "en": "58.炭燒奶茶(壺)",
-      "ko": "58.炭燒奶茶(壺)",
-      "ja": "58.炭燒奶茶(壺)",
-      "th": "58.炭燒奶茶(壺)"
+      "en": "58. Charcoal Milk Tea (Pot)",
+      "ko": "58. 숯불 밀크티 (포트)",
+      "ja": "58. 炭火焼きミルクティー (ポット)",
+      "th": "58. ชานมถ่าน (กา)"
     },
     "price": 180.0,
     "image": "https://images.unsplash.com/photo-1558618047-f4d7e7e23e6e?auto=format&fit=crop&q=80&w=400",
@@ -1906,10 +1906,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "60.泰醇奶酒5.6%",
-      "en": "60.泰醇奶酒5.6%",
-      "ko": "60.泰醇奶酒5.6%",
-      "ja": "60.泰醇奶酒5.6%",
-      "th": "60.泰醇奶酒5.6%"
+      "en": "60. Thai Cream Liqueur 5.6%",
+      "ko": "60. 태국 크림 리큐어 5.6%",
+      "ja": "60. タイクリームリキュール 5.6%",
+      "th": "60. ไวน์นม 5.6%"
     },
     "price": 380.0,
     "image": "https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&q=80&w=400",
@@ -1931,10 +1931,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "59.泰醇奶酒1.4%",
-      "en": "59.泰醇奶酒1.4%",
-      "ko": "59.泰醇奶酒1.4%",
-      "ja": "59.泰醇奶酒1.4%",
-      "th": "59.泰醇奶酒1.4%"
+      "en": "59. Thai Cream Liqueur 1.4%",
+      "ko": "59. 태국 크림 리큐어 1.4%",
+      "ja": "59. タイクリームリキュール 1.4%",
+      "th": "59. ไวน์นม 1.4%"
     },
     "price": 280.0,
     "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=400",
@@ -2383,10 +2383,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "54.果肉椰子水",
-      "en": "54.果肉椰子水",
-      "ko": "54.果肉椰子水",
-      "ja": "54.果肉椰子水",
-      "th": "54.果肉椰子水"
+      "en": "54. Coconut Water with Pulp",
+      "ko": "54. 과육 코코넛 워터",
+      "ja": "54. 果肉入りコナッツウォーター",
+      "th": "54. น้ำมะพร้าวเนื้อ"
     },
     "price": 90.0,
     "image": "https://images.unsplash.com/photo-1519996529931-28324d5a630e?auto=format&fit=crop&q=80&w=400",
@@ -2753,9 +2753,7 @@ export const INITIAL_MENU: MenuItem[] = [
     "containsBeef": true,
     "containsPork": false,
     "containsSeafood": false,
-    "isNotSpicy": true,
-    "hasNoodlesOption": true,
-    "hasCoconutsMilkOption": true
+    "isNotSpicy": true
   },
   {
     "id": "dish-2207122338495",
@@ -2862,10 +2860,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "55.可口可樂",
-      "en": "55.可口可樂",
-      "ko": "55.可口可樂",
-      "ja": "55.可口可樂",
-      "th": "55.可口可樂"
+      "en": "55. Coca-Cola",
+      "ko": "55. 코카콜라",
+      "ja": "55. コカ・コーラ",
+      "th": "55. โค้ก"
     },
     "price": 90.0,
     "image": "https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&q=80&w=400",
@@ -2887,10 +2885,10 @@ export const INITIAL_MENU: MenuItem[] = [
     "category": "drinks",
     "name": {
       "zh": "52.泰式奶茶400ml",
-      "en": "52.泰式奶茶400ml",
-      "ko": "52.泰式奶茶400ml",
-      "ja": "52.泰式奶茶400ml",
-      "th": "52.泰式奶茶400ml"
+      "en": "52. Thai Milk Tea 400ml",
+      "ko": "52. 태국 밀크티 400ml",
+      "ja": "52. タイミルクティー 400ml",
+      "th": "52. ชาไทย 400ml"
     },
     "price": 90.0,
     "image": "https://images.unsplash.com/photo-1558618047-f4d7e7e23e6e?auto=format&fit=crop&q=80&w=400",
@@ -3054,8 +3052,8 @@ export const INITIAL_MENU: MenuItem[] = [
     "available": true,
     "containsBeef": false,
     "containsPork": false,
-    "containsSeafood": false,
-    "isNotSpicy": false
+    "containsSeafood": true,
+    "isNotSpicy": true
   },
   {
     "id": "dish-2207122132048",
