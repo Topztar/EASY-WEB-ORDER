@@ -748,7 +748,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
   };
 
   return (
-    <div className={`space-y-6 transition-all duration-300 ${isSimplifiedMode ? 'bg-[#FFFFFF] text-[#000000] p-4 sm:p-6 min-h-screen border-4 border-[#FFA500]' : 'text-white'}`} id="customer-order-panel">
+    <div className={`space-y-6 transition-all duration-300 ${isSimplifiedMode ? 'bg-[#FFFFFF] text-[#000000] p-4 sm:p-6 min-h-screen border-4 border-black' : 'text-white'}`} id="customer-order-panel">
       {/* 📣 Customer Scrolling Notice */}
       {customerNotice && (
         <div className="w-full bg-thai-gold/10 border border-thai-gold/20 rounded-full overflow-hidden py-1.5 px-4 shadow-sm flex items-center space-x-2 text-thai-gold text-xs font-sans">
@@ -795,7 +795,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       <div 
         className={`rounded-3xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-lg transition-all duration-300 ${
           isSimplifiedMode 
-            ? 'bg-[#FFFFFF] border-4 border-[#FFA500] text-black' 
+            ? 'bg-[#FFFFFF] border-4 border-black text-black' 
             : 'bg-gradient-to-r from-thai-gold/20 via-[#E5B453]/10 to-transparent border border-thai-gold/30 text-white'
         }`}
       >
@@ -1170,10 +1170,10 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                 className={`px-4.5 py-3 rounded-full text-sm font-bold flex items-center space-x-1.5 transition shrink-0 cursor-pointer active:scale-95 ${
                   isSelected
                     ? isSimplifiedMode
-                      ? 'bg-[#FFA500] text-black border-2 border-black font-extrabold shadow-md text-base'
+                      ? 'bg-white text-black border-2 border-black font-extrabold shadow-md text-base'
                       : 'bg-[#E5B453] text-[#0F0F0F] shadow-lg shadow-[#E5B453]/20 font-extrabold'
                     : isSimplifiedMode
-                      ? 'bg-black text-white border-2 border-black text-base font-black'
+                      ? 'bg-black text-white border-2 border-black text-base font-black hover:bg-zinc-800'
                       : 'bg-white/5 hover:bg-white/10 text-white/80 border border-white/10'
                 }`}
               >
@@ -1187,7 +1187,7 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
       {/* Catelog Menu Grid */}
       <div 
         className={isSimplifiedMode 
-          ? "grid grid-cols-1 md:grid-cols-2 gap-6" 
+          ? "flex flex-col gap-3" 
           : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
         } 
         id="dish-catalog-grid"
@@ -1199,75 +1199,67 @@ export const CustomerOrderView: React.FC<CustomerOrderViewProps> = ({
                 key={item.id}
                 id={`dish-card-${item.id}`}
                 onClick={() => { if (item.available) handleOpenDetail(item); }}
-                className={`bg-white text-black rounded-3xl overflow-hidden shadow-xl border-4 ${
+                className={`bg-white text-black rounded-2xl overflow-hidden shadow-md border-2 ${
                   item.available 
-                    ? 'border-[#FFA500] hover:border-amber-500 cursor-pointer active:scale-[1.01] transition-all' 
+                    ? 'border-black hover:border-zinc-600 cursor-pointer active:scale-[1.01] transition-all' 
                     : 'border-zinc-300 opacity-60 cursor-not-allowed'
-                } flex flex-col justify-between text-left relative`}
+                } flex flex-row items-stretch text-left relative`}
               >
-                {/* Out of Stock Ribbon */}
-                {!item.available && (
-                  <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-black px-4 py-2 rounded-full z-10 shadow-lg">
-                    ⚠️ 賣完了 SOLD OUT
-                  </div>
-                )}
-
-                <div>
-                  {/* Picture Frame */}
-                  <div className="h-60 overflow-hidden relative bg-zinc-100 border-b-2 border-zinc-200">
-                    <img
-                      src={item.image}
-                      alt={item.name.zh}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute top-4 left-4 bg-amber-500 text-black text-xs font-black px-3 py-1 rounded-lg border border-black uppercase">
-                      高對比配圖
+                {/* Left: Thumbnail */}
+                <div className="w-28 sm:w-36 shrink-0 relative">
+                  <img
+                    src={item.image}
+                    alt={item.name.zh}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  {!item.available && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <span className="text-white text-xs font-black text-center px-1">賣完了</span>
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  {/* Text Frame (No description, very large text) */}
-                  <div className="p-6 space-y-3">
-                    <h4 className="font-extrabold text-black text-2xl sm:text-3xl leading-snug tracking-wide font-sans">
+                {/* Right: Info + Action */}
+                <div className="flex flex-col justify-between flex-1 px-4 py-3">
+                  <div className="space-y-1">
+                    <h4 className="font-extrabold text-black text-xl sm:text-2xl leading-snug tracking-wide font-sans">
                       {item.name.zh || item.name[currentLang]}
                     </h4>
-                    
-                    <div className="flex items-center space-x-2 flex-wrap gap-1.5 pt-1">
-                      <span className="bg-[#FFA500] text-black text-lg font-black px-4 py-1.5 rounded-xl border border-black shadow">
-                        現金價 NT$ {item.price} 元
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="bg-black text-white text-base font-black px-3 py-1 rounded-lg">
+                        NT$ {item.price} 元
                       </span>
                       {item.isNotSpicy ? (
-                        <span className="bg-emerald-600 text-white text-xs font-black px-3 py-1 rounded-lg border border-emerald-700">
-                          🍃 完全不辣 No Spicy
+                        <span className="bg-white text-black text-xs font-black px-2.5 py-1 rounded-lg border-2 border-black">
+                          🍃 不辣
                         </span>
                       ) : (
-                        <span className="bg-red-600 text-white text-xs font-black px-3 py-1 rounded-lg border border-red-700">
-                          🌶️ 香中帶辣 Spicy
+                        <span className="bg-white text-black text-xs font-black px-2.5 py-1 rounded-lg border-2 border-black">
+                          🌶️ 辣
                         </span>
                       )}
                     </div>
                   </div>
-                </div>
 
-                {/* Big Button action */}
-                <div className="p-6 border-t-2 border-zinc-100 bg-amber-50/50">
-                  {item.available ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenDetail(item);
-                      }}
-                      className="w-full py-4.5 bg-[#FFA500] hover:bg-amber-400 text-black font-black text-base sm:text-lg rounded-2xl border-2 border-black transition active:scale-95 cursor-pointer shadow-md flex items-center justify-center gap-2"
-                    >
-                      <span>🎯 點選：開始點餐加到購物車</span>
-                      <ChevronRight size={22} className="stroke-[3]" />
-                    </button>
-                  ) : (
-                    <div className="w-full py-4 bg-zinc-200 text-zinc-500 font-black text-center text-sm rounded-2xl border border-zinc-300">
-                      本日售罄 (Sold Out Today)
-                    </div>
-                  )}
+                  {/* Action */}
+                  <div className="pt-2">
+                    {item.available ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDetail(item);
+                        }}
+                        className="px-4 py-2 bg-black hover:bg-zinc-800 text-white font-black text-sm rounded-xl border-2 border-black transition active:scale-95 cursor-pointer shadow-sm flex items-center gap-1.5"
+                      >
+                        <span>🛒 點餐</span>
+                        <ChevronRight size={16} className="stroke-[3]" />
+                      </button>
+                    ) : (
+                      <span className="text-zinc-500 font-black text-sm">本日售罄</span>
+                    )}
+                  </div>
                 </div>
               </div>
             );
