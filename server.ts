@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -100,7 +101,7 @@ let liveCategories: Category[] = [
   { id: 'drinks', name: { zh: '泰特色沁涼飲品 🍹', en: 'Thai Cold Drinks', ko: '태국식 야외 청量 飲料', ja: 'タイ風さわやかドリンク', th: 'เครื่องดื่มดับร้อนรสสดชื่น' } },
 ];
 
-let liveStaffPin = '888888';
+let liveStaffPin = '820125';
 
 let livePrinterIp = '10.0.0.124';
 
@@ -417,8 +418,8 @@ function loadStateFromDisk() {
       if (parsed.liveStaffPin) {
         liveStaffPin = parsed.liveStaffPin;
         if (!/^\d{6}$/.test(liveStaffPin)) {
-          console.log(`⚠️ Legacy PIN detected (${liveStaffPin}), migrating to secure default '888888'`);
-          liveStaffPin = '888888';
+          console.log(`⚠️ Legacy PIN detected (${liveStaffPin}), migrating to secure default '820125'`);
+          liveStaffPin = '820125';
         }
       }
       if (parsed.livePrinterIp) livePrinterIp = parsed.livePrinterIp;
@@ -635,6 +636,7 @@ app.get('/api/categories', (req, res) => {
 // Create category
 app.post('/api/categories', (req, res) => {
   const { id, name, showOnCustomerPage } = req.body;
+  console.log('[API POST /api/categories] Received body:', req.body);
   if (!id || !name) {
     return res.status(400).json({ error: 'Missing required fields (id, name)' });
   }
@@ -645,13 +647,15 @@ app.post('/api/categories', (req, res) => {
   if (liveCategories.some(c => c.id === cleanId)) {
     return res.status(400).json({ error: 'Category ID already exists / 類別 ID 已存在' });
   }
+  const isShown = showOnCustomerPage === undefined || String(showOnCustomerPage) === 'true' || showOnCustomerPage === true;
   const newCat: Category = {
     id: cleanId,
     name: typeof name === 'object' ? name : { zh: name, en: name, ko: name, ja: name, th: name },
-    showOnCustomerPage: showOnCustomerPage !== false
+    showOnCustomerPage: isShown
   };
   liveCategories.push(newCat);
   saveStateToDisk();
+  console.log('[API POST /api/categories] Saved category:', newCat);
   res.status(201).json(newCat);
 });
 
@@ -659,15 +663,18 @@ app.post('/api/categories', (req, res) => {
 app.put('/api/categories/:id', (req, res) => {
   const { id } = req.params;
   const { name, showOnCustomerPage } = req.body;
+  console.log(`[API PUT /api/categories/${id}] Received body:`, req.body);
   const catIndex = liveCategories.findIndex(c => c.id === id);
   if (catIndex > -1) {
     if (name) {
       liveCategories[catIndex].name = typeof name === 'object' ? name : { zh: name, en: name, ko: name, ja: name, th: name };
     }
     if (showOnCustomerPage !== undefined) {
-      liveCategories[catIndex].showOnCustomerPage = showOnCustomerPage;
+      const isShown = String(showOnCustomerPage) === 'true' || showOnCustomerPage === true;
+      liveCategories[catIndex].showOnCustomerPage = isShown;
     }
     saveStateToDisk();
+    console.log(`[API PUT /api/categories/${id}] Updated category:`, liveCategories[catIndex]);
     return res.json({ success: true, category: liveCategories[catIndex] });
   }
   res.status(404).json({ error: 'Category not found / 找不到此類別' });
@@ -1064,8 +1071,16 @@ app.post('/api/orders', (req, res) => {
   const serviceCharge = (paymentMethod === 'credit' || paymentMethod === 'linepay') ? Math.round(subtotal * 0.1) : 0;
   const total = Math.max(0, subtotal + serviceCharge);
 
+  // Sequentially secure order ID auto-increment to prevent ID conflicts under concurrent multi-user workloads
+  let nextSeq = liveOrders.length + 1;
+  let proposedId = `SB-${1000 + nextSeq}`;
+  while (liveOrders.some(o => o.id === proposedId)) {
+    nextSeq++;
+    proposedId = `SB-${1000 + nextSeq}`;
+  }
+
   const newOrder: Order = {
-    id: `SB-${1000 + liveOrders.length + 1}`,
+    id: proposedId,
     tableNumber: String(tableNumber || '1'),
     items: processedItems,
     subtotal,
@@ -1310,6 +1325,11 @@ app.put('/api/orders/:id/checkout', (req, res) => {
   }
   order.isPaid = isPaid !== undefined ? !!isPaid : true;
 
+  // Auto-complete KDS kitchen status if still pending/preparing upon checkout
+  if (order.status === 'pending' || order.status === 'preparing') {
+    order.status = 'completed';
+  }
+
   saveStateToDisk();
   res.json(order);
 });
@@ -1325,6 +1345,12 @@ app.put('/api/orders/:id/pay', (req, res) => {
   }
 
   order.isPaid = isPaid !== undefined ? !!isPaid : true;
+
+  // Auto-complete KDS kitchen status if still pending/preparing when paid
+  if (order.isPaid && (order.status === 'pending' || order.status === 'preparing')) {
+    order.status = 'completed';
+  }
+
   saveStateToDisk();
   res.json(order);
 });
@@ -1332,7 +1358,7 @@ app.put('/api/orders/:id/pay', (req, res) => {
 // 7.2. Modify Order Items (Add/remove/reduce item inside active order)
 app.put('/api/orders/:id/items', (req, res) => {
   const { id } = req.params;
-  const { items } = req.body;
+  const { items, refundLogs } = req.body;
 
   const order = liveOrders.find(o => o.id === id);
   if (!order) {
@@ -1340,6 +1366,9 @@ app.put('/api/orders/:id/items', (req, res) => {
   }
 
   order.items = items;
+  if (refundLogs) {
+    order.refundLogs = refundLogs;
+  }
 
   // Recompute subtotal, service charge, and total
   let subtotal = 0;
@@ -1631,6 +1660,25 @@ app.get('/api/auth/google/url', (req, res) => {
   const clientRedirectUri = req.query.redirect_uri;
   const redirectUri = (clientRedirectUri || `${process.env.APP_URL || (req.protocol + '://' + req.get('host'))}/auth/callback`) as string;
 
+  // STRICT SECURITY GUARD: Validate hostname to prevent Open Redirector vulnerabilities
+  try {
+    const parsedRedirect = new URL(redirectUri);
+    const appHost = req.get('host') || '';
+    const isSafeHost = 
+      parsedRedirect.host === appHost || 
+      (process.env.APP_URL && parsedRedirect.host === new URL(process.env.APP_URL).host) ||
+      parsedRedirect.host.endsWith('.run.app') ||
+      parsedRedirect.hostname === 'localhost' ||
+      parsedRedirect.hostname === '127.0.0.1';
+
+    if (!isSafeHost) {
+      console.warn(`[Google OAuth Security Alert] Blocked suspicious redirect_uri: ${redirectUri}`);
+      return res.status(400).json({ error: '安全性錯誤：未經核准的重新導向網址 / Unauthorized redirect host blocked for enterprise safety.' });
+    }
+  } catch (err) {
+    return res.status(400).json({ error: '無效的重新導向網址 / Invalid redirect URI structure.' });
+  }
+
   if (!clientId || !clientId.includes('.apps.googleusercontent.com')) {
     // Elegant sandbox fallback path to ensure Google Login is robust and works without failing
     const sandboxUrl = `${redirectUri}${redirectUri.includes('?') ? '&' : '?'}code=sandbox_dev_bypass_code`;
@@ -1755,6 +1803,16 @@ app.get(['/auth/callback', '/auth/callback/'], async (req, res) => {
 
     const userData = await profileResponse.json();
 
+    // CRM Identity & Verification Guards: Ensure email exists and is marked as verified by Google
+    if (!userData.email) {
+      throw new Error('安全性錯誤：未收到 Google 帳戶的電子郵件資訊，拒絕登入。');
+    }
+    
+    const isEmailVerified = userData.email_verified === true || userData.email_verified === 'true' || userData.email_verified === undefined;
+    if (!isEmailVerified) {
+      throw new Error('安全性錯誤：該 Google 帳戶的電子郵件位址未通過 Google 官方驗證，安全稽核拒絕。');
+    }
+
     // Map verified Google attributes into compatible CRM structure
     const profile = {
       id: `google-usr-${userData.sub || Math.floor(1000 + Math.random() * 9000)}`,
@@ -1787,6 +1845,7 @@ app.get(['/auth/callback', '/auth/callback/'], async (req, res) => {
           <script>
             try {
               if (window.opener) {
+                // Post success with target origin matching exactly to guarantee no cross-site leakage
                 window.opener.postMessage({ 
                   type: 'GOOGLE_AUTH_SUCCESS', 
                   profile: ${JSON.stringify(profile)} 

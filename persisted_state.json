@@ -1779,11 +1779,11 @@
       "id": "dish-2412021733504",
       "category": "skewers",
       "name": {
-        "zh": "18.炙燒幹貝3P",
-        "en": "18.炙燒幹貝3P",
-        "ko": "18.炙燒幹貝3P",
-        "ja": "18.炙燒幹貝3P",
-        "th": "18.炙燒幹貝3P"
+        "zh": "18.炙燒干貝3P",
+        "en": "18.炙燒干貝3P",
+        "ko": "18.炙燒干貝3P",
+        "ja": "18.炙燒干貝3P",
+        "th": "18.炙燒干貝3P"
       },
       "price": 390,
       "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&q=80&w=400",
@@ -1798,7 +1798,9 @@
       "containsBeef": false,
       "containsPork": false,
       "containsSeafood": true,
-      "isNotSpicy": false
+      "isNotSpicy": false,
+      "hasNoodlesOption": false,
+      "customAddOns": []
     },
     {
       "id": "dish-2412021732545",
@@ -2131,24 +2133,26 @@
       "name": {
         "zh": "76.泰式牛小排.米線",
         "en": "76.Thai Style 牛小排.米線",
-        "ko": "76.태국식牛小排.米線",
-        "ja": "76.タイ風牛小排.米線",
-        "th": "76.สไตล์ไทย牛小排.米線"
+        "ko": "76.泰式牛小排.米線",
+        "ja": "76.泰式牛小排.米線",
+        "th": "76.泰式牛小排.米線"
       },
       "price": 620,
       "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=400",
       "description": {
         "zh": "特製美味的76.泰式牛小排.米線",
         "en": "特製美味的76.Thai Style 牛小排.米線",
-        "ko": "特製美味的76.태국식牛小排.米線",
-        "ja": "特製美味的76.タイ風牛小排.米線",
-        "th": "特製美味的76.สไตล์ไทย牛小排.米線"
+        "ko": "特製美味的76.泰式牛小排.米線",
+        "ja": "特製美味的76.泰式牛小排.米線",
+        "th": "特製美味的76.泰式牛小排.米線"
       },
       "available": true,
       "containsBeef": false,
       "containsPork": false,
       "containsSeafood": false,
-      "isNotSpicy": false
+      "isNotSpicy": false,
+      "hasNoodlesOption": true,
+      "customAddOns": []
     },
     {
       "id": "dish-2409232042549",
@@ -3534,7 +3538,7 @@
       }
     }
   ],
-  "liveStaffPin": "888888",
+  "liveStaffPin": "820125",
   "livePrinterIp": "10.0.0.124",
   "liveTables": [
     {
@@ -3570,7 +3574,7 @@
       "qrCodeUrl": "/?table=12"
     }
   ],
-  "liveTakeoutSeq": 0,
+  "liveTakeoutSeq": 1,
   "lastTakeoutDate": "Sat Jun 13 2026",
   "liveMinSpendPerPerson": 200,
   "liveOperatingHours": [
@@ -4352,6 +4356,172 @@
       "isPaid": true,
       "guestCount": 2,
       "discount": 0
+    },
+    {
+      "id": "SB-1018",
+      "tableNumber": "外帶 #1",
+      "items": [
+        {
+          "id": "oi-1781352843741-0",
+          "menuItemId": "dish-2409232044239",
+          "name": {
+            "zh": "68.牛小排冬蔭功湯",
+            "en": "68.牛小排Tom Yum Goong 湯",
+            "ko": "68.牛小排똠얌꿍湯",
+            "ja": "68.牛小排トムヤムクン湯",
+            "th": "68.牛小排ต้มยำกุ้ง湯"
+          },
+          "price": 620,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781352843741-1",
+          "menuItemId": "dish-2409232043478",
+          "name": {
+            "zh": "76.泰式牛小排.米線",
+            "en": "76.Thai Style 牛小排.米線",
+            "ko": "76.태국식牛小排.米線",
+            "ja": "76.タイ風牛小排.米線",
+            "th": "76.สไตล์ไทย牛小排.米線"
+          },
+          "price": 620,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781352843741-2",
+          "menuItemId": "dish-2409232042549",
+          "name": {
+            "zh": "75.泰式牛小排.河粉",
+            "en": "75.Thai Style 牛小排.河粉",
+            "ko": "75.태국식牛小排.河粉",
+            "ja": "75.タイ風牛小排.河粉",
+            "th": "75.สไตล์ไทย牛小排.河粉"
+          },
+          "price": 620,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781355667004-pvsm",
+          "menuItemId": "dish-2601221737270",
+          "name": {
+            "zh": "4支-金芬黛葡萄酒14.5%",
+            "en": "4支-金芬黛葡萄酒14.5%",
+            "ko": "4支-金芬黛葡萄酒14.5%",
+            "ja": "4支-金芬黛葡萄酒14.5%",
+            "th": "4支-金芬黛葡萄酒14.5%"
+          },
+          "price": 2400,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "櫃檯收銀加點"
+          }
+        }
+      ],
+      "subtotal": 4260,
+      "serviceCharge": 50,
+      "total": 3671,
+      "status": "completed",
+      "createdAt": "2026-06-13T12:14:03.741Z",
+      "customerName": "顧客",
+      "customerAvatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "cash",
+      "isMember": false,
+      "isPaid": true,
+      "discount": 639
+    },
+    {
+      "id": "SB-1019",
+      "tableNumber": "3",
+      "items": [
+        {
+          "id": "oi-1781357008011-0",
+          "menuItemId": "dish-2509271759269",
+          "name": {
+            "zh": "0.大魷MAMA麵",
+            "en": "0.大魷MAMANoodles",
+            "ko": "0.大魷MAMA국수",
+            "ja": "0.大魷MAMA麺",
+            "th": "0.大魷MAMAบะหมี่"
+          },
+          "price": 390,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781357008011-1",
+          "menuItemId": "dish-2505041753253",
+          "name": {
+            "zh": "67.海陸牛冬蔭功湯",
+            "en": "67.海陸牛Tom Yum Goong 湯",
+            "ko": "67.海陸牛똠얌꿍湯",
+            "ja": "67.海陸牛トムヤムクン湯",
+            "th": "67.海陸牛ต้มยำกุ้ง湯"
+          },
+          "price": 390,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "",
+            "selectedAddOns": []
+          }
+        },
+        {
+          "id": "oi-1781357047494-g28a",
+          "menuItemId": "dish-2606012021064",
+          "name": {
+            "zh": "麒麟啤酒",
+            "en": "Kirin Beer",
+            "ko": "기린 맥주",
+            "ja": "キリンビール",
+            "th": "เบียร์คิริน"
+          },
+          "price": 150,
+          "qty": 1,
+          "customization": {
+            "sweetness": 2,
+            "spiciness": 1,
+            "notes": "櫃檯收銀加點"
+          }
+        }
+      ],
+      "subtotal": 930,
+      "serviceCharge": 93,
+      "total": 1023,
+      "status": "completed",
+      "createdAt": "2026-06-13T13:23:28.011Z",
+      "customerName": "顧客",
+      "customerAvatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150",
+      "paymentMethod": "linepay",
+      "isMember": false,
+      "isPaid": true,
+      "guestCount": 5,
+      "discount": 0
     }
   ],
   "inventoryLogs": [
@@ -4441,6 +4611,20 @@
       "timestamp": "上午3:03:35",
       "content": "========================================\n       沙貝燒烤 (顧客點餐菜單明細單)\n       桌號: 10 桌\n========================================\n單號: SB-1017\n出單位址: 10.0.0.124 (TCP/3000)\n付費方式: CASH (Google會員: 否)\n時間: 上午2:59:38\n----------------------------------------\n餐點明細:\n  0.大魷MAMA麵 x1  $390\n  D餐贈可哥冰奶 x1  $0\n----------------------------------------\n小計: $390\n服務費(10%): $0\n親享總計: $390\n========================================\n*感謝您的光臨，請至櫃檯完成買單。",
       "orderId": "SB-1017",
+      "type": "customer"
+    },
+    {
+      "id": "pr-1781357037260-k",
+      "timestamp": "1:23:57 PM",
+      "content": "========================================\n       沙貝燒烤 (廚房工作單)\n       桌號: 外帶 #1 桌\n========================================\n單號: SB-1018\n出單位址: 10.0.0.124 (TCP/3000)\n時間: 12:14:03 PM\n----------------------------------------\n餐點菜單項目:\n[ ] 68.牛小排冬蔭功湯 x 1份\n    【 小辣/正常糖 】\n[ ] 76.泰式牛小排.米線 x 1份\n    【 小辣/正常糖 】\n[ ] 75.泰式牛小排.河粉 x 1份\n    【 小辣/正常糖 】\n[ ] 4支-金芬黛葡萄酒14.5% x 1份\n    【 小辣/正常糖/備註: 櫃檯收銀加點 】\n----------------------------------------\n*請依序出餐後更新平板進度\n========================================",
+      "orderId": "SB-1018",
+      "type": "kitchen"
+    },
+    {
+      "id": "pr-1781357037260-c",
+      "timestamp": "1:23:57 PM",
+      "content": "========================================\n       沙貝燒烤 (顧客點餐菜單明細單)\n       桌號: 外帶 #1 桌\n========================================\n單號: SB-1018\n出單位址: 10.0.0.124 (TCP/3000)\n付費方式: CASH (Google會員: 否)\n時間: 12:14:03 PM\n----------------------------------------\n餐點明細:\n  68.牛小排冬蔭功湯 x1  $620\n  76.泰式牛小排.米線 x1  $620\n  75.泰式牛小排.河粉 x1  $620\n  4支-金芬黛葡萄酒14.5% x1  $2400\n----------------------------------------\n小計: $4260\n服務費(10%): $50\n親享總計: $3671\n========================================\n*感謝您的光臨，請至櫃檯完成買單。",
+      "orderId": "SB-1018",
       "type": "customer"
     }
   ],

@@ -62,6 +62,7 @@ export interface Order {
   isMember: boolean;
   isPaid?: boolean;
   guestCount?: number;
+  refundLogs?: any[];
 }
 
 export interface Ingredient {

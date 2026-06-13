@@ -345,12 +345,12 @@ export default function App() {
   };
 
   // 2.4 Update Order Items list (add / remove qty inside order items)
-  const handleUpdateOrderItems = async (orderId: string, items: any[]) => {
+  const handleUpdateOrderItems = async (orderId: string, items: any[], refundLogs?: any[]) => {
     try {
       const res = await fetch(`/api/orders/${orderId}/items`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, refundLogs }),
       });
       if (res.ok) {
         await fetchData();
@@ -817,6 +817,22 @@ export default function App() {
                     </button>
 
                     <button
+                      id="tab-btn-cashier-nav-right"
+                      onClick={() => {
+                        setActiveTab('cashier');
+                        setAdminSubTab('cashier');
+                      }}
+                      className={`flex items-center space-x-1 px-3.5 py-2 font-black text-xs rounded-xl cursor-pointer transition ml-1 shrink-0 ${
+                        activeTab === 'cashier'
+                          ? 'bg-[#E5B453] text-[#0F0F0F] shadow-md shadow-[#E5B453]/15'
+                          : 'text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/25 animate-pulse'
+                      }`}
+                    >
+                      <Coins size={13} />
+                      <span>現正收銀結帳 Terminal</span>
+                    </button>
+
+                    <button
                       id="tab-btn-logout-staff"
                       onClick={() => {
                         setIsStaff(false);
@@ -944,11 +960,25 @@ export default function App() {
               setAdminSubTab('stats');
             }}
             className={`flex-1 py-1.5 text-center text-[10px] font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
-              activeTab === 'admin' ? 'text-[#E5B453]' : 'text-white/40'
+              activeTab === 'admin' && adminSubTab !== 'eod' ? 'text-[#E5B453]' : 'text-white/40'
             }`}
           >
             <BarChart3 size={15} />
             <span>數據庫存</span>
+          </button>
+
+          <button
+            id="m-tab-btn-eod"
+            onClick={() => {
+              setActiveTab('admin');
+              setAdminSubTab('eod');
+            }}
+            className={`flex-1 py-1.5 text-center text-[10px] font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
+              activeTab === 'admin' && adminSubTab === 'eod' ? 'text-[#E5B453]' : 'text-white/40'
+            }`}
+          >
+            <span className="text-sm select-none leading-none h-[15px] flex items-center">🏁</span>
+            <span>每日結帳</span>
           </button>
 
           <button

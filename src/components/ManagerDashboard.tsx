@@ -286,6 +286,182 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     }
   }, [selectedOrder]);
 
+  // Paid Order Modifications (Return & Refund workflow)
+  const [paidModDetails, setPaidModDetails] = useState<{ item?: any; menuItemId?: string; delta: number; isAddingNew: boolean } | null>(null);
+  const [modReason, setModReason] = useState('input_error');
+  const [modNotes, setModNotes] = useState('');
+  const [modPin, setModPin] = useState('');
+
+  const handleSavePaidModification = async () => {
+    if (!selectedOrder || !onUpdateOrderItems || !paidModDetails) return;
+
+    // Validate PIN with backend
+    try {
+      const pinRes = await fetch('/api/staff/pin/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: modPin.trim() })
+      });
+      if (!pinRes.ok) {
+        const errData = await pinRes.json().catch(() => ({}));
+        alert(`❌ 簽核失敗：${errData.error || '員工授權 PIN 碼不正確！請重新輸入。'}`);
+        return;
+      }
+    } catch (e) {
+      alert('❌ 網路連線或伺服器驗證失敗，請稍後再試。');
+      return;
+    }
+
+    let updatedItems = [...selectedOrder.items];
+    let originalPrice = selectedOrder.total;
+    let qtyChange = paidModDetails.delta;
+    let itemName = '';
+    let unitPrice = 0;
+
+    if (paidModDetails.isAddingNew) {
+      // Step 1: Manual item adding
+      const dish = menuItems.find((m: any) => m.id === paidModDetails.menuItemId);
+      if (!dish) {
+        alert('❌ 找不到該餐點資料！');
+        return;
+      }
+      itemName = dish.name.zh || dish.name;
+      unitPrice = dish.price;
+
+      const existing = updatedItems.find((it: any) => it.menuItemId === dish.id);
+      if (existing) {
+        updatedItems = updatedItems.map((it: any) => {
+          if (it.menuItemId === dish.id) {
+            return { ...it, qty: it.qty + 1 };
+          }
+          return it;
+        });
+      } else {
+        const newItem = {
+          id: `oi-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          menuItemId: dish.id,
+          name: typeof dish.name === 'object' ? dish.name : { zh: dish.name, en: dish.name }, // keep consistent
+          price: dish.price,
+          qty: 1,
+          customization: {
+            sweetness: 2,
+            spiciness: 1,
+            notes: '已結帳後台手動補加 / Post-payment added',
+          }
+        };
+        updatedItems = [...updatedItems, newItem];
+      }
+    } else {
+      // Step 2: Modifying existing quantity
+      const targetItem = updatedItems.find((it: any) => it.id === paidModDetails.item.id);
+      if (!targetItem) {
+        alert('❌ 點單中查無此餐點！');
+        return;
+      }
+      itemName = targetItem.name?.zh || targetItem.name;
+      unitPrice = targetItem.price;
+
+      updatedItems = updatedItems.map((it: any) => {
+        if (it.id === paidModDetails.item.id) {
+          return { ...it, qty: it.qty + qtyChange };
+        }
+        return it;
+      }).filter((it: any) => it.qty > 0);
+    }
+
+    // Recompute total & diff
+    let subtotal = 0;
+    updatedItems.forEach((it: any) => {
+      subtotal += it.price * it.qty;
+    });
+    const serviceCharge = (selectedOrder.paymentMethod === 'credit' || selectedOrder.paymentMethod === 'linepay') ? Math.round(subtotal * 0.1) : 0;
+    const total = subtotal + serviceCharge;
+    const totalDiff = total - originalPrice;
+
+    // Create unique log item
+    const REASONS_MAP: Record<string, string> = {
+      kitchen_prep_error: '🍳 廚房製餐瑕疵 / 食安事件',
+      wrong_delivery: '🚶‍♂️ 員工送錯桌席 / 漏做重出',
+      customer_cancel: '⏳ 餐期延誤 / 顧客臨時取消',
+      input_error: '收銀點錯帳目更正 / 系統修正',
+      sold_out: '🚫 食材告罄 / 沽清被迫退餐',
+      vip_promo: '🎁 VIP 招待 / 自主促銷補償',
+      customer_addon: '➕ 客人追加現場點餐',
+    };
+
+    const newLog = {
+      id: `ref-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      timestamp: new Date().toISOString(),
+      type: totalDiff < 0 ? 'refund' : 'addon',
+      itemName: itemName,
+      pricePerUnit: unitPrice,
+      qtyChange: qtyChange,
+      totalDiff: totalDiff,
+      reason: REASONS_MAP[modReason] || modReason,
+      notes: modNotes.trim() || '無特別備註',
+      authorizedByPin: `Staff PIN: ****${modPin.slice(-2)}`,
+    };
+
+    // If payment method is member, sync membership database
+    if (selectedOrder.paymentMethod === 'member') {
+      const dbStr = localStorage.getItem('google-members-database');
+      if (dbStr) {
+        try {
+          const db = JSON.parse(dbStr);
+          let vipEmail = 'topztar@gmail.com';
+          if (selectedOrder.customerName) {
+            const matched = db.find((m: any) => m.name === selectedOrder.customerName);
+            if (matched) vipEmail = matched.email;
+          }
+          const userIndex = db.findIndex((m: any) => m.email === vipEmail);
+          if (userIndex !== -1) {
+            const currentBal = db[userIndex].balance || 0;
+            const finalBal = currentBal - totalDiff; // Negative totalDiff means refund, which increases balance (+ absolute totalDiff)
+            
+            if (finalBal < 0) {
+              alert(`⚠️ 警告：此會員儲值卡餘額不足（剩餘: NT$ ${currentBal}）！自動扣減使餘額透支，請現場向顧客索取差額 ${Math.abs(finalBal)} 元！`);
+            }
+            db[userIndex].balance = Math.max(0, finalBal);
+            localStorage.setItem('google-members-database', JSON.stringify(db));
+            alert(`💳 因應本次退貨/加點核銷：會員額度已自動變更，原額: NT$ ${currentBal} ➔ 現額: NT$ ${db[userIndex].balance}`);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    } else if (selectedOrder.paymentMethod === 'cash') {
+      if (totalDiff < 0) {
+        alert(`💵 現金退款核銷通知：本更動完成後，請現場從收銀機退還顧客現金 NT$ ${Math.abs(totalDiff)} 元！`);
+      } else if (totalDiff > 0) {
+        alert(`💵 現金補款稽核通知：本更動完成後，請向顧客加收額外現金 NT$ ${totalDiff} 元，並確認投入收銀機中！`);
+      }
+    } else {
+      // Credit/LINEPay
+      alert(`💳 電子款項金流調帳通知：此單採線上電子支付。差額 NT$ ${totalDiff} 元，已對應記為店家記帳退補核對項。`);
+    }
+
+    // Save and sync with backend
+    const logs = selectedOrder.refundLogs ? [...selectedOrder.refundLogs, newLog] : [newLog];
+    await onUpdateOrderItems(selectedOrder.id, updatedItems, logs);
+
+    // Update selectedOrder modal state to sync UI
+    setSelectedOrder({
+      ...selectedOrder,
+      items: updatedItems,
+      subtotal,
+      serviceCharge,
+      total,
+      refundLogs: logs
+    });
+
+    // Reset state & close modal
+    setPaidModDetails(null);
+    setModReason('input_error');
+    setModNotes('');
+    setModPin('');
+    alert('✅ 已結帳點單帳目異動稽查記錄，已與 Cloud Firestore 資料庫安全核算並同步更新！');
+  };
+
   // Cashier Subsystem States
   const [selectedCashierOrderId, setSelectedCashierOrderId] = useState<string | null>(null);
   const [cashierDiscountRate, setCashierDiscountRate] = useState<number>(0); // percentage, e.g. 10 for 10% off
@@ -676,6 +852,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       setSelectedOrder({
         ...selectedOrder,
         isPaid: true,
+        status: (selectedOrder.status === 'pending' || selectedOrder.status === 'preparing') ? 'completed' : selectedOrder.status
       });
 
       alert(`✅ 結帳成功！
@@ -1363,7 +1540,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   return (
     <div className="space-y-6 text-white" id="manager-dashboard-container">
       {/* 1. Dynamic Tab Switcher */}
-      {defaultSubTab !== 'cashier' && activeSubTab !== 'eod' && (
+      {activeSubTab !== 'eod' && activeSubTab !== 'cashier' && (
         <div className="flex flex-wrap gap-2 border-b border-white/10 pb-4" id="admin-subtabs-nav">
           {[
             { id: 'stats', label: '📊 營運數據分析', desc: '全店每日銷售分析、客流量時段與菜品排行' },
@@ -3739,50 +3916,115 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </button>
             </div>
 
-            {/* Grid of menu items catalog */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {menuItems.map((item) => {
-                const foundCategoryObj = categories.find(c => c.id === item.category);
-                return (
-                  <div key={item.id} className="bg-black/30 border border-white/10 rounded-xl overflow-hidden flex flex-col hover:border-amber-400/35 transition">
-                    <img src={item.image} alt="dish" className="w-full h-32 object-cover bg-neutral-900" referrerPolicy="no-referrer" />
-                    <div className="p-4 space-y-2 text-xs flex-1 flex flex-col justify-between">
-                      <div className="space-y-1">
-                        <span className="text-[9px] font-bold text-amber-500 uppercase">{foundCategoryObj?.name.zh || item.category}</span>
-                        <h5 className="font-bold text-white text-[13px]">{item.name.zh}</h5>
-                        <p className="text-[10px] text-zinc-500 font-mono">ID碼: {item.id} | 定價 NT$ {item.price}</p>
-                        <p className="text-white/45 text-[10px] line-clamp-2 leading-tight">{item.description.zh}</p>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-3 border-t border-white/5 mt-2">
-                        <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                          item.available
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        }`}>
-                          {item.available ? '● 可預訂可售' : '✕ 已售罄沽清'}
-                        </span>
-                        <div className="flex space-x-1">
-                          <button
-                            type="button"
-                            onClick={() => onToggleMenuItemAvailability(item.id)}
-                            className="bg-black/45 hover:bg-white/5 border border-white/10 px-2 py-1 rounded text-[10px] font-bold transition cursor-pointer"
-                          >
-                            沽清
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => triggerEditMenuItemMode(item)}
-                            className="bg-[#E5B453]/15 hover:bg-[#E5B453]/25 text-[#E5B453] border border-[#E5B453]/35 px-2 py-1 rounded text-[10px] font-bold transition cursor-pointer"
-                          >
-                            編輯
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            {/* Excel-style table of menu items catalog */}
+            <div className="overflow-x-auto border border-white/10 rounded-xl bg-black/10">
+              <table className="w-full min-w-[800px] border-collapse text-xs text-left font-sans">
+                <thead>
+                  <tr className="bg-zinc-800/80 border-b border-white/10 text-[11px] font-bold text-amber-400">
+                    <th scope="col" className="p-3 border-r border-white/10 text-center w-10">#</th>
+                    <th scope="col" className="p-3 border-r border-white/10">ID碼 (ID Code)</th>
+                    <th scope="col" className="p-3 border-r border-white/10">菜品分類 (Category)</th>
+                    <th scope="col" className="p-3 border-r border-white/10">品名 (Dish Name)</th>
+                    <th scope="col" className="p-3 border-r border-white/10 text-right">定價 (Price)</th>
+                    <th scope="col" className="p-3 border-r border-white/10 text-center">可售狀態 (Stock Status)</th>
+                    <th scope="col" className="p-3 border-r border-white/10">附加規格 (Options)</th>
+                    <th scope="col" className="p-3 text-center">後端控制 (Operations)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {menuItems.map((item, index) => {
+                    const foundCategoryObj = categories.find(c => c.id === item.category);
+                    return (
+                      <tr 
+                        key={item.id} 
+                        className={`hover:bg-[#E5B453]/5 transition-colors ${
+                          index % 2 === 0 ? 'bg-zinc-900/20' : 'bg-black/30'
+                        }`}
+                      >
+                        {/* # Row Index */}
+                        <td className="p-2.5 border-r border-white/10 text-center text-zinc-500 font-mono text-[10px]">{index + 1}</td>
+                        
+                        {/* ID碼 */}
+                        <td className="p-2.5 border-r border-white/10 font-mono text-zinc-400 font-medium select-all">{item.id}</td>
+                        
+                        {/* 菜品分類 */}
+                        <td className="p-2.5 border-r border-white/10">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            {foundCategoryObj?.name.zh || item.category}
+                          </span>
+                        </td>
+                        
+                        {/* 品名 */}
+                        <td className="p-2.5 border-r border-white/10 font-sans">
+                          <div className="space-y-0.5">
+                            <p className="font-bold text-white text-[13px]">{item.name.zh}</p>
+                            {item.name.en && <p className="text-[10px] text-zinc-500">{item.name.en}</p>}
+                          </div>
+                        </td>
+                        
+                        {/* 定價 */}
+                        <td className="p-2.5 border-r border-white/10 text-right font-mono font-bold text-white">
+                          NT$ {item.price}
+                        </td>
+                        
+                        {/* 可售狀態 */}
+                        <td className="p-2.5 border-r border-white/10 text-center">
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            item.available
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          }`}>
+                            {item.available ? '● 販售中 Supply' : '✕ 沽清 Sold Out'}
+                          </span>
+                        </td>
+                        
+                        {/* 附加規格 */}
+                        <td className="p-2.5 border-r border-white/10 text-zinc-400 text-[10px]">
+                          <div className="flex flex-wrap gap-1">
+                            {item.hasNoodlesOption && (
+                              <span className="bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded text-[9px] border border-blue-500/15">麵類自選</span>
+                            )}
+                            {item.isNotSpicy && (
+                              <span className="bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded text-[9px] border border-emerald-500/15">完全不辣</span>
+                            )}
+                            {Array.isArray(item.customAddOns) && item.customAddOns.length > 0 ? (
+                              <span className="bg-zinc-500/15 text-zinc-300 px-1.5 py-0.5 rounded text-[9px] border border-zinc-500/20">
+                                加價項目x{item.customAddOns.length}
+                              </span>
+                            ) : (
+                              <span className="text-zinc-600 italic">無加選</span>
+                            )}
+                          </div>
+                        </td>
+                        
+                        {/* 後端控制 */}
+                        <td className="p-2.5 text-center">
+                          <div className="flex items-center justify-center space-x-1.5">
+                            <button
+                              type="button"
+                              onClick={() => onToggleMenuItemAvailability(item.id)}
+                              className={`px-2 py-1 rounded text-[10px] font-bold border transition cursor-pointer select-none active:scale-95 ${
+                                item.available 
+                                  ? 'bg-[#E5B453]/10 text-amber-300 border-amber-500/30 hover:bg-[#E5B453]/20'
+                                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                              }`}
+                            >
+                              {item.available ? '設為沽清' : '恢復販售'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => triggerEditMenuItemMode(item)}
+                              className="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 px-2 py-1 rounded text-[10px] font-bold transition cursor-pointer select-none active:scale-95 flex items-center space-x-1"
+                            >
+                              <span>編輯品項 ✏️</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -5603,115 +5845,116 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
                 </div>
               </div>
 
-              {/* Right Column: Ordered dishes list */}
-              <div className="md:col-span-7 space-y-4 font-sans">
-                <div className="bg-black/30 border border-white/5 rounded-xl p-5 space-y-4">
-                  <div className="border-b border-white/5 pb-2">
-                    <span className="text-[10px] font-black tracking-widest text-[#E5B453] uppercase block">餐點規格與特配耗用</span>
-                    <h4 className="text-white text-xs mt-0.5">本單餐點品項與客製需求：</h4>
-                  </div>
-                  
-                  <div className="divide-y divide-white/5 space-y-3">
-                    {selectedOrder.items.map((it: any) => {
-                      const spec = [
-                        it.customization?.spiciness === 0 ? '不辣' : (it.customization?.spiciness === 1 ? '小辣' : (it.customization?.spiciness === 2 ? '中辣' : '泰辣')),
-                        it.customization?.sweetness === 0 ? '無糖' : (it.customization?.sweetness === 1 ? '微糖' : (it.customization?.sweetness === 2 ? '正常甜' : '多糖')),
-                        it.customization?.noodleType === 'rice-noodle' ? '河粉' : (it.customization?.noodleType === 'vermicelli' ? '米線' : ''),
-                        it.customization?.soupBase === 'coconut-milk' ? '升級奶香冬蔭' : '',
-                        it.customization?.notes ? `客備：${it.customization?.notes}` : ''
-                      ].filter(Boolean).join(' / ');
+              {/* Right Column: Ordered dishes list and checkout status */}
+              {!selectedOrder.isPaid ? (
+                /* ----------------- UNPAID ORDER PANEL ----------------- */
+                <div className="md:col-span-7 space-y-4 font-sans">
+                  <div className="bg-black/30 border border-white/5 rounded-xl p-5 space-y-4">
+                    <div className="border-b border-white/5 pb-2">
+                      <span className="text-[10px] font-black tracking-widest text-[#E5B453] uppercase block">餐點規格與特配耗用</span>
+                      <h4 className="text-white text-xs mt-0.5">本單餐點品項與客製需求：</h4>
+                    </div>
+                    
+                    <div className="divide-y divide-white/5 space-y-3">
+                      {selectedOrder.items.map((it: any) => {
+                        const spec = [
+                          it.customization?.spiciness === 0 ? '不辣' : (it.customization?.spiciness === 1 ? '小辣' : (it.customization?.spiciness === 2 ? '中辣' : '泰辣')),
+                          it.customization?.sweetness === 0 ? '無糖' : (it.customization?.sweetness === 1 ? '微糖' : (it.customization?.sweetness === 2 ? '正常甜' : '多糖')),
+                          it.customization?.noodleType === 'rice-noodle' ? '河粉' : (it.customization?.noodleType === 'vermicelli' ? '米線' : ''),
+                          it.customization?.soupBase === 'coconut-milk' ? '升級奶香冬蔭' : '',
+                          it.customization?.notes ? `客備：${it.customization?.notes}` : ''
+                        ].filter(Boolean).join(' / ');
 
-                      return (
-                        <div key={it.id} className="pt-3 first:pt-0 flex justify-between items-center text-xs font-sans">
-                          <div className="space-y-1 pr-4">
-                            <p className="font-bold text-white text-[13px]">{it.name.zh}</p>
-                            {spec && <p className="text-[10px] text-amber-400 font-sans">{spec}</p>}
-                            <p className="text-[10px] text-zinc-500 font-mono">定額單價: NT$ {it.price}</p>
-                          </div>
-                          
-                          <div className="flex items-center space-x-3">
-                            {/* Quantity Editor Buttons */}
-                            <div className="flex items-center border border-white/10 rounded-lg bg-black/40 overflow-hidden">
-                              <button
-                                type="button"
-                                onClick={() => handleLocalQtyChange(it.id, -1)}
-                                className="p-1 px-2 hover:bg-white/5 text-zinc-400 hover:text-white transition cursor-pointer"
-                                title="減少數量"
-                              >
-                                <Minus size={10} />
-                              </button>
-                              <span className="px-2 font-mono text-xs font-bold text-white select-none">{it.qty}</span>
-                              <button
-                                type="button"
-                                onClick={() => handleLocalQtyChange(it.id, 1)}
-                                className="p-1 px-2 hover:bg-white/5 text-zinc-400 hover:text-white transition cursor-pointer"
-                                title="增加數量"
-                              >
-                                <Plus size={10} />
-                              </button>
+                        return (
+                          <div key={it.id} className="pt-3 first:pt-0 flex justify-between items-center text-xs font-sans">
+                            <div className="space-y-1 pr-4">
+                              <p className="font-bold text-white text-[13px]">{it.name?.zh || it.name}</p>
+                              {spec && <p className="text-[10px] text-amber-400 font-sans">{spec}</p>}
+                              <p className="text-[10px] text-zinc-500 font-mono">定額單價: NT$ {it.price}</p>
                             </div>
+                            
+                            <div className="flex items-center space-x-3">
+                              {/* Quantity Editor Buttons */}
+                              <div className="flex items-center border border-white/10 rounded-lg bg-black/40 overflow-hidden">
+                                <button
+                                  type="button"
+                                  onClick={() => handleLocalQtyChange(it.id, -1)}
+                                  className="p-1 px-2 hover:bg-white/5 text-zinc-400 hover:text-white transition cursor-pointer"
+                                  title="減少數量"
+                                >
+                                  <Minus size={10} />
+                                </button>
+                                <span className="px-2 font-mono text-xs font-bold text-white select-none">{it.qty}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleLocalQtyChange(it.id, 1)}
+                                  className="p-1 px-2 hover:bg-white/5 text-zinc-400 hover:text-white transition cursor-pointer"
+                                  title="增加數量"
+                                >
+                                  <Plus size={10} />
+                                </button>
+                              </div>
 
-                            <div className="text-right whitespace-nowrap min-w-[70px]">
-                              <p className="font-mono text-white font-bold text-[13px]">NT$ {(it.price * it.qty).toLocaleString()}</p>
+                              <div className="text-right whitespace-nowrap min-w-[70px]">
+                                <p className="font-mono text-white font-bold text-[13px]">NT$ {(it.price * it.qty).toLocaleString()}</p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
 
-                  {/* Add dish tool inline */}
-                  <div className="pt-3 border-t border-white/5 space-y-2">
-                    <span className="text-[10px] text-white/40 font-bold block mb-1">➕ 後台手動新增餐點到此單：</span>
-                    <div className="flex gap-2">
-                      <select id="modal-append-item-select" className="bg-[#1e1e1e] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white flex-1 cursor-pointer outline-none">
-                        {menuItems.map((item: any) => (
-                          <option key={item.id} value={item.id}>
-                            {item.name.zh} (NT$ {item.price})
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const selectEl = document.getElementById('modal-append-item-select') as HTMLSelectElement;
-                          if (selectEl && selectEl.value) {
-                            handleAddLocalItem(selectEl.value);
-                          }
-                        }}
-                        className="bg-[#E5B453] hover:bg-[#ebd594] text-black px-4 py-1.5 font-bold rounded-lg text-xs transition cursor-pointer active:scale-95"
-                      >
-                        確認加點
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Summary math calculation */}
-                  <div className="border-t border-white/10 pt-4 space-y-2.5 text-xs font-sans">
-                    <div className="flex justify-between text-zinc-400">
-                      <span>餐點客用金額小計 Subtotal</span>
-                      <span className="font-mono text-white">NT$ {selectedOrder.subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-zinc-400">
-                      <span>刷卡等計10%客用服務費 Charge</span>
-                      <span className="font-mono text-white">NT$ {selectedOrder.serviceCharge.toLocaleString()}</span>
-                    </div>
-                    {selectedOrder.isMember && (
-                      <div className="flex justify-between text-emerald-400">
-                        <span>⭐ Google Quick 會員累點優惠</span>
-                        <span>0 元免點累存中</span>
+                    {/* Add dish tool inline */}
+                    <div className="pt-3 border-t border-white/5 space-y-2">
+                      <span className="text-[10px] text-white/40 font-bold block mb-1">➕ 後台手動新增餐點到此單：</span>
+                      <div className="flex gap-2">
+                        <select id="modal-append-item-select" className="bg-[#1e1e1e] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white flex-1 cursor-pointer outline-none">
+                          {menuItems.map((item: any) => (
+                            <option key={item.id} value={item.id}>
+                              {item.name.zh || item.name} (NT$ {item.price})
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const selectEl = document.getElementById('modal-append-item-select') as HTMLSelectElement;
+                            if (selectEl && selectEl.value) {
+                              handleAddLocalItem(selectEl.value);
+                            }
+                          }}
+                          className="bg-[#E5B453] hover:bg-[#ebd594] text-black px-4 py-1.5 font-bold rounded-lg text-xs transition cursor-pointer active:scale-95"
+                        >
+                          確認加點
+                        </button>
                       </div>
-                    )}
-                    <div className="flex justify-between border-t border-white/5 pt-3.5 text-sm font-extrabold text-white">
-                      <span className="text-[#E5B453]">親享解算總金額 Total</span>
-                      <span className="font-mono text-xl text-[#E5B453]">NT$ {selectedOrder.total.toLocaleString()}</span>
+                    </div>
+
+                    {/* Summary math calculation */}
+                    <div className="border-t border-white/10 pt-4 space-y-2.5 text-xs font-sans">
+                      <div className="flex justify-between text-zinc-400">
+                        <span>餐點客用金額小計 Subtotal</span>
+                        <span className="font-mono text-white">NT$ {selectedOrder.subtotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-zinc-400">
+                        <span>刷卡等計10%客用服務費 Charge</span>
+                        <span className="font-mono text-white">NT$ {selectedOrder.serviceCharge.toLocaleString()}</span>
+                      </div>
+                      {selectedOrder.isMember && (
+                        <div className="flex justify-between text-emerald-400">
+                          <span>⭐ Google Quick 會員累點優惠</span>
+                          <span>0 元免點累存中</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between border-t border-white/5 pt-3.5 text-sm font-extrabold text-white">
+                        <span className="text-[#E5B453]">親享解算總金額 Total</span>
+                        <span className="font-mono text-xl text-[#E5B453]">NT$ {selectedOrder.total.toLocaleString()}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Checkout screen block */}
-                <div className="mt-4 pt-1 font-sans">
-                  {!selectedOrder.isPaid ? (
+                  {/* Checkout screen block */}
+                  <div className="mt-4 pt-1 font-sans">
                     <div className="bg-gradient-to-br from-[#1a1a1a] via-[#121212] to-[#0a0a0a] border border-[#E5B453]/20 rounded-xl p-4.5 space-y-3.5">
                       <div className="flex items-center space-x-2 border-b border-white/5 pb-2">
                         <Coins className="text-[#E5B453]" size={16} />
@@ -5878,96 +6121,196 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center space-y-1">
-                      <p className="text-emerald-400 font-extrabold text-xs">💸 此訂單已完成結帳</p>
-                      <p className="text-[9.5px] text-zinc-500 font-sans">
-                        本筆資金已被安全收付，且對應流水交易紀錄已在 Firebase 成功建檔，無法變更。
-                      </p>
+                  </div>
+
+                  {/* Print simulator option */}
+                  <div className="bg-black/30 border border-white/5 rounded-xl p-4 space-y-3 text-xs">
+                    <span className="text-[10px] font-black tracking-widest text-[#E5B453] uppercase block">店鋪出餐熱感存票模擬</span>
+                    <p className="text-[10px] text-white/40">可將顧客結賬明細或廚房交代工作票重寄發送列印隊列備用明細單：</p>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => alert(`🖨️ 模擬重行印列【防爆/防油熱感廚房交代票】成功！`)}
+                        className="flex-1 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-[10.5px] border border-white/10 font-bold active:scale-95 transition cursor-pointer"
+                      >
+                        🧾 再印工作廚房票
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => alert(`🖨️ 模擬重行印列【顧客結賬發票與消點收據】成功！`)}
+                        className="flex-1 py-1.5 bg-[#E5B453]/15 hover:bg-[#E5B453]/25 text-[#E5B453] rounded-lg text-[10.5px] border border-[#E5B453]/25 font-bold active:scale-95 transition cursor-pointer"
+                      >
+                        💵 再印顧客結算收據
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                {/* Print simulator option */}
-                <div className="bg-black/30 border border-white/5 rounded-xl p-4 space-y-3 text-xs">
-                  <span className="text-[10px] font-black tracking-widest text-[#E5B453] uppercase block">店鋪出餐熱感存票模擬</span>
-                  <p className="text-[10px] text-white/40">可將顧客結賬明細或廚房交代工作票重寄發送列印隊列備用明細單：</p>
-                  <div className="flex space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => alert(`🖨️ 模擬重行印列【防爆/防油熱感廚房交代票】成功！`)}
-                      className="flex-1 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-[10.5px] border border-white/10 font-bold active:scale-95 transition cursor-pointer"
-                    >
-                      🧾 再印工作廚房票
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => alert(`🖨️ 模擬重行印列【顧客結賬發票與消點收據】成功！`)}
-                      className="flex-1 py-1.5 bg-[#E5B453]/15 hover:bg-[#E5B453]/25 text-[#E5B453] rounded-lg text-[10.5px] border border-[#E5B453]/25 font-bold active:scale-95 transition cursor-pointer"
-                    >
-                      💵 再印顧客結算收據
-                    </button>
                   </div>
                 </div>
-              </div>
+              ) : (
+                /* ----------------- PAID ORDER PANEL ----------------- */
+                <div className="md:col-span-7 space-y-4 font-sans">
+                  <div className="bg-black/30 border border-white/5 rounded-xl p-5 space-y-4">
+                    <div className="border-b border-white/5 pb-2">
+                      <span className="text-[10px] font-black tracking-widest text-[#E5B453] uppercase block">餐點規格與特配耗用 (已結帳)</span>
+                      <h4 className="text-white text-xs mt-0.5">本單餐點品項與客製需求（變更項目需配合退貨稽核簽核）：</h4>
+                    </div>
+                    
+                    <div className="divide-y divide-white/5 space-y-3">
+                      {selectedOrder.items.map((it: any) => {
+                        const spec = [
+                          it.customization?.spiciness === 0 ? '不辣' : (it.customization?.spiciness === 1 ? '小辣' : (it.customization?.spiciness === 2 ? '中辣' : '泰辣')),
+                          it.customization?.sweetness === 0 ? '無糖' : (it.customization?.sweetness === 1 ? '微糖' : (it.customization?.sweetness === 2 ? '正常甜' : '多糖')),
+                          it.customization?.noodleType === 'rice-noodle' ? '河粉' : (it.customization?.noodleType === 'vermicelli' ? '米線' : ''),
+                          it.customization?.soupBase === 'coconut-milk' ? '升級奶香冬蔭' : '',
+                          it.customization?.notes ? `客備：${it.customization?.notes}` : ''
+                        ].filter(Boolean).join(' / ');
 
-              {/* Right Column: Ordered dishes list */}
-              <div className="md:col-span-7 space-y-4 font-sans">
-                <div className="bg-black/30 border border-white/5 rounded-xl p-5 space-y-4">
-                  <div className="border-b border-white/5 pb-2">
-                    <span className="text-[10px] font-black tracking-widest text-[#E5B453] uppercase block">餐點規格與特配耗用</span>
-                    <h4 className="text-white text-xs mt-0.5">本單餐點品項與客製需求：</h4>
-                  </div>
-                  
-                  <div className="divide-y divide-white/5 space-y-3">
-                    {selectedOrder.items.map((it: any) => {
-                      const spec = [
-                        it.customization?.spiciness === 0 ? '不辣' : (it.customization?.spiciness === 1 ? '小辣' : (it.customization?.spiciness === 2 ? '中辣' : '泰辣')),
-                        it.customization?.sweetness === 0 ? '無糖' : (it.customization?.sweetness === 1 ? '微糖' : (it.customization?.sweetness === 2 ? '正常甜' : '多糖')),
-                        it.customization?.noodleType === 'rice-noodle' ? '河粉' : (it.customization?.noodleType === 'vermicelli' ? '米線' : ''),
-                        it.customization?.soupBase === 'coconut-milk' ? '升級奶香冬蔭' : '',
-                        it.customization?.notes ? `客備：${it.customization?.notes}` : ''
-                      ].filter(Boolean).join(' / ');
+                        return (
+                          <div key={it.id} className="pt-3 first:pt-0 flex justify-between items-center text-xs font-sans">
+                            <div className="space-y-1 pr-4">
+                              <p className="font-bold text-white text-[13px]">{it.name?.zh || it.name}</p>
+                              {spec && <p className="text-[10px] text-amber-400 font-sans">{spec}</p>}
+                              <p className="text-[10px] text-zinc-500 font-mono">定額單價: NT$ {it.price}</p>
+                            </div>
+                            
+                            <div className="flex items-center space-x-3">
+                              {/* Quantity Editor Buttons with Return Workflow */}
+                              <div className="flex items-center border border-white/10 rounded-lg bg-black/40 overflow-hidden">
+                                <button
+                                  type="button"
+                                  onClick={() => setPaidModDetails({ item: it, delta: -1, isAddingNew: false })}
+                                  className="p-1 px-2 hover:bg-white/5 text-rose-450 hover:text-rose-450 text-rose-400 transition cursor-pointer"
+                                  title="欲進行已結帳退貨，請點擊以發起核銷簽核"
+                                >
+                                  <Minus size={10} />
+                                </button>
+                                <span className="px-2 font-mono text-xs font-bold text-white select-none">{it.qty}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setPaidModDetails({ item: it, delta: 1, isAddingNew: false })}
+                                  className="p-1 px-2 hover:bg-white/5 text-emerald-450 hover:text-emerald-450 text-emerald-400 transition cursor-pointer"
+                                  title="欲進行已結帳加點，請點擊以發起補收簽核"
+                                >
+                                  <Plus size={10} />
+                                </button>
+                              </div>
 
-                      return (
-                        <div key={it.id} className="pt-3 first:pt-0 flex justify-between items-start text-xs font-sans">
-                          <div className="space-y-1 pr-4">
-                            <p className="font-bold text-white text-[13px]">{it.name.zh}</p>
-                            {spec && <p className="text-[10px] text-amber-400 font-sans">{spec}</p>}
-                            <p className="text-[10px] text-zinc-500 font-mono">定額單價: NT$ {it.price}</p>
+                              <div className="text-right whitespace-nowrap min-w-[70px]">
+                                <p className="font-mono text-white font-bold text-[13px]">NT$ {(it.price * it.qty).toLocaleString()}</p>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-right whitespace-nowrap min-w-[70px]">
-                            <span className="text-zinc-400 font-bold">x {it.qty} 份</span>
-                            <p className="font-mono text-white font-bold mt-1">NT$ {(it.price * it.qty).toLocaleString()}</p>
-                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Append item selection dropdown for paid orders */}
+                    <div className="pt-3 border-t border-white/5 space-y-2">
+                      <span className="text-[10px] text-amber-500 font-extrabold block mb-1">➕ 連動退貨或追加異動（點擊下方以追加商品）：</span>
+                      <div className="flex gap-2">
+                        <select id="paid-modal-append-item-select" className="bg-[#1c1c1c] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white flex-1 cursor-pointer outline-none">
+                          {menuItems.map((item: any) => (
+                            <option key={item.id} value={item.id}>
+                              {item.name.zh || item.name} (NT$ {item.price})
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const selectEl = document.getElementById('paid-modal-append-item-select') as HTMLSelectElement;
+                            if (selectEl && selectEl.value) {
+                              const dish = menuItems.find((m: any) => m.id === selectEl.value);
+                              if (dish) {
+                                setPaidModDetails({ menuItemId: dish.id, item: { name: dish.name, price: dish.price }, delta: 1, isAddingNew: true });
+                              }
+                            }
+                          }}
+                          className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-1.5 font-bold rounded-lg text-xs transition cursor-pointer active:scale-95 shadow-sm shadow-amber-500/10 whitespace-nowrap"
+                        >
+                          確認追加餐點
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Summary math calculation */}
+                    <div className="border-t border-white/10 pt-4 space-y-2.5 text-xs font-sans">
+                      <div className="flex justify-between text-zinc-400">
+                        <span>餐點實收金額小計 Subtotal</span>
+                        <span className="font-mono text-white">NT$ {selectedOrder.subtotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-zinc-400">
+                        <span>刷卡等計10%客用服務費 Charge</span>
+                        <span className="font-mono text-white">NT$ {selectedOrder.serviceCharge.toLocaleString()}</span>
+                      </div>
+                      {selectedOrder.isMember && (
+                        <div className="flex justify-between text-emerald-400">
+                          <span>⭐ Google Quick 會員累點優惠</span>
+                          <span>0 元免點累存中</span>
                         </div>
-                      );
-                    })}
-                  </div>
+                      )}
+                      <div className="flex justify-between border-t border-white/5 pt-3.5 text-sm font-extrabold text-white">
+                        <span className="text-[#E5B453]">已結帳核實總金額 Total</span>
+                        <span className="font-mono text-xl text-[#E5B453]">NT$ {selectedOrder.total.toLocaleString()}</span>
+                      </div>
+                    </div>
 
-                  {/* Summary math calculation */}
-                  <div className="border-t border-white/10 pt-4 space-y-2.5 text-xs font-sans">
-                    <div className="flex justify-between text-zinc-400">
-                      <span>餐點客用金額小計 Subtotal</span>
-                      <span className="font-mono text-white">NT$ {selectedOrder.subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-zinc-400">
-                      <span>刷卡等計10%客用服務費 Charge</span>
-                      <span className="font-mono text-white">NT$ {selectedOrder.serviceCharge.toLocaleString()}</span>
-                    </div>
-                    {selectedOrder.isMember && (
-                      <div className="flex justify-between text-emerald-400">
-                        <span>⭐ Google Quick 會員累點優惠</span>
-                        <span>0 元免點累存中</span>
+                    {/* Ledger Audit Rail for modifications */}
+                    {selectedOrder.refundLogs && selectedOrder.refundLogs.length > 0 && (
+                      <div className="mt-4 pt-3 border-t border-orange-500/20 bg-orange-500/5 p-3 rounded-lg space-y-2">
+                        <span className="text-[10px] text-orange-400 font-extrabold block uppercase tracking-wider">📔 已簽核已結帳退貨與追加款稽核明細 ({selectedOrder.refundLogs.length} 筆)</span>
+                        <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                          {selectedOrder.refundLogs.map((log: any) => (
+                            <div key={log.id} className="text-[10.5px] border-b border-orange-500/10 pb-2 last:border-0 last:pb-0 font-sans">
+                              <div className="flex justify-between font-bold text-white">
+                                <span>{log.type === 'refund' ? '🏮 已核准退貨核銷' : '📈 已簽核追加補款'}</span>
+                                <span className={log.totalDiff < 0 ? 'text-rose-400 font-mono' : 'text-emerald-400 font-mono'}>
+                                  {log.totalDiff < 0 ? `退核 NT$ ${Math.abs(log.totalDiff)}` : `補收 NT$ ${log.totalDiff}`}
+                                </span>
+                              </div>
+                              <p className="text-zinc-300 mt-0.5">標的物: {log.itemName} (增減量: {log.qtyChange > 0 ? `+${log.qtyChange}` : log.qtyChange})</p>
+                              <div className="flex justify-between text-zinc-400 text-[9.5px] mt-1 italic font-mono">
+                                <span>原因: {log.reason} {log.notes && `(${log.notes})`}</span>
+                                <span>經辦: {log.authorizedByPin}</span>
+                              </div>
+                              <span className="block text-zinc-500 text-[8.5px] text-right mt-0.5">{new Date(log.timestamp).toLocaleString()}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
-                    <div className="flex justify-between border-t border-white/5 pt-3.5 text-sm font-extrabold text-white">
-                      <span className="text-[#E5B453]">親享解算總金額 Total</span>
-                      <span className="font-mono text-xl text-[#E5B453]">NT$ {selectedOrder.total.toLocaleString()}</span>
+                  </div>
+
+                  {/* Billing complete banner */}
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center space-y-1">
+                    <p className="text-emerald-400 font-extrabold text-xs">💸 此訂單已完成結帳</p>
+                    <p className="text-[9.5px] text-zinc-500 font-sans">
+                      本筆資金已被安全收付，且對應流水交易紀錄已在 Firebase 成功建檔。如因餐點規格異動已自動登錄對沖帳目。
+                    </p>
+                  </div>
+
+                  {/* Print simulator option */}
+                  <div className="bg-black/30 border border-white/5 rounded-xl p-4 space-y-3 text-xs">
+                    <span className="text-[10px] font-black tracking-widest text-[#E5B453] uppercase block">店鋪出餐熱感存票模擬</span>
+                    <p className="text-[10px] text-white/40">可將顧客結賬明細或廚房交代工作票重寄發送列印隊列備用明細單：</p>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => alert(`🖨️ 模擬重行印列【防爆/防油熱感廚房交代票】成功！`)}
+                        className="flex-1 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-[10.5px] border border-white/10 font-bold active:scale-95 transition cursor-pointer"
+                      >
+                        🧾 再印工作廚房票
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => alert(`🖨️ 模擬重行印列【顧客結賬發票與消點收據】成功！`)}
+                        className="flex-1 py-1.5 bg-[#E5B453]/15 hover:bg-[#E5B453]/25 text-[#E5B453] rounded-lg text-[10.5px] border border-[#E5B453]/25 font-bold active:scale-95 transition cursor-pointer"
+                      >
+                        💵 再印顧客結算收據
+                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Footer */}
@@ -5984,14 +6327,146 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
         </div>
       )}
 
+      {/* PAID ORDER MODIFICATION APPROVAL MODAL (退貨與追加安全簽核對話框) */}
+      {paidModDetails && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[60] flex items-center justify-center p-4" id="paid-order-mod-modal">
+          <div className="bg-[#18181b] border border-[#E5B453]/40 rounded-2xl w-full max-w-md p-6 space-y-5 text-left shadow-2xl">
+            {/* Title block */}
+            <div className="space-y-1">
+              <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wider block w-fit">
+                🛡️ SECURE BILLING RECONCILIATION GATEWAY
+              </span>
+              <h3 className="text-sm font-black text-white flex items-center gap-1.5 pt-1">
+                已結帳實收帳目 ➔ 安全退改換貨稽核簽核
+              </h3>
+              <p className="text-[10.5px] text-zinc-400 leading-relaxed">
+                本對單已完成付款。任何品項退計或追加加點將影響總流水帳。請在此登記核銷並輸入授權碼安全記帳。
+              </p>
+            </div>
+
+            {/* Change Detail Card */}
+            <div className="bg-black/40 border border-white/5 p-4 rounded-xl space-y-2">
+              <span className="text-[10px] text-[#E5B453] block uppercase tracking-wider font-extrabold font-mono">標的異動明細 (Target change)</span>
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-white text-sm">
+                  {paidModDetails.isAddingNew ? '追加餐點: ' : ''}
+                  {typeof paidModDetails.item?.name === 'object'
+                    ? (paidModDetails.item.name.zh || paidModDetails.item.name.en || '')
+                    : (paidModDetails.item?.name || '')}
+                </span>
+                <span className="font-mono bg-white/5 border border-white/15 px-2 py-0.5 rounded text-white font-bold text-[10px]">
+                  單價 NT$ {paidModDetails.item?.price}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs pt-1 border-t border-white/5">
+                <span className="text-zinc-400">異動內容：</span>
+                <span className="font-bold text-[#E5B453]">
+                  {paidModDetails.isAddingNew 
+                    ? `全新追加 +1 份` 
+                    : (paidModDetails.delta < 0 ? `減少單項餐點數量 -1 份 (退貨)` : `增加單項餐點數量 +1 份 (追加)`)}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs pt-1">
+                <span className="text-zinc-400">預估本筆變更差額：</span>
+                <span className={`font-mono font-black text-sm ${paidModDetails.delta < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                  {paidModDetails.delta < 0 ? '-' : '+'}NT$ {paidModDetails.item?.price}
+                </span>
+              </div>
+            </div>
+
+            {/* Input Reason and notes */}
+            <div className="space-y-3.5 text-xs">
+              <div className="space-y-1">
+                <label className="text-zinc-400 block font-bold">選擇已結帳退減變更之「防弊原因分類」：</label>
+                <select
+                  value={modReason}
+                  onChange={(e) => setModReason(e.target.value)}
+                  className="w-full bg-[#202020] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#E5B453]/60 cursor-pointer"
+                >
+                  <option value="kitchen_prep_error">🍳 廚房製餐瑕疵 / 出餐食安退餐</option>
+                  <option value="wrong_delivery">🚶‍♂️ 員工送錯桌席 / 漏做重出變更</option>
+                  <option value="customer_cancel">⏳ 餐期延誤過長 / 顧客臨時取消</option>
+                  <option value="input_error">收銀點錯帳目更正 / 單據錯誤補救</option>
+                  <option value="sold_out">🚫 食材中途告罄 / 沽清被迫退餐</option>
+                  <option value="vip_promo">🎁 現場 VIP 招待 / 自主促銷補償</option>
+                  <option value="customer_addon">➕ 顧客追加點餐 / 現正加碼單量</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-zinc-400 block font-bold">稽核備註/詳情文字描述 (Optional)：</label>
+                <input
+                  type="text"
+                  placeholder="請輸入詳情（例如：客席反應烤玉米過焦、漏給醬汁、顧客要求追加等）"
+                  value={modNotes}
+                  onChange={(e) => setModNotes(e.target.value)}
+                  className="w-full bg-[#202020] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#E5B453]/60"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[#E5B453] block font-black flex items-center justify-between">
+                  <span>🔒 輸入經理人/員工安全簽核 PIN 碼：</span>
+                </label>
+                <input
+                  type="password"
+                  maxLength={10}
+                  placeholder="請輸入員工授權 PIN 密碼"
+                  value={modPin}
+                  onChange={(e) => setModPin(e.target.value)}
+                  className="w-full bg-black/60 border border-yellow-500/30 rounded-lg px-4 py-2 text-center text-sm tracking-widest text-[#E5B453] font-mono focus:outline-none focus:border-[#E5B453] focus:ring-1 focus:ring-[#E5B453]"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex space-x-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setPaidModDetails(null);
+                  setModReason('input_error');
+                  setModNotes('');
+                  setModPin('');
+                }}
+                className="flex-1 py-2 border border-white/10 rounded-xl hover:bg-white/5 text-zinc-300 font-bold transition text-xs cursor-pointer text-center"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={handleSavePaidModification}
+                className="flex-1 py-2 bg-[#E5B453] hover:bg-[#e4cd91] text-black font-extrabold rounded-xl transition text-xs cursor-pointer text-center shadow-lg shadow-[#E5B453]/10"
+              >
+                📝 核准並對沖登錄流水賬
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* DISH CREATION/EDITING MODAL FORM */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 text-xs font-sans" onClick={() => setIsFormOpen(false)}>
-          <form onSubmit={handleSaveItemSubmit} className="bg-[#121212] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden space-y-4 p-5" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-bold text-sm text-amber-400 border-b border-white/5 pb-2">
-              {editingItem ? `✏️ 編輯餐點品項 Spec: ${editingItem.id}` : '➕ 新增菜單美食單品 Add Dish'}
-            </h3>
-            <div className="space-y-3.5 text-left text-xs">
+          <form onSubmit={handleSaveItemSubmit} className="bg-[#121212] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="p-5 pb-3 border-b border-white/5 flex-shrink-0">
+              <h3 className="font-bold text-sm text-amber-400">
+                {editingItem ? `✏️ 編輯餐點品項 Spec: ${editingItem.id}` : '➕ 新增菜單美食單品 Add Dish'}
+              </h3>
+            </div>
+            
+            {/* Modal Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {itemImage && (
+                <div className="w-full h-32 rounded-xl overflow-hidden relative border border-white/10 [content-visibility:auto]">
+                  <img src={itemImage} alt="dish mockup preview" className="w-full h-full object-cover bg-neutral-950" referrerPolicy="no-referrer" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-2.5">
+                    <span className="text-[10px] text-zinc-300 font-bold font-sans">🖼️ 菜品圖片預覽 Dish Photo Preview</span>
+                  </div>
+                </div>
+              )}
+              <div className="space-y-3.5 text-left text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-zinc-400">正體中文標題 Name Zh</label>
@@ -6139,8 +6614,10 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
                 </div>
               </div>
             </div>
-            <div className="flex justify-end space-x-2 pt-3 border-t border-white/5">
-              <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 hover:bg-white/5 border border-white/10 rounded-lg font-bold transition active:scale-95 cursor-pointer">取消</button>
+            </div>
+            {/* Modal Fixed Footer */}
+            <div className="flex justify-end space-x-2 p-5 border-t border-white/5 bg-zinc-900/40 flex-shrink-0">
+              <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 hover:bg-white/5 border border-white/10 rounded-lg font-bold transition active:scale-95 cursor-pointer text-white">取消</button>
               <button type="submit" className="px-5 py-2 bg-[#E5B453] hover:bg-amber-400 text-slate-900 font-extrabold rounded-lg active:scale-95 transition cursor-pointer shadow-md">儲存餐點</button>
             </div>
           </form>
@@ -6150,12 +6627,18 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
       {/* CATEGORY ADDITION/EDITING MODAL FORM */}
       {isCatFormOpen && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 text-xs font-sans" onClick={() => setIsCatFormOpen(false)}>
-          <form onSubmit={handleSaveCatSubmit} className="bg-[#121212] border border-white/10 rounded-2xl w-full max-w-md p-5 space-y-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-bold text-sm text-amber-400 border-b border-white/5 pb-2">
-              {editingCategory ? `✏️ 編輯分類：${editingCategory.id}` : '➕ 新增菜單分類標籤 Create Category'}
-            </h3>
-            {catError && <div className="p-2.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded font-bold">{catError}</div>}
-            <div className="space-y-3 text-left">
+          <form onSubmit={handleSaveCatSubmit} className="bg-[#121212] border border-white/10 rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="p-5 pb-3 border-b border-white/5 flex-shrink-0">
+              <h3 className="font-bold text-sm text-amber-400">
+                {editingCategory ? `✏️ 編輯分類：${editingCategory.id}` : '➕ 新增菜單分類標籤 Create Category'}
+              </h3>
+            </div>
+            
+            {/* Modal Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {catError && <div className="p-2.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded font-bold">{catError}</div>}
+              <div className="space-y-3 text-left">
               <div className="space-y-1">
                 <label className="text-zinc-400">分類標記 ID 碼 (英文小寫，如 tomyum，儲存後不得修改)</label>
                 <input type="text" required disabled={!!editingCategory} value={catId} onChange={(e) => setCatId(e.target.value)} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white font-mono disabled:opacity-40" />
@@ -6195,8 +6678,10 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
                 </div>
               </div>
             </div>
-            <div className="flex justify-end space-x-2 pt-3 border-t border-white/5 text-xs">
-              <button type="button" onClick={() => setIsCatFormOpen(false)} className="px-4 py-1.5 hover:bg-white/5 border border-white/10 rounded font-bold transition active:scale-95 cursor-pointer">取消</button>
+            </div>
+            {/* Modal Fixed Footer */}
+            <div className="flex justify-end space-x-2 p-5 border-t border-white/5 bg-zinc-900/40 flex-shrink-0 text-xs">
+              <button type="button" onClick={() => setIsCatFormOpen(false)} className="px-4 py-1.5 hover:bg-white/5 border border-white/10 rounded font-bold transition active:scale-95 cursor-pointer text-white">取消</button>
               <button type="submit" className="px-4 py-1.5 bg-[#E5B453] hover:bg-amber-400 text-slate-900 font-extrabold rounded transition active:scale-95 cursor-pointer shadow-sm">儲存分類</button>
             </div>
           </form>
@@ -6206,13 +6691,19 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
       {/* TABLE SETTING MODAL FORM */}
       {isTableFormOpen && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 text-xs font-sans" onClick={() => setIsTableFormOpen(false)}>
-          <form onSubmit={handleTableSaveSubmit} className="bg-[#121212] border border-white/10 rounded-2xl w-full max-w-sm p-5 space-y-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-bold text-sm text-amber-400 border-b border-white/5 pb-2">
-              {editingTableObj ? `✏️ 編輯客座：第 ${editingTableObj.id} 桌` : '➕ 新增客座與條碼定位 Create Table'}
-            </h3>
-            {tableError && <div className="p-2.5 bg-rose-500/10 text-rose-400 font-bold rounded">{tableError}</div>}
-            {tableSuccess && <div className="p-2.5 bg-emerald-500/10 text-emerald-400 font-bold rounded">{tableSuccess}</div>}
-            <div className="space-y-3.5 text-left">
+          <form onSubmit={handleTableSaveSubmit} className="bg-[#121212] border border-white/10 rounded-2xl w-full max-w-sm max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="p-5 pb-3 border-b border-white/5 flex-shrink-0">
+              <h3 className="font-bold text-sm text-amber-400">
+                {editingTableObj ? `✏️ 編輯客座：第 ${editingTableObj.id} 桌` : '➕ 新增客座與條碼定位 Create Table'}
+              </h3>
+            </div>
+            
+            {/* Modal Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {tableError && <div className="p-2.5 bg-rose-500/10 text-rose-400 font-bold rounded">{tableError}</div>}
+              {tableSuccess && <div className="p-2.5 bg-emerald-500/10 text-emerald-400 font-bold rounded">{tableSuccess}</div>}
+              <div className="space-y-3.5 text-left">
               <div className="space-y-1">
                 <span className="text-zinc-500 block">桌鍵號碼 Table ID (限阿拉伯數字，保存後不改)</span>
                 <input type="text" inputMode="numeric" pattern="[0-9]*" required disabled={!!editingTableObj} value={tableIdInput} onChange={(e) => setTableIdInput(e.target.value.replace(/\D/g, ''))} className="w-full bg-[#1e1e1e] border border-white/10 rounded px-2.5 py-1.5 text-white font-mono font-bold" />
@@ -6234,8 +6725,10 @@ ${ingredientLines || '  (尚無庫存異動記錄)'}
                 </div>
               </div>
             </div>
-            <div className="flex justify-end space-x-2 pt-3 border-t border-white/5 text-xs">
-              <button type="button" onClick={() => setIsTableFormOpen(false)} className="px-4 py-1.5 hover:bg-white/5 border border-white/10 rounded transition cursor-pointer">取消</button>
+            </div>
+            {/* Modal Fixed Footer */}
+            <div className="flex justify-end space-x-2 p-5 border-t border-white/5 bg-zinc-900/40 flex-shrink-0 text-xs">
+              <button type="button" onClick={() => setIsTableFormOpen(false)} className="px-4 py-1.5 hover:bg-white/5 border border-white/10 rounded transition cursor-pointer text-white">取消</button>
               <button type="submit" className="px-4 py-1.5 bg-[#E5B453] hover:bg-amber-400 text-slate-900 font-extrabold rounded transition cursor-pointer shadow-md">儲存桌次</button>
             </div>
           </form>
